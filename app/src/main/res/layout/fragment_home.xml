@@ -34,19 +34,18 @@
 
     </com.google.android.material.card.MaterialCardView>
 
-    <ImageView
-        android:id="@+id/graph_balance"
-        android:layout_width="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/card_balance"
-        android:layout_height="600px"
-        android:layout_margin="16dp"
-        android:src="@drawable/chart_sample"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="134dp" />
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/chart_balance"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/card_balance"
+        android:layout_centerHorizontal="true"
+        android_layout_height="500px"
+        android:layout_margin="50px"/>
 
     <LinearLayout
         android:id="@+id/cards_overview"
-        app:layout_constraintTop_toBottomOf="@id/graph_balance"
+        app:layout_constraintTop_toBottomOf="@id/chart_balance"
         android:layout_width="match_parent"
         android:layout_height="200px"
         android:orientation="horizontal">
@@ -132,14 +131,13 @@
 
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/graph_stack"
-        android:layout_width="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/cards_overview"
-        android:layout_height="600px"
-        android:layout_margin="16dp"
-        android:src="@drawable/chart_sample"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="134dp" />
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/chart_stock"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/cards_overview"
+        android:layout_centerHorizontal="true"
+        android_layout_height="500px"
+        android:layout_margin="50px"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
