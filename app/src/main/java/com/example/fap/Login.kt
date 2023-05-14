@@ -101,7 +101,7 @@ class Login : AppCompatActivity() {
         btnBack.setOnClickListener {
             val current = textLogin.text?.toString()
             if (!current.isNullOrEmpty()) {
-                textLogin.setText(current?.substring(0, current.length - 1))
+                textLogin.setText(current.substring(0, current.length - 1))
             }
         }
 
