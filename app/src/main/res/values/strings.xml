@@ -16,4 +16,9 @@
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="menu_logout">Logout</string>
+    <string name="password_hint">Password</string>
+    <string name="register_pin">Input a Pin to secure your data</string>
+    <string name="retry_register_pin">Wrong PIN\nInput a Pin to secure your data</string>
+    <string name="wrong_pin">Wrong PIN</string>
+    <string name="confirm_pin">Confirm PIN</string>
 </resources>

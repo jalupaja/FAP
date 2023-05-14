@@ -4,9 +4,12 @@ import androidx.appcompat.app.AppCompatActivity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.util.TypedValue
+import android.view.MenuItem
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.ImageButton
+import android.widget.TextView
 import com.example.fap.databinding.ActivityLoginBinding
 import com.google.android.material.textfield.TextInputEditText
 
@@ -14,9 +17,19 @@ import com.google.android.material.textfield.TextInputEditText
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
+
 class Login : AppCompatActivity() {
 
+    enum class REGISTER_STATE {
+        REGISTERED,
+        REGISTERING,
+        CONFIRMING
+    }
+
+    private var registerStatus: REGISTER_STATE = REGISTER_STATE.REGISTERED
+    private var tmpPass: String = ""
     private lateinit var binding: ActivityLoginBinding
+    private lateinit var lblLoginStatus: TextView
     private lateinit var textLogin: TextInputEditText
     private lateinit var btn1: Button
     private lateinit var btn2: Button
@@ -39,6 +52,7 @@ class Login : AppCompatActivity() {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        lblLoginStatus = binding.lblLoginStatus
         textLogin = binding.passwordInput
         btnLogin = binding.btnLoginAccept
         btn1 = binding.btnLogin1
@@ -91,11 +105,9 @@ class Login : AppCompatActivity() {
             }
         }
 
-        // TODO single line login text
-
         textLogin.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_UNSPECIFIED) { /* Arrow on mobile || Enter on Desktop */
-                checkPassword()
+                tryLogin()
                 true
             } else {
                 false
@@ -103,28 +115,95 @@ class Login : AppCompatActivity() {
         }
 
         btnLogin.setOnClickListener {
-            checkPassword()
+            tryLogin()
         }
-
 
         textLogin.setText("")
+
+       if (! checkRegistered()) {
+           registerStatus = REGISTER_STATE.REGISTERING
+           lblLoginStatus.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20F)
+           lblLoginStatus.text = getString(R.string.register_pin)
+
+       }
     }
 
-    private fun checkPassword() {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Fix Back Button in Toolbar
+        if (item.itemId == android.R.id.home) {
+            onBackPressed()
+            return true
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onBackPressed() {
+        // Implement Back Button
+        when (registerStatus) {
+            REGISTER_STATE.CONFIRMING -> {
+                textLogin.text!!.clear()
+                registerStatus = REGISTER_STATE.REGISTERING
+                lblLoginStatus.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20F)
+                lblLoginStatus.text = getString(R.string.register_pin)
+            }
+            else -> {
+                finish()
+            }
+        }
+    }
+
+    private fun checkRegistered(): Boolean {
+        return true // TODO check if database file exists?
+    }
+
+    private fun tryLogin() {
         Log.d("Login", "Password: " + textLogin.text!!)
 
-        if (textLogin.text!!.toString() == "000") {  // TODO implement password logic
-            val intent = Intent(this, MainActivity::class.java)
-            /* use following code, if back button returns to login */
-            //val stackBuilder = TaskStackBuilder.create(this)
-            //stackBuilder.addNextIntentWithParentStack(intent)
-            //stackBuilder.startActivities()
-            startActivity(intent)
-            finishAffinity()
-            textLogin.text!!.clear()
-        } else {
-            textLogin.text!!.clear()
-            // TODO add error label
+        // Disallow 0 length Passwords
+        if (textLogin.text.isNullOrEmpty()) {
+            return
         }
+
+        when (registerStatus) {
+            REGISTER_STATE.REGISTERED -> {
+                Log.d("Login", "REGISTERED")
+                if (textLogin.text!!.toString() == "000") {  // TODO check if passwords matches database?
+                    // TODO send Database to MainActivity
+                    val intent = Intent(this, MainActivity::class.java)
+                    startActivity(intent)
+                    finishAffinity()
+                    lblLoginStatus.text = ""
+                } else {
+                    lblLoginStatus.text = getString(R.string.wrong_pin)
+                }
+            }
+            REGISTER_STATE.REGISTERING -> {
+                Log.d("Login", "REGISTERING")
+                tmpPass = textLogin.text!!.toString()
+                lblLoginStatus.text = getString(R.string.confirm_pin)
+                registerStatus = REGISTER_STATE.CONFIRMING
+            }
+            REGISTER_STATE.CONFIRMING -> {
+                Log.d("Login", "CONFIRMING")
+                if (textLogin.text!!.toString() == tmpPass) {
+                    Log.d("Login", "true")
+                    // TODO create Database with Password?
+                    // TODO send Database to MainActivity
+                    val intent = Intent(this, MainActivity::class.java)
+                    startActivity(intent)
+                    finishAffinity()
+                    lblLoginStatus.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14F)
+                    lblLoginStatus.text = ""
+                    registerStatus = REGISTER_STATE.REGISTERED
+                } else {
+                    lblLoginStatus.text = getString(R.string.retry_register_pin)
+                    registerStatus = REGISTER_STATE.REGISTERING
+                }
+            }
+            else -> {
+                Log.d("Login", "ERROR")
+            }
+        }
+        textLogin.text!!.clear()
     }
 }
