@@ -123,8 +123,7 @@ class Login : AppCompatActivity() {
        if (! checkRegistered()) {
            registerStatus = REGISTER_STATE.REGISTERING
            lblLoginStatus.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20F)
-           lblLoginStatus.text = getString(R.string.register_pin)
-
+           lblLoginStatus.text = getString(R.string.register_password)
        }
     }
 
@@ -144,7 +143,7 @@ class Login : AppCompatActivity() {
                 textLogin.text!!.clear()
                 registerStatus = REGISTER_STATE.REGISTERING
                 lblLoginStatus.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20F)
-                lblLoginStatus.text = getString(R.string.register_pin)
+                lblLoginStatus.text = getString(R.string.register_password)
             }
             else -> {
                 finish()
@@ -174,19 +173,16 @@ class Login : AppCompatActivity() {
                     finishAffinity()
                     lblLoginStatus.text = ""
                 } else {
-                    lblLoginStatus.text = getString(R.string.wrong_pin)
+                    lblLoginStatus.text = getString(R.string.wrong_password)
                 }
             }
             REGISTER_STATE.REGISTERING -> {
-                Log.d("Login", "REGISTERING")
                 tmpPass = textLogin.text!!.toString()
-                lblLoginStatus.text = getString(R.string.confirm_pin)
+                lblLoginStatus.text = getString(R.string.confirm_password)
                 registerStatus = REGISTER_STATE.CONFIRMING
             }
             REGISTER_STATE.CONFIRMING -> {
-                Log.d("Login", "CONFIRMING")
                 if (textLogin.text!!.toString() == tmpPass) {
-                    Log.d("Login", "true")
                     // TODO create Database with Password?
                     // TODO send Database to MainActivity
                     val intent = Intent(this, MainActivity::class.java)
@@ -196,12 +192,9 @@ class Login : AppCompatActivity() {
                     lblLoginStatus.text = ""
                     registerStatus = REGISTER_STATE.REGISTERED
                 } else {
-                    lblLoginStatus.text = getString(R.string.retry_register_pin)
+                    lblLoginStatus.text = getString(R.string.retry_register_password)
                     registerStatus = REGISTER_STATE.REGISTERING
                 }
-            }
-            else -> {
-                Log.d("Login", "ERROR")
             }
         }
         textLogin.text!!.clear()
