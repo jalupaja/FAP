@@ -156,7 +156,6 @@ class Login : AppCompatActivity() {
     }
 
     private fun tryLogin() {
-        Log.d("Login", "Password: " + textLogin.text!!)
 
         // Disallow 0 length Passwords
         if (textLogin.text.isNullOrEmpty()) {
@@ -165,7 +164,6 @@ class Login : AppCompatActivity() {
 
         when (registerStatus) {
             REGISTER_STATE.REGISTERED -> {
-                Log.d("Login", "REGISTERED")
                 if (textLogin.text!!.toString() == "000") {  // TODO check if passwords matches database?
                     // TODO send Database to MainActivity
                     val intent = Intent(this, MainActivity::class.java)
