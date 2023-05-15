@@ -16,17 +16,17 @@ import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import android.R.color
 import android.graphics.Color
+import com.github.mikephil.charting.animation.Easing
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
 
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
-
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
-
-    //TODO: fix runtime Error
-    //private val chartBalance: PieChart = AppCompatActivity().findViewById(R.id.chart_balance)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,38 +34,78 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
 
+        _binding = FragmentHomeBinding.inflate(inflater, container, false)
+
+        val view = binding.root
+
         val homeViewModel =
             ViewModelProvider(this).get(HomeViewModel::class.java)
 
-        _binding = FragmentHomeBinding.inflate(inflater, container, false)
-        val root: View = binding.root
-
+        val chartBalance = binding.chartBalance
+        val chartStock = binding.chartStock
 
         //Balance Chart
-        /*
-        chartBalance.setDrawHoleEnabled(true)
-        chartBalance.setHoleColor(Color.WHITE)
+        chartBalance.setExtraOffsets(5f, 10f, 5f, 5f)
         chartBalance.setTransparentCircleColor(Color.WHITE)
         chartBalance.setTransparentCircleAlpha(110)
-        chartBalance.setHoleRadius(58f)
-        chartBalance.setTransparentCircleRadius(61f)
-        val entries = listOf(
+        chartBalance.holeRadius = 58f
+        chartBalance.transparentCircleRadius = 61f
+        chartBalance.legend.isEnabled = false
+        chartBalance.setEntryLabelColor(Color.WHITE)
+        chartBalance.setEntryLabelTextSize(12f)
+        val entriesBalance = listOf(
             PieEntry(30f, "Einnahmen"),
             PieEntry(50f, "Saldo"),
             PieEntry(20f, "Ausgaben")
         )
-        val dataSet = PieDataSet(entries, "TODO")
+        val dataSet = PieDataSet(entriesBalance, "Finanzen")
+        dataSet.setDrawIcons(false)
+        dataSet.sliceSpace = 3f
+        dataSet.selectionShift = 5f
         dataSet.colors = listOf(
-            color.darker_gray,
-            color.holo_green_light,
-            color.holo_red_light
+            resources.getColor(R.color.green),
+            resources.getColor(R.color.red),
+            resources.getColor(R.color.purple_700)
         )
         val cbData = PieData(dataSet)
         chartBalance.data = cbData
+        chartBalance.highlightValues(null)
         chartBalance.invalidate()
-        */
 
-        return root
+        //Chart Stock
+        val entriesStock = listOf(
+            Entry(1f, 10f),
+            Entry(2f, 2f),
+            Entry(3f, 7f),
+            Entry(4f, 20f),
+        )
+
+        val vl = LineDataSet(entriesStock, "Test1")
+        vl.setDrawValues(false)
+        vl.setDrawFilled(false)
+        vl.lineWidth = 2f
+
+        val entriesStock2 = listOf(
+            Entry(1f, 30f),
+            Entry(2f, 4f),
+            Entry(3f, 100f),
+            Entry(4f, 2f),
+        )
+
+        val vl2 = LineDataSet(entriesStock2, "Test2")
+        vl.setDrawValues(false)
+        vl.setDrawFilled(false)
+        vl.lineWidth = 2f
+
+        chartStock.data = LineData(vl, vl2)
+        chartStock.axisRight.isEnabled
+        chartStock.setTouchEnabled(true)
+        chartStock.setPinchZoom(true)
+        chartStock.description.text = "Stock"
+        chartStock.animateX(1800, Easing.EaseInExpo)
+        chartStock.invalidate()
+
+        return view
     }
 
     override fun onDestroyView() {
