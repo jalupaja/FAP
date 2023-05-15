@@ -70,6 +70,7 @@ class HomeFragment : Fragment() {
         val cbData = PieData(dataSet)
         chartBalance.data = cbData
         chartBalance.highlightValues(null)
+        chartBalance.description.text = ""
         chartBalance.invalidate()
 
         //Chart Stock
@@ -93,9 +94,8 @@ class HomeFragment : Fragment() {
         )
 
         val vl2 = LineDataSet(entriesStock2, "Test2")
-        vl.setDrawValues(false)
-        vl.setDrawFilled(false)
-        vl.lineWidth = 2f
+        vl2.color = R.color.red
+        vl2.lineWidth = 2f
 
         chartStock.data = LineData(vl, vl2)
         chartStock.axisRight.isEnabled
