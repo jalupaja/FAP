@@ -1,15 +1,14 @@
 package com.example.fap
 
-import androidx.appcompat.app.AppCompatActivity
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.util.TypedValue
 import android.view.MenuItem
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import com.example.fap.databinding.ActivityLoginBinding
 import com.google.android.material.textfield.TextInputEditText
 
