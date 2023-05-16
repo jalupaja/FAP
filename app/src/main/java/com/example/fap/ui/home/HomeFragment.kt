@@ -4,19 +4,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.fap.R
 import com.example.fap.databinding.FragmentHomeBinding
-import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
-import android.R.color
-import android.graphics.Color
 import com.github.mikephil.charting.animation.Easing
+import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
@@ -44,46 +40,44 @@ class HomeFragment : Fragment() {
         val chartBalance = binding.chartBalance
         val chartStock = binding.chartStock
 
-        //Balance Chart
-        chartBalance.setExtraOffsets(5f, 10f, 5f, 5f)
-        chartBalance.setTransparentCircleColor(Color.WHITE)
-        chartBalance.setTransparentCircleAlpha(110)
-        chartBalance.holeRadius = 58f
-        chartBalance.transparentCircleRadius = 61f
+    //Balance Chart
+        chartBalance.setExtraOffsets(5f, 5f, 5f, 5f)
+        chartBalance.setDrawEntryLabels(false)
+        chartBalance.holeRadius = 70f
+        chartBalance.transparentCircleRadius = 72.5f
         chartBalance.legend.isEnabled = false
-        chartBalance.setEntryLabelColor(Color.WHITE)
-        chartBalance.setEntryLabelTextSize(12f)
+
+        var einnahmen = 30f
+        var ausgaben = 20f
+        var saldo = (einnahmen - ausgaben)
         val entriesBalance = listOf(
-            PieEntry(30f, "Einnahmen"),
-            PieEntry(50f, "Saldo"),
-            PieEntry(20f, "Ausgaben")
+            PieEntry(einnahmen, "Einnahmen"),
+            PieEntry(ausgaben, "Ausgaben"),
+            PieEntry(saldo, "Saldo")
         )
         val dataSet = PieDataSet(entriesBalance, "Finanzen")
-        dataSet.setDrawIcons(false)
+        chartBalance.centerText = "Einnahmen: $einnahmen € \nAusgaben: $ausgaben €\n _______________________ \nSaldo: $saldo €"
+
         dataSet.sliceSpace = 3f
         dataSet.selectionShift = 5f
         dataSet.colors = listOf(
             resources.getColor(R.color.green),
             resources.getColor(R.color.red),
-            resources.getColor(R.color.purple_700)
+            resources.getColor(androidx.transition.R.color.material_blue_grey_800)
         )
-        val cbData = PieData(dataSet)
-        chartBalance.data = cbData
-        chartBalance.highlightValues(null)
+        chartBalance.data = PieData(dataSet)
         chartBalance.description.text = ""
         chartBalance.invalidate()
+        chartBalance.notifyDataSetChanged()
 
-        //Chart Stock
+    //Chart Stock
         val entriesStock = listOf(
             Entry(1f, 10f),
             Entry(2f, 2f),
             Entry(3f, 7f),
             Entry(4f, 20f),
         )
-
         val vl = LineDataSet(entriesStock, "Test1")
-        vl.setDrawValues(false)
-        vl.setDrawFilled(false)
         vl.lineWidth = 2f
 
         val entriesStock2 = listOf(
@@ -92,18 +86,22 @@ class HomeFragment : Fragment() {
             Entry(3f, 100f),
             Entry(4f, 2f),
         )
-
         val vl2 = LineDataSet(entriesStock2, "Test2")
         vl2.color = R.color.red
         vl2.lineWidth = 2f
 
         chartStock.data = LineData(vl, vl2)
-        chartStock.axisRight.isEnabled
-        chartStock.setTouchEnabled(true)
+        chartStock.axisRight.isEnabled = false
+        chartStock.setTouchEnabled(false)
         chartStock.setPinchZoom(true)
         chartStock.description.text = "Stock"
-        chartStock.animateX(1800, Easing.EaseInExpo)
+        chartStock.animateX(1000, Easing.EaseInExpo)
+
+        chartStock.xAxis.position = XAxis.XAxisPosition.BOTTOM
+        chartStock.xAxis.setDrawGridLines(false)
+
         chartStock.invalidate()
+        chartStock.notifyDataSetChanged()
 
         return view
     }
