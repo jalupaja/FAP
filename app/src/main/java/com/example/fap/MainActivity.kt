@@ -3,6 +3,7 @@ package com.example.fap
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuItem
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.navigation.NavigationView
 import androidx.navigation.findNavController
@@ -48,12 +49,7 @@ class MainActivity : AppCompatActivity() {
         navView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.nav_logout -> {
-                    val intent = Intent(this, Login::class.java)
-                    /* use following code, if back button returns to login */
-                    //val stackBuilder = TaskStackBuilder.create(this)
-                    //stackBuilder.addNextIntentWithParentStack(intent)
-                    //stackBuilder.startActivities()
-                    startActivity(intent)
+                    startActivity(Intent(this, Login::class.java))
                     finishAffinity()
                     true
                  }
@@ -71,6 +67,20 @@ class MainActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.main, menu)
         return true
     }
+
+        override fun onOptionsItemSelected(item: MenuItem): Boolean {
+                val navController = findNavController(R.id.nav_host_fragment_content_main)
+                when (item.itemId) {
+                        R.id.action_settings -> {
+                                navController.navigate(R.id.nav_settings)
+                                return true
+                            }
+                        else -> {
+                                return super.onOptionsItemSelected(item)
+                            }
+                    }
+            }
+
 
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
