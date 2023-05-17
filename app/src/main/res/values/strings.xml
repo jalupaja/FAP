@@ -7,8 +7,6 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
 
-    <string name="login_input">Login</string>
-
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
@@ -16,9 +14,25 @@
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="menu_logout">Logout</string>
+
+    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="settings">Settings</string>
+    <string name="settings_header_security">Security</string>
+
+    <string name="login_input">Login</string>
     <string name="password_hint">Password</string>
     <string name="register_password">Input a Password to secure your data</string>
     <string name="retry_register_password">Wrong Password\nInput a Password to secure your data</string>
     <string name="wrong_password">Wrong Password</string>
     <string name="confirm_password">Confirm Password</string>
+    <string name="biometric_subtitle">Biometric verification</string>
+    <string name="biometric_dont_use">Cancel</string>
+    <string name="activate_biometrics">Input your password to activate biometrics</string>
+    <string name="use_biometrics">use biometrics</string>
+
+    <string name="secret_key_name">FAP_sec_key</string>
+    <string name="shared_prefs">FAP_shared_prefs</string>
+
+    <string name="shared_prefs_biometrics_key">USE_BIOMETRICS</string>
+
 </resources>
