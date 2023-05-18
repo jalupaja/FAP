@@ -1,43 +1,46 @@
 package com.example.fap.ui.settings
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import com.example.fap.Login
-//import com.example.fap.BiometricHandler
 import com.example.fap.R
+import com.example.fap.utils.SharedPreferencesManager
 
 class SettingsFragment : PreferenceFragmentCompat() {
 
+    private lateinit var sharedPreferences: SharedPreferencesManager
+    private lateinit var biometricsEnabledPreference: SwitchPreferenceCompat
+
     override fun onResume() {
         super.onResume()
-        val biometricsEnabledPreference = findPreference<SwitchPreferenceCompat>("biometrics")
-        val sharedPreferences = context?.getSharedPreferences(getString(R.string.shared_prefs), Context.MODE_PRIVATE)
-
-        biometricsEnabledPreference?.isChecked = !sharedPreferences?.getString(getString(R.string.shared_prefs_biometrics_key), "").isNullOrEmpty()
+        updateSettings()
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
+        sharedPreferences = SharedPreferencesManager.getInstance(requireContext())
+        biometricsEnabledPreference = findPreference<SwitchPreferenceCompat>("biometrics")!!
 
-        val biometricsEnabledPreference = findPreference<SwitchPreferenceCompat>("biometrics")
+        updateSettings()
+
+        /* Biometrics */
         biometricsEnabledPreference?.setOnPreferenceChangeListener { _, newValue ->
             if (newValue as Boolean) {
-                /* TODO enable biometrics */
+                /* enable */
                 val intent = Intent(requireContext(), Login::class.java)
                 intent.putExtra("STATE", Login.Companion.REGISTER_STATE.ACTIVATE_BIOMETRICS)
                 startActivity(intent)
-
             } else {
-                val editor = context?.getSharedPreferences(getString(R.string.shared_prefs), Context.MODE_PRIVATE)?.edit()
-                if (editor != null) {
-                    editor.putString(getString(R.string.shared_prefs_biometrics_key), "")
-                }
+                /* disable */
+                sharedPreferences.saveString(getString(R.string.shared_prefs_biometrics_key), "")
             }
             true
         }
+    }
+
+    private fun updateSettings() {
+        biometricsEnabledPreference?.isChecked = ! sharedPreferences.getString(getString(R.string.shared_prefs_biometrics_key), "").isNullOrEmpty()
     }
 }

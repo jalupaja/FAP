@@ -30,9 +30,7 @@
     <string name="activate_biometrics">Input your password to activate biometrics</string>
     <string name="use_biometrics">use biometrics</string>
 
-    <string name="secret_key_name">FAP_sec_key</string>
-    <string name="shared_prefs">FAP_shared_prefs</string>
-
-    <string name="shared_prefs_biometrics_key">USE_BIOMETRICS</string>
+    <string name="shared_prefs_biometrics_key">TEST_FAP_BIO_KEY4</string>
+    <string name="shared_prefs_biometrics_iv">TEST_FAP_BIO_IV</string>
 
 </resources>
