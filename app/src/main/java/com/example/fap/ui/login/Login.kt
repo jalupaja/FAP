@@ -12,6 +12,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.biometric.BiometricPrompt
 import com.example.fap.databinding.ActivityLoginBinding
 import com.example.fap.utils.SharedPreferencesManager
@@ -58,8 +59,7 @@ class Login : AppCompatActivity() {
     // Implement biometry callbacks
     private val biometricAuthenticationCallback = object : BiometricPrompt.AuthenticationCallback() {
             override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-                val encryptedCode =
-                    sharedPreferences.getString(getString(R.string.shared_prefs_biometrics_key), "")
+                val encryptedCode = sharedPreferences.getString(getString(R.string.shared_prefs_biometrics_key))
 
                 if (encryptedCode.isNullOrEmpty()) {
                     // Encrypt
@@ -103,6 +103,12 @@ class Login : AppCompatActivity() {
 
         sharedPreferences = SharedPreferencesManager.getInstance(applicationContext)
         sharedSecurity = SharedSecurityManager.getInstance(applicationContext)
+
+        val currentTheme = sharedPreferences.getInt(getString(R.string.shared_prefs_theme))
+        if (AppCompatDelegate.getDefaultNightMode() != currentTheme) {
+            AppCompatDelegate.setDefaultNightMode(currentTheme)
+            recreate()
+        }
 
         registerState = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent?.getSerializableExtra("STATE", REGISTER_STATE::class.java)
@@ -195,7 +201,7 @@ class Login : AppCompatActivity() {
         }
 
 
-        if (sharedPreferences.getString(getString(R.string.shared_prefs_biometrics_key), "") .isNullOrEmpty() ) {
+        if (sharedPreferences.getString(getString(R.string.shared_prefs_biometrics_key)) .isNullOrEmpty() ) {
             binding.useBiometrics.visibility = View.INVISIBLE
         } else {
             authenticateWithBiometrics()

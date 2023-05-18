@@ -12,8 +12,18 @@ class SharedPreferencesManager(context: Context) {
         editor.apply()
     }
 
-    fun getString(key: String, defaultValue: String): String {
+    fun getString(key: String, defaultValue: String=""): String {
         return sharedPreferences.getString(key, defaultValue) ?: defaultValue
+    }
+
+    fun saveInt(key: String, value: Int) {
+        val editor = sharedPreferences.edit()
+        editor.putInt(key, value)
+        editor.apply()
+    }
+
+    fun getInt(key: String, defaultValue: Int=0): Int {
+        return sharedPreferences.getInt(key, defaultValue) ?: defaultValue
     }
 
     companion object {
