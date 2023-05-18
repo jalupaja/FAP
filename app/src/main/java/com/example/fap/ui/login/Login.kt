@@ -53,7 +53,7 @@ class Login : AppCompatActivity() {
     private lateinit var btnLogin: ImageButton
 
     private lateinit var sharedPreferences: SharedPreferencesManager
-    private lateinit var sharedSecurityManager: SharedSecurityManager
+    private lateinit var sharedSecurity: SharedSecurityManager
 
     // Implement biometry callbacks
     private val biometricAuthenticationCallback = object : BiometricPrompt.AuthenticationCallback() {
@@ -63,18 +63,18 @@ class Login : AppCompatActivity() {
 
                 if (encryptedCode.isNullOrEmpty()) {
                     // Encrypt
-                    if (!sharedSecurityManager.startEncryption(tmpPass)) {
-                        sharedSecurityManager.showBiometricError(findViewById(android.R.id.content), "Biometric failed")
+                    if (!sharedSecurity.startEncryption(tmpPass)) {
+                        sharedSecurity.showBiometricError(findViewById(android.R.id.content), "Biometric failed")
                     } else {
                         backButtonCallback.handleOnBackPressed()
                     }
                 } else {
                     // Decrypt
-                    val plaintext = sharedSecurityManager.startDecryption(encryptedCode)
+                    val plaintext = sharedSecurity.startDecryption(encryptedCode)
                     if (checkPassword(plaintext)) {
                         login(plaintext)
                     } else {
-                        sharedSecurityManager.showBiometricError(findViewById(android.R.id.content), "There was a problem logging in. Please redo the biometry")
+                        sharedSecurity.showBiometricError(findViewById(android.R.id.content), "There was a problem logging in. Please redo the biometry")
                     }
                 }
             }
@@ -102,7 +102,7 @@ class Login : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         sharedPreferences = SharedPreferencesManager.getInstance(applicationContext)
-        sharedSecurityManager = SharedSecurityManager.getInstance(applicationContext)
+        sharedSecurity = SharedSecurityManager.getInstance(applicationContext)
 
         registerState = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent?.getSerializableExtra("STATE", REGISTER_STATE::class.java)
@@ -195,9 +195,7 @@ class Login : AppCompatActivity() {
         }
 
 
-        if (sharedPreferences.getString(getString(R.string.shared_prefs_biometrics_key), "")
-                .isNullOrEmpty()
-        ) {
+        if (sharedPreferences.getString(getString(R.string.shared_prefs_biometrics_key), "") .isNullOrEmpty() ) {
             binding.useBiometrics.visibility = View.INVISIBLE
         } else {
             authenticateWithBiometrics()
@@ -277,7 +275,7 @@ class Login : AppCompatActivity() {
     }
 
     private fun authenticateWithBiometrics() {
-        sharedSecurityManager.authenticateWithBiometrics(this, mainExecutor, biometricAuthenticationCallback)
+        sharedSecurity.authenticateWithBiometrics(this, mainExecutor, biometricAuthenticationCallback)
     }
 
     private fun login(key: String) {

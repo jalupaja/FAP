@@ -13,6 +13,7 @@ import java.security.PublicKey
 import android.content.Context
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import com.example.fap.R
 import java.util.concurrent.Executor
