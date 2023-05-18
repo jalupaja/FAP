@@ -27,10 +27,9 @@
     <string name="confirm_password">Confirm Password</string>
     <string name="biometric_subtitle">Biometric verification</string>
     <string name="biometric_dont_use">Cancel</string>
-    <string name="activate_biometrics">Input your password to activate biometrics</string>
+    <string name="activate_biometrics">Input your password to proceed</string>
     <string name="use_biometrics">use biometrics</string>
 
-    <string name="shared_prefs_biometrics_key">TEST_FAP_BIO_KEY4</string>
-    <string name="shared_prefs_biometrics_iv">TEST_FAP_BIO_IV</string>
+    <string name="shared_prefs_biometrics_key">FAP_BIO_KEY</string>
 
 </resources>
