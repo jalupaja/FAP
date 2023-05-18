@@ -7,7 +7,18 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
 
+    <string name="login_input">Login</string>
+
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
+    <string name="title_activity_login">Login</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="menu_logout">Logout</string>
+    <string name="password_hint">Password</string>
+    <string name="register_password">Input a Password to secure your data</string>
+    <string name="retry_register_password">Wrong Password\nInput a Password to secure your data</string>
+    <string name="wrong_password">Wrong Password</string>
+    <string name="confirm_password">Confirm Password</string>
 </resources>

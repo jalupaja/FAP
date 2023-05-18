@@ -1,5 +1,6 @@
 package com.example.fap
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import com.google.android.material.snackbar.Snackbar
@@ -11,6 +12,8 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat
+import androidx.navigation.NavGraphBuilder
 import com.example.fap.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -37,11 +40,30 @@ class MainActivity : AppCompatActivity() {
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow
+                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow, R.id.nav_logout
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+        navView.setNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.nav_logout -> {
+                    val intent = Intent(this, Login::class.java)
+                    /* use following code, if back button returns to login */
+                    //val stackBuilder = TaskStackBuilder.create(this)
+                    //stackBuilder.addNextIntentWithParentStack(intent)
+                    //stackBuilder.startActivities()
+                    startActivity(intent)
+                    finishAffinity()
+                    true
+                 }
+                else -> {
+                    navController.navigate(menuItem.itemId)
+                    drawerLayout.closeDrawer(GravityCompat.START)
+                    true
+                }
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
