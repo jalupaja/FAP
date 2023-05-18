@@ -183,6 +183,10 @@ class SharedSecurityManager(context: Context) {
         sharedPreferences.saveString(context.getString(R.string.shared_prefs_biometrics_key), str)
     }
 
+    public fun checkBiometric(): Boolean {
+        return BiometricManager.from(context).canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG) == BiometricManager.BIOMETRIC_SUCCESS
+    }
+
     public fun authenticateWithBiometrics(
         parent: AppCompatActivity,
         callback: Executor,

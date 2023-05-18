@@ -7,10 +7,12 @@ import androidx.preference.SwitchPreferenceCompat
 import com.example.fap.Login
 import com.example.fap.R
 import com.example.fap.utils.SharedPreferencesManager
+import com.example.fap.utils.SharedSecurityManager
 
 class SettingsFragment : PreferenceFragmentCompat() {
 
     private lateinit var sharedPreferences: SharedPreferencesManager
+    private lateinit var sharedSecurity: SharedSecurityManager
     private lateinit var biometricsEnabledPreference: SwitchPreferenceCompat
 
     override fun onResume() {
@@ -21,6 +23,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
         sharedPreferences = SharedPreferencesManager.getInstance(requireContext())
+        sharedSecurity = SharedSecurityManager.getInstance(requireContext())
         biometricsEnabledPreference = findPreference<SwitchPreferenceCompat>("biometrics")!!
 
         updateSettings()
@@ -42,5 +45,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     private fun updateSettings() {
         biometricsEnabledPreference?.isChecked = ! sharedPreferences.getString(getString(R.string.shared_prefs_biometrics_key), "").isNullOrEmpty()
+        biometricsEnabledPreference?.isEnabled = sharedSecurity.checkBiometric()
     }
 }
