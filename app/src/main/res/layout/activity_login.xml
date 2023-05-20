@@ -33,13 +33,13 @@
     <GridLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="80dp"
-        android:layout_marginBottom="80dp"
+        android:layout_marginTop="110dp"
+        android:layout_marginBottom="50dp"
         android:columnCount="3"
         android:rowCount="4"
         android:gravity="center"
         app:layout_constraintTop_toBottomOf="@id/password_input"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toBottomOf="@id/use_biometrics">
 
     <Button
         android:id="@+id/btn_login_1"
@@ -181,5 +181,16 @@
         android:background="@android:color/transparent"
         app:tint="@color/black" />
     </GridLayout>
+
+    <Button
+        android:id="@+id/use_biometrics"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/use_biometrics"
+        android:textSize="15sp"
+        android:textColor="@color/black"
+        android:background="@android:color/transparent"
+        android:layout_marginBottom="20sp"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
