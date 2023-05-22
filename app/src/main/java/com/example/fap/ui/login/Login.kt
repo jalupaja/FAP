@@ -1,6 +1,8 @@
 package com.example.fap
 
+import android.content.Context
 import android.content.Intent
+import android.database.sqlite.SQLiteDatabaseCorruptException
 import android.os.Build
 import android.os.Bundle
 import android.util.TypedValue
@@ -14,10 +16,14 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.biometric.BiometricPrompt
+import androidx.lifecycle.lifecycleScope
 import com.example.fap.databinding.ActivityLoginBinding
+import com.example.fap.utils.SharedDatabaseManager
 import com.example.fap.utils.SharedPreferencesManager
 import com.example.fap.utils.SharedSecurityManager
 import com.google.android.material.textfield.TextInputEditText
+import kotlinx.coroutines.launch
+import java.util.UUID
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -71,8 +77,8 @@ class Login : AppCompatActivity() {
                 } else {
                     // Decrypt
                     val plaintext = sharedSecurity.startDecryption(encryptedCode)
-                    if (checkPassword(plaintext)) {
-                        login(plaintext)
+                    if (checkPassword(applicationContext, plaintext)) {
+                        login()
                     } else {
                         sharedSecurity.showBiometricError(findViewById(android.R.id.content), "There was a problem logging in. Please redo the biometry")
                     }
@@ -191,7 +197,7 @@ class Login : AppCompatActivity() {
 
         textLogin.setText("")
 
-        if (!checkRegistered()) {
+        if (!checkRegistered(applicationContext)) {
             registerState = REGISTER_STATE.REGISTERING
             lblLoginStatus.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20F)
             lblLoginStatus.text = getString(R.string.register_password)
@@ -233,8 +239,8 @@ class Login : AppCompatActivity() {
 
         when (registerState) {
             REGISTER_STATE.REGISTERED -> {
-                if (checkPassword(textLogin.text.toString())) {
-                    login(textLogin.text.toString())
+                if (checkPassword(applicationContext, textLogin.text.toString())) {
+                    login()
                 } else {
                     lblLoginStatus.text = getString(R.string.wrong_password)
                 }
@@ -250,8 +256,15 @@ class Login : AppCompatActivity() {
                 if (textLogin.text!!.toString() == tmpPass) {
                     lblLoginStatus.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14F)
                     registerState = REGISTER_STATE.REGISTERED
-                    // TODO create Database with Password?
-                    login(tmpPass)
+
+                    val userId = UUID.randomUUID().toString()
+                    sharedPreferences.saveString(getString(R.string.shared_prefs_cur_user), userId)
+                    // create Database with Password
+                    val sharedDatabase = SharedDatabaseManager.getInstance(applicationContext, textLogin.text!!.toString())
+                    lifecycleScope.launch {
+                        sharedDatabase.setupDefaultValues()
+                    }
+                    login()
                 } else {
                     lblLoginStatus.text = getString(R.string.retry_register_password)
                     registerState = REGISTER_STATE.REGISTERING
@@ -259,7 +272,7 @@ class Login : AppCompatActivity() {
             }
 
             REGISTER_STATE.ACTIVATE_BIOMETRICS -> {
-                if (checkPassword(textLogin.text!!.toString())) {
+                if (checkPassword(applicationContext, textLogin.text!!.toString())) {
                     tmpPass = textLogin.text!!.toString()
                     lblLoginStatus.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14F)
                     lblLoginStatus.text = ""
@@ -272,20 +285,25 @@ class Login : AppCompatActivity() {
         textLogin.text!!.clear()
     }
 
-    private fun checkRegistered(): Boolean {
-        return true // TODO check if database file exists OR use shared prefs
+    private fun checkRegistered(context: Context): Boolean {
+        val ctx = context.applicationContext
+        return ctx.getDatabasePath(ctx.getString(R.string.shared_prefs_database_name)).exists()
     }
 
-    private fun checkPassword(password: String): Boolean {
-        return password == "000" // TODO check if passwords matches database?
+    private fun checkPassword(context: Context, password: String): Boolean {
+        try {
+            SharedDatabaseManager.getInstance(context.applicationContext, password)
+        } catch (e: SQLiteDatabaseCorruptException) {
+            return false
+        }
+        return true
     }
 
     private fun authenticateWithBiometrics() {
         sharedSecurity.authenticateWithBiometrics(this, mainExecutor, biometricAuthenticationCallback)
     }
 
-    private fun login(key: String) {
-        // TODO send Database to MainActivity
+    private fun login() {
         startActivity(Intent(this, MainActivity::class.java))
         finishAffinity()
         lblLoginStatus.text = ""

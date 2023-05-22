@@ -16,6 +16,9 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
+import androidx.lifecycle.lifecycleScope
+import com.example.fap.utils.SharedDatabaseManager
+import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment() {
 
@@ -24,6 +27,8 @@ class HomeFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
+    private lateinit var sharedDatabase: SharedDatabaseManager
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -31,14 +36,21 @@ class HomeFragment : Fragment() {
     ): View {
 
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        sharedDatabase = SharedDatabaseManager.getInstance(requireContext())
 
         val view = binding.root
 
         val homeViewModel =
             ViewModelProvider(this).get(HomeViewModel::class.java)
 
+        val lblTotal = binding.lblTotal
         val chartBalance = binding.chartBalance
         val chartStock = binding.chartStock
+
+        lifecycleScope.launch {
+            //lblTotal.text = sharedDatabase.getTotal().toString()
+        }
+
 
     //Balance Chart
         chartBalance.setExtraOffsets(5f, 5f, 5f, 5f)

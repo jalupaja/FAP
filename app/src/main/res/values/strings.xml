@@ -30,6 +30,8 @@
     <string name="use_biometrics">use biometrics</string>
 
     <string name="shared_prefs_biometrics_key">FAP_BIO_KEY</string>
+    <string name="shared_prefs_database_name">FAP_DATABASE</string>
+    <string name="shared_prefs_cur_user">FAP_CUR_USER</string>
     <string name="shared_prefs_theme">FAP_THEME</string>
 
     <string name="theme_dialog">Change Theme</string>
