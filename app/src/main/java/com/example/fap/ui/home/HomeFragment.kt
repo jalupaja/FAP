@@ -6,7 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.example.fap.R
+import com.example.fap.data.FapDatabase
 import com.example.fap.databinding.FragmentHomeBinding
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
@@ -16,8 +18,6 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
-import androidx.lifecycle.lifecycleScope
-import com.example.fap.utils.SharedDatabaseManager
 import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment() {

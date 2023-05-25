@@ -1,8 +1,7 @@
-package com.example.fap
+package com.example.fap.ui.login
 
 import android.content.Context
 import android.content.Intent
-import android.database.sqlite.SQLiteDatabaseCorruptException
 import android.os.Build
 import android.os.Bundle
 import android.util.TypedValue
@@ -17,12 +16,18 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.biometric.BiometricPrompt
 import androidx.lifecycle.lifecycleScope
+import com.example.fap.MainActivity
+import com.example.fap.R
+import com.example.fap.data.Category
+import com.example.fap.data.FapDatabase
+import com.example.fap.data.User
+import com.example.fap.data.Wallet
 import com.example.fap.databinding.ActivityLoginBinding
-import com.example.fap.utils.SharedDatabaseManager
 import com.example.fap.utils.SharedPreferencesManager
 import com.example.fap.utils.SharedSecurityManager
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.launch
+import java.security.MessageDigest
 import java.util.UUID
 
 /**

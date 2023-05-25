@@ -23,7 +23,7 @@ class SharedPreferencesManager(context: Context) {
     }
 
     fun getInt(key: String, defaultValue: Int=0): Int {
-        return sharedPreferences.getInt(key, defaultValue) ?: defaultValue
+        return sharedPreferences.getInt(key, defaultValue)
     }
 
     companion object {
