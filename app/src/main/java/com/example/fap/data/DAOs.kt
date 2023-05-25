@@ -9,11 +9,14 @@ import androidx.room.Update
 import java.util.Date
 
 @Dao
-interface UserDao {
+interface FapDao {
     // User
     @Insert
     suspend fun insertUser(user: User): Long
-/*
+
+    @Query("SELECT * FROM user")
+    suspend fun getUsers(): List<User>
+
     // Wallet
     @Query("SELECT * FROM Wallet WHERE userId = :userId")
     suspend fun getWallets(userId: Int): List<Wallet>
@@ -71,5 +74,4 @@ interface UserDao {
 
     @Insert
     suspend fun insertSavingsGoal(savingsGoal: SavingsGoal): Long
- */
 }
