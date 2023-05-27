@@ -6,7 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/white"
     android:theme="@style/ThemeOverlay.FAP.FullscreenContainer"
-    tools:context=".Login">
+    tools:context=".ui.login.Login">
 
     <TextView
         android:id="@+id/lbl_login_status"

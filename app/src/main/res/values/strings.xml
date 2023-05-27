@@ -28,9 +28,12 @@
     <string name="biometric_dont_use">Cancel</string>
     <string name="activate_biometrics">Input your password to proceed</string>
     <string name="use_biometrics">use biometrics</string>
+    <string name="database_name">FAP_DATABASE.db</string>
 
     <string name="shared_prefs_biometrics_key">FAP_BIO_KEY</string>
+    <string name="shared_prefs_cur_user">FAP_CUR_USER</string>
     <string name="shared_prefs_theme">FAP_THEME</string>
+    <string name="shared_prefs_hash">FAP_HASH</string>
 
     <string name="theme_dialog">Change Theme</string>
     <string name="theme_default">Dark Theme</string>

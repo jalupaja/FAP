@@ -15,7 +15,7 @@
         android:theme="@style/Theme.FAP"
         tools:targetApi="31">
         <activity
-            android:name=".Login"
+            android:name=".ui.login.Login"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="true"
             android:label="@string/app_name"

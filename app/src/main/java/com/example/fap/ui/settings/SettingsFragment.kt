@@ -2,13 +2,11 @@ package com.example.fap.ui.settings
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.os.BuildCompat
 import androidx.preference.ListPreference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
-import com.example.fap.Login
+import com.example.fap.ui.login.Login
 import com.example.fap.R
 import com.example.fap.utils.SharedPreferencesManager
 import com.example.fap.utils.SharedSecurityManager
@@ -39,7 +37,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             if (newValue as Boolean) {
                 /* enable */
                 val intent = Intent(requireContext(), Login::class.java)
-                intent.putExtra("STATE", Login.Companion.REGISTER_STATE.ACTIVATE_BIOMETRICS)
+                intent.putExtra("STATE", Login.Companion.REGISTERSTATE.ACTIVATE_BIOMETRICS)
                 startActivity(intent)
             } else {
                 /* disable */
@@ -49,7 +47,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
 
         /* Theme */
-        theme.setOnPreferenceChangeListener { preference, newValue ->
+        theme.setOnPreferenceChangeListener { _, newValue ->
             newValue as? String
             when (newValue) {
                 getString(R.string.theme_light) -> {

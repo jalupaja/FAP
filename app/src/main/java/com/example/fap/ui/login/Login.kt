@@ -1,5 +1,6 @@
-package com.example.fap
+package com.example.fap.ui.login
 
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -14,10 +15,20 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.biometric.BiometricPrompt
+import androidx.lifecycle.lifecycleScope
+import com.example.fap.MainActivity
+import com.example.fap.R
+import com.example.fap.data.Category
+import com.example.fap.data.FapDatabase
+import com.example.fap.data.User
+import com.example.fap.data.Wallet
 import com.example.fap.databinding.ActivityLoginBinding
 import com.example.fap.utils.SharedPreferencesManager
 import com.example.fap.utils.SharedSecurityManager
 import com.google.android.material.textfield.TextInputEditText
+import kotlinx.coroutines.launch
+import java.security.MessageDigest
+import java.util.UUID
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -27,7 +38,7 @@ import com.google.android.material.textfield.TextInputEditText
 class Login : AppCompatActivity() {
 
     companion object {
-        enum class REGISTER_STATE {
+        enum class REGISTERSTATE {
             REGISTERED,
             REGISTERING,
             CONFIRMING,
@@ -35,7 +46,7 @@ class Login : AppCompatActivity() {
         }
     }
 
-    private lateinit var registerState: REGISTER_STATE
+    private lateinit var registerState: REGISTERSTATE
     private var tmpPass: String = ""
     private lateinit var binding: ActivityLoginBinding
     private lateinit var lblLoginStatus: TextView
@@ -72,7 +83,7 @@ class Login : AppCompatActivity() {
                     // Decrypt
                     val plaintext = sharedSecurity.startDecryption(encryptedCode)
                     if (checkPassword(plaintext)) {
-                        login(plaintext)
+                        login()
                     } else {
                         sharedSecurity.showBiometricError(findViewById(android.R.id.content), "There was a problem logging in. Please redo the biometry")
                     }
@@ -84,9 +95,9 @@ class Login : AppCompatActivity() {
     private val backButtonCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             when (registerState) {
-                REGISTER_STATE.CONFIRMING -> {
+                REGISTERSTATE.CONFIRMING -> {
                     textLogin.text!!.clear()
-                    registerState = REGISTER_STATE.REGISTERING
+                    registerState = REGISTERSTATE.REGISTERING
                     lblLoginStatus.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20F)
                     lblLoginStatus.text = getString(R.string.register_password)
                 }
@@ -111,11 +122,11 @@ class Login : AppCompatActivity() {
         }
 
         registerState = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent?.getSerializableExtra("STATE", REGISTER_STATE::class.java)
-                ?: REGISTER_STATE.REGISTERED
+            intent?.getSerializableExtra("STATE", REGISTERSTATE::class.java)
+                ?: REGISTERSTATE.REGISTERED
         } else {
             @Suppress("DEPRECATION")
-            intent?.getSerializableExtra("STATE") as? REGISTER_STATE ?: REGISTER_STATE.REGISTERED
+            intent?.getSerializableExtra("STATE") as? REGISTERSTATE ?: REGISTERSTATE.REGISTERED
         }
 
         binding = ActivityLoginBinding.inflate(layoutInflater)
@@ -191,11 +202,11 @@ class Login : AppCompatActivity() {
 
         textLogin.setText("")
 
-        if (!checkRegistered()) {
-            registerState = REGISTER_STATE.REGISTERING
+        if (!checkRegistered(applicationContext)) {
+            registerState = REGISTERSTATE.REGISTERING
             lblLoginStatus.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20F)
             lblLoginStatus.text = getString(R.string.register_password)
-        } else if (registerState == REGISTER_STATE.ACTIVATE_BIOMETRICS) {
+        } else if (registerState == REGISTERSTATE.ACTIVATE_BIOMETRICS) {
             lblLoginStatus.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20F)
             lblLoginStatus.text = getString(R.string.activate_biometrics)
         }
@@ -232,33 +243,47 @@ class Login : AppCompatActivity() {
         }
 
         when (registerState) {
-            REGISTER_STATE.REGISTERED -> {
+            REGISTERSTATE.REGISTERED -> {
                 if (checkPassword(textLogin.text.toString())) {
-                    login(textLogin.text.toString())
+                    login()
                 } else {
                     lblLoginStatus.text = getString(R.string.wrong_password)
                 }
             }
 
-            REGISTER_STATE.REGISTERING -> {
+            REGISTERSTATE.REGISTERING -> {
                 tmpPass = textLogin.text!!.toString()
                 lblLoginStatus.text = getString(R.string.confirm_password)
-                registerState = REGISTER_STATE.CONFIRMING
+                registerState = REGISTERSTATE.CONFIRMING
             }
 
-            REGISTER_STATE.CONFIRMING -> {
+            REGISTERSTATE.CONFIRMING -> {
                 if (textLogin.text!!.toString() == tmpPass) {
                     lblLoginStatus.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14F)
-                    registerState = REGISTER_STATE.REGISTERED
-                    // TODO create Database with Password?
-                    login(tmpPass)
+                    registerState = REGISTERSTATE.REGISTERED
+
+                    val userId = UUID.randomUUID().toString()
+                    sharedPreferences.saveString(getString(R.string.shared_prefs_cur_user), userId)
+                    // save password hash
+                    sharedPreferences.saveString(getString(R.string.shared_prefs_hash), calculateHash(tmpPass))
+                    lifecycleScope.launch {
+                        // create Database using the Password
+                        val db = FapDatabase.getInstance(applicationContext, tmpPass)
+                        // setup default values
+                        db.fapDao().insertUser(User(userId))
+                        db.fapDao().insertCategory(Category(userId = userId, name = "Groceries"))
+                        db.fapDao().insertCategory(Category(userId = userId, name = "Income"))
+                        db.fapDao().insertWallet(Wallet(userId = userId, name = "Bank"))
+                        db.fapDao().insertWallet(Wallet(userId = userId, name = "Cash"))
+                    }
+                    login()
                 } else {
                     lblLoginStatus.text = getString(R.string.retry_register_password)
-                    registerState = REGISTER_STATE.REGISTERING
+                    registerState = REGISTERSTATE.REGISTERING
                 }
             }
 
-            REGISTER_STATE.ACTIVATE_BIOMETRICS -> {
+            REGISTERSTATE.ACTIVATE_BIOMETRICS -> {
                 if (checkPassword(textLogin.text!!.toString())) {
                     tmpPass = textLogin.text!!.toString()
                     lblLoginStatus.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14F)
@@ -272,20 +297,26 @@ class Login : AppCompatActivity() {
         textLogin.text!!.clear()
     }
 
-    private fun checkRegistered(): Boolean {
-        return true // TODO check if database file exists OR use shared prefs
+    private fun checkRegistered(context: Context): Boolean {
+        val ctx = context.applicationContext
+        return ctx.getDatabasePath(ctx.getString(R.string.database_name)).exists()
     }
 
     private fun checkPassword(password: String): Boolean {
-        return password == "000" // TODO check if passwords matches database?
+        return calculateHash(password) == sharedPreferences.getString(getString(R.string.shared_prefs_hash))
+    }
+
+    private fun calculateHash(str: String): String {
+        val messageDigest = MessageDigest.getInstance("SHA-512")
+        val byteHash = messageDigest.digest(str.toByteArray())
+        return byteHash.joinToString("") { "%02x".format(it) }
     }
 
     private fun authenticateWithBiometrics() {
         sharedSecurity.authenticateWithBiometrics(this, mainExecutor, biometricAuthenticationCallback)
     }
 
-    private fun login(key: String) {
-        // TODO send Database to MainActivity
+    private fun login() {
         startActivity(Intent(this, MainActivity::class.java))
         finishAffinity()
         lblLoginStatus.text = ""
