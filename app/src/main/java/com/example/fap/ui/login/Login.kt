@@ -301,9 +301,14 @@ class Login : AppCompatActivity() {
         val ctx = context.applicationContext
         return ctx.getDatabasePath(ctx.getString(R.string.database_name)).exists()
     }
-
+    
     private fun checkPassword(password: String): Boolean {
-        return calculateHash(password) == sharedPreferences.getString(getString(R.string.shared_prefs_hash))
+        return if (calculateHash(password) == sharedPreferences.getString(getString(R.string.shared_prefs_hash))) {
+            FapDatabase.getInstance(applicationContext, password)
+            true
+        } else {
+            false
+        }
     }
 
     private fun calculateHash(str: String): String {
