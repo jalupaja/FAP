@@ -52,6 +52,7 @@
     <style name="Theme.FAP.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="android:actionMenuTextColor">@color/md_theme_light_onBackground</item>
     </style>
 
     <style name="Theme.FAP.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

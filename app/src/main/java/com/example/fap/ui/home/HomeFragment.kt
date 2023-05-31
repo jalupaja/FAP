@@ -49,21 +49,20 @@ class HomeFragment : Fragment() {
 
         var einnahmen = 30f
         var ausgaben = 20f
-        var saldo = (einnahmen - ausgaben)
+        var saldo = einnahmen - ausgaben
         val entriesBalance = listOf(
             PieEntry(einnahmen, "Einnahmen"),
-            PieEntry(ausgaben, "Ausgaben"),
-            PieEntry(saldo, "Saldo")
+            PieEntry(ausgaben, "Ausgaben")
         )
         val dataSet = PieDataSet(entriesBalance, "Finanzen")
         chartBalance.centerText = "Einnahmen: $einnahmen € \nAusgaben: $ausgaben €\n _______________________ \nSaldo: $saldo €"
 
         dataSet.sliceSpace = 3f
         dataSet.selectionShift = 5f
+        //TODO: remove deprecated function
         dataSet.colors = listOf(
             resources.getColor(R.color.green),
-            resources.getColor(R.color.red),
-            resources.getColor(androidx.transition.R.color.material_blue_grey_800)
+            resources.getColor(R.color.red)
         )
         chartBalance.data = PieData(dataSet)
         chartBalance.description.text = ""
