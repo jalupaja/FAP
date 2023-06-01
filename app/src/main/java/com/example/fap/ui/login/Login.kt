@@ -271,8 +271,9 @@ class Login : AppCompatActivity() {
                         val db = FapDatabase.getInstance(applicationContext, tmpPass)
                         // setup default values
                         db.fapDao().insertUser(User(userId))
-                        db.fapDao().insertCategory(Category(userId = userId, name = "Groceries"))
-                        db.fapDao().insertCategory(Category(userId = userId, name = "Income"))
+                        db.fapDao().insertCategory(Category(name = "")) // use as 'not categorised' to avoid FOREIGN KEY constraint fails
+                        db.fapDao().insertCategory(Category(name = "Groceries"))
+                        db.fapDao().insertCategory(Category(name = "Income"))
                         db.fapDao().insertWallet(Wallet(userId = userId, name = "Bank"))
                         db.fapDao().insertWallet(Wallet(userId = userId, name = "Cash"))
                     }

@@ -6,12 +6,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.fap.R
 import com.example.fap.data.FapDatabase
 import com.example.fap.databinding.FragmentHomeBinding
+import com.example.fap.utils.SharedPreferencesManager
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
@@ -28,8 +33,11 @@ class HomeFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+    private lateinit var sharedPreferences: SharedPreferencesManager
 
     private lateinit var db: FapDatabase
+
+    private lateinit var lblTotal: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,6 +46,7 @@ class HomeFragment : Fragment() {
     ): View {
 
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        sharedPreferences = SharedPreferencesManager.getInstance(requireContext())
 
         db = FapDatabase.getInstance(requireContext())
 
@@ -46,7 +55,7 @@ class HomeFragment : Fragment() {
         val homeViewModel =
             ViewModelProvider(this)[HomeViewModel::class.java]
 
-        val lblTotal = binding.lblTotal
+        lblTotal = binding.lblTotal
         val chartBalance = binding.chartBalance
         val chartStock = binding.chartStock
     //get theme OnSurface Color
@@ -54,10 +63,6 @@ class HomeFragment : Fragment() {
         val theme = requireContext().theme
         theme.resolveAttribute(com.google.android.material.R.attr.colorOnSurface, typedValue, true)
         @ColorInt val colorOnSurface = typedValue.data
-
-        lifecycleScope.launch {
-            lblTotal.text = num2Money(updateTotal())
-        }
 
     //Balance Chart
         chartBalance.setExtraOffsets(5f, 5f, 5f, 5f)
@@ -90,7 +95,8 @@ class HomeFragment : Fragment() {
                 resources.getColor(com.google.android.material.R.color.mtrl_btn_transparent_bg_color, context?.theme)
             )
         )
-        chartBalance.data = PieData(dataSet)
+        val chartData = PieData(dataSet)
+        chartBalance.data = chartData
         chartBalance.description.text = ""
         chartBalance.invalidate()
         chartBalance.notifyDataSetChanged()
@@ -133,6 +139,14 @@ class HomeFragment : Fragment() {
         return view
     }
 
+    override fun onResume() {
+        super.onResume()
+        // update values
+        lifecycleScope.launch {
+            lblTotal.text = num2Money(updateTotal())
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
@@ -144,13 +158,14 @@ class HomeFragment : Fragment() {
     }
 
     private suspend fun updateTotal(): Double {
-        // income and spent CAN be null even if Android Studio tells you otherwise
-        val income: Double? = db.fapDao().getTotalIncome(requireContext().getString(R.string.shared_prefs_cur_user))
-        val spent: Double? = db.fapDao().getTotalAmountSpent(requireContext().getString(R.string.shared_prefs_cur_user))
-        return if (income != null && spent != null) {
-            (income - spent)
-        } else {
-            0.0
-        }
+        var income: Double? = db.fapDao().getTotalIncome(sharedPreferences.getString(requireContext().getString(R.string.shared_prefs_cur_user)))
+        var spent: Double? = db.fapDao().getTotalAmountSpent(sharedPreferences.getString(requireContext().getString(R.string.shared_prefs_cur_user)))
+
+        if (income == null)
+            income = 0.0
+        if (spent == null)
+            spent = 0.0
+
+        return income - spent
     }
 }

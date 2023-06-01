@@ -10,4 +10,8 @@
         <item>@string/theme_dark</item>
         <item>@string/theme_oled</item>
     </string-array>
+
+    <string-array name="empty_spinner">
+        <item></item>
+    </string-array>
 </resources>
