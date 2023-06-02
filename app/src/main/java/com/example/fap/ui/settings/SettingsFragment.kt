@@ -27,8 +27,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
         sharedPreferences = SharedPreferencesManager.getInstance(requireContext())
         sharedSecurity = SharedSecurityManager.getInstance(requireContext())
-        biometrics = findPreference<SwitchPreferenceCompat>("biometrics")!!
-        theme = findPreference<ListPreference>("theme")!!
+        biometrics = findPreference("biometrics")!!
+        theme = findPreference("theme")!!
 
         updateSettings()
 
@@ -69,8 +69,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     private fun updateSettings() {
-        biometrics.isChecked = ! sharedPreferences.getString(getString(R.string.shared_prefs_biometrics_key)).isNullOrEmpty()
-        biometrics.isEnabled = sharedSecurity.checkBiometric()
+        biometrics.isChecked =
+            sharedPreferences.getString(getString(R.string.shared_prefs_biometrics_key)).isNotEmpty()
+        biometrics.isEnabled = sharedSecurity.checkBiometric(requireContext())
     }
 
     private fun updateTheme(mode: Int) {

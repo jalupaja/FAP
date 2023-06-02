@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.appBarMain.toolbar)
 
-        binding.appBarMain.fab.setOnClickListener { _ ->
+        binding.appBarMain.fab.setOnClickListener {
             startActivity(Intent(this, AddPayment::class.java))
         }
         val drawerLayout: DrawerLayout = binding.drawerLayout
@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity() {
                     startActivity(Intent(this, Login::class.java))
                     finishAffinity()
                     true
-                 }
+                }
                 else -> {
                     navController.navigate(menuItem.itemId)
                     drawerLayout.closeDrawer(GravityCompat.START)
@@ -67,18 +67,18 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-        override fun onOptionsItemSelected(item: MenuItem): Boolean {
-                val navController = findNavController(R.id.nav_host_fragment_content_main)
-                when (item.itemId) {
-                        R.id.action_settings -> {
-                                navController.navigate(R.id.nav_settings)
-                                return true
-                            }
-                        else -> {
-                                return super.onOptionsItemSelected(item)
-                            }
-                    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val navController = findNavController(R.id.nav_host_fragment_content_main)
+        return when (item.itemId) {
+            R.id.action_settings -> {
+                navController.navigate(R.id.nav_settings)
+                true
             }
+            else -> {
+                super.onOptionsItemSelected(item)
+            }
+        }
+    }
 
 
     override fun onSupportNavigateUp(): Boolean {

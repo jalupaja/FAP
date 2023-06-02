@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.fap.R
 import com.example.fap.data.FapDatabase
@@ -52,9 +51,6 @@ class HomeFragment : Fragment() {
 
         val view = binding.root
 
-        val homeViewModel =
-            ViewModelProvider(this)[HomeViewModel::class.java]
-
         lblTotal = binding.lblTotal
         val chartBalance = binding.chartBalance
         val chartStock = binding.chartStock
@@ -64,7 +60,7 @@ class HomeFragment : Fragment() {
         theme.resolveAttribute(com.google.android.material.R.attr.colorOnSurface, typedValue, true)
         @ColorInt val colorOnSurface = typedValue.data
 
-    //Balance Chart
+        //Balance Chart
         chartBalance.setExtraOffsets(5f, 5f, 5f, 5f)
         chartBalance.setDrawEntryLabels(false)
         chartBalance.holeRadius = 70f
@@ -101,7 +97,7 @@ class HomeFragment : Fragment() {
         chartBalance.invalidate()
         chartBalance.notifyDataSetChanged()
 
-    //Chart com.example.fap.data.Stock
+        //Chart com.example.fap.data.Stock
         val entriesStock = listOf(
             Entry(1f, 10f),
             Entry(2f, 2f),
@@ -153,7 +149,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun num2Money(num: Number): String {
-        val currency: Char = '€'
+        val currency = '€'
         return "%.2f".format(num) + currency
     }
 

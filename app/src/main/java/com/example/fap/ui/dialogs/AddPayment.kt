@@ -3,7 +3,6 @@ package com.example.fap.ui.dialogs
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.example.fap.R
 import com.example.fap.data.Category
 import com.example.fap.data.FapDatabase
 import com.example.fap.databinding.ActivityAddPaymentBinding

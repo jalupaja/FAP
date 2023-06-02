@@ -69,27 +69,27 @@ class Login : AppCompatActivity() {
 
     // Implement biometry callbacks
     private val biometricAuthenticationCallback = object : BiometricPrompt.AuthenticationCallback() {
-            override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-                val encryptedCode = sharedPreferences.getString(getString(R.string.shared_prefs_biometrics_key))
+        override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+            val encryptedCode = sharedPreferences.getString(getString(R.string.shared_prefs_biometrics_key))
 
-                if (encryptedCode.isNullOrEmpty()) {
-                    // Encrypt
-                    if (!sharedSecurity.startEncryption(tmpPass)) {
-                        sharedSecurity.showBiometricError(findViewById(android.R.id.content), "Biometric failed")
-                    } else {
-                        backButtonCallback.handleOnBackPressed()
-                    }
+            if (encryptedCode.isEmpty()) {
+                // Encrypt
+                if (!sharedSecurity.startEncryption(tmpPass, applicationContext)) {
+                    sharedSecurity.showBiometricError(findViewById(android.R.id.content), "Biometric failed", applicationContext)
                 } else {
-                    // Decrypt
-                    val plaintext = sharedSecurity.startDecryption(encryptedCode)
-                    if (checkPassword(plaintext)) {
-                        login()
-                    } else {
-                        sharedSecurity.showBiometricError(findViewById(android.R.id.content), "There was a problem logging in. Please redo the biometry")
-                    }
+                    backButtonCallback.handleOnBackPressed()
+                }
+            } else {
+                // Decrypt
+                val plaintext = sharedSecurity.startDecryption(encryptedCode, applicationContext)
+                if (checkPassword(plaintext)) {
+                    login()
+                } else {
+                    sharedSecurity.showBiometricError(findViewById(android.R.id.content), "There was a problem logging in. Please redo the biometry", applicationContext)
                 }
             }
         }
+    }
 
     // Implement Back Button
     private val backButtonCallback = object : OnBackPressedCallback(true) {
@@ -212,7 +212,7 @@ class Login : AppCompatActivity() {
         }
 
 
-        if (sharedPreferences.getString(getString(R.string.shared_prefs_biometrics_key)) .isNullOrEmpty() ) {
+        if (sharedPreferences.getString(getString(R.string.shared_prefs_biometrics_key)).isEmpty() ) {
             binding.useBiometrics.visibility = View.INVISIBLE
         } else {
             authenticateWithBiometrics()
@@ -302,7 +302,7 @@ class Login : AppCompatActivity() {
         val ctx = context.applicationContext
         return ctx.getDatabasePath(ctx.getString(R.string.database_name)).exists()
     }
-    
+
     private fun checkPassword(password: String): Boolean {
         return if (calculateHash(password) == sharedPreferences.getString(getString(R.string.shared_prefs_hash))) {
             FapDatabase.getInstance(applicationContext, password)
@@ -319,7 +319,7 @@ class Login : AppCompatActivity() {
     }
 
     private fun authenticateWithBiometrics() {
-        sharedSecurity.authenticateWithBiometrics(this, mainExecutor, biometricAuthenticationCallback)
+        sharedSecurity.authenticateWithBiometrics(this, mainExecutor, biometricAuthenticationCallback, applicationContext)
     }
 
     private fun login() {
