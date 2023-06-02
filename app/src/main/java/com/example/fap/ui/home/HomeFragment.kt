@@ -158,8 +158,8 @@ class HomeFragment : Fragment() {
     }
 
     private suspend fun updateTotal(): Double {
-        var income: Double? = db.fapDao().getTotalIncome(sharedPreferences.getString(requireContext().getString(R.string.shared_prefs_cur_user)))
-        var spent: Double? = db.fapDao().getTotalAmountSpent(sharedPreferences.getString(requireContext().getString(R.string.shared_prefs_cur_user)))
+        var income: Double? = db.fapDao().getTotalIncome(sharedPreferences.getCurUser(requireContext()))
+        var spent: Double? = db.fapDao().getTotalAmountSpent(sharedPreferences.getCurUser(requireContext()))
 
         if (income == null)
             income = 0.0

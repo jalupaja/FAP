@@ -42,7 +42,7 @@ class AddPayment : AppCompatActivity() {
         sharedPreferences = SharedPreferencesManager.getInstance(applicationContext)
         val db = FapDatabase.getInstance(applicationContext).fapDao()
         val dateFormatPattern = "dd.MM.yyyy"
-        val curUser = sharedPreferences.getString(getString(R.string.shared_prefs_cur_user))
+        val curUser = sharedPreferences.getCurUser(applicationContext)
 
         // Set default values
         val datePicker = binding.datePicker

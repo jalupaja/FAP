@@ -2,6 +2,9 @@ package com.example.fap.utils
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.example.fap.R
+import kotlinx.coroutines.currentCoroutineContext
+import kotlin.coroutines.coroutineContext
 
 class SharedPreferencesManager(context: Context) {
     private val sharedPreferences: SharedPreferences = context.getSharedPreferences("FAP_SHARED_PREFS", Context.MODE_PRIVATE)
@@ -24,6 +27,16 @@ class SharedPreferencesManager(context: Context) {
 
     fun getInt(key: String, defaultValue: Int=0): Int {
         return sharedPreferences.getInt(key, defaultValue)
+    }
+
+    fun saveCurUser(context: Context, curUser: String) {
+        val editor = sharedPreferences.edit()
+        editor.putString(context.getString(R.string.shared_prefs_cur_user), curUser)
+        editor.apply()
+    }
+    
+    fun getCurUser(context: Context): String {
+        return sharedPreferences.getString(context.getString(R.string.shared_prefs_cur_user), "") ?: ""
     }
 
     companion object {

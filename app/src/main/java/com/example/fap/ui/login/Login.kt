@@ -263,7 +263,7 @@ class Login : AppCompatActivity() {
                     registerState = REGISTERSTATE.REGISTERED
 
                     val userId = UUID.randomUUID().toString()
-                    sharedPreferences.saveString(getString(R.string.shared_prefs_cur_user), userId)
+                    sharedPreferences.saveCurUser(applicationContext, userId)
                     // save password hash
                     sharedPreferences.saveString(getString(R.string.shared_prefs_hash), calculateHash(tmpPass))
                     lifecycleScope.launch {
