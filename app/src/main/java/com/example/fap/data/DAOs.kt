@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import androidx.room.Upsert
 import java.util.Date
 
 @Dao
@@ -25,8 +26,8 @@ interface FapDao {
     suspend fun insertWallet(wallet: Wallet): Long
 
     // Payment
-    @Insert
-    suspend fun insertPayment(payment: Payment)
+    @Upsert
+    suspend fun upsertPayment(payment: Payment)
 
     @Update
     suspend fun updatePayment(payment: Payment)
@@ -36,6 +37,9 @@ interface FapDao {
 
     @Query("SELECT * FROM Payment WHERE userId = :userId")
     suspend fun getPayments(userId: String): List<Payment>
+
+    @Query("SELECT * FROM Payment WHERE id = :itemId")
+    suspend fun getPayment(itemId: Int): Payment
 
     @Query("SELECT * FROM Payment WHERE userId = :userId AND wallet = :wallet")
     suspend fun getPaymentsByWallet(userId: String, wallet: String): List<Payment>

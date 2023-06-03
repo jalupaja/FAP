@@ -1,9 +1,7 @@
 package com.example.fap.ui.history
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
@@ -17,9 +15,9 @@ import kotlinx.coroutines.launch
 class HistoryFragment : Fragment() {
 
     private var _binding: FragmentHistoryBinding? = null
-
     // This property is only valid between onCreateView and
     // onDestroyView.
+
     private val binding get() = _binding!!
     private lateinit var sharedPreferences: SharedPreferencesManager
     private var historyData = ArrayList<HistoryItem>()
