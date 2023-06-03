@@ -5,4 +5,5 @@ data class HistoryItem(
     val title: String,
     val category: String,
     val price: Double,
+    val isPayment: Boolean,
 )

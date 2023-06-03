@@ -5,14 +5,25 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.fap.R
 import com.example.fap.ui.dialogs.AddPayment
+import com.example.fap.utils.SharedCurrencyManager
 
 class HistoryAdapter(private val historyList: List<HistoryItem>) : RecyclerView.Adapter<HistoryAdapter.ViewHolder>() {
 
+    private lateinit var sharedCurrency: SharedCurrencyManager
+    private var colorRed = 0
+    private var colorGreen = 0
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.history_item, parent, false)
+        val context = parent.context
+        val view = LayoutInflater.from(context).inflate(R.layout.history_item, parent, false)
+
+        sharedCurrency = SharedCurrencyManager.getInstance(context)
+        colorRed = ContextCompat.getColor(context, R.color.dark_red)
+        colorGreen = ContextCompat.getColor(context, R.color.dark_green)
         return ViewHolder(view)
     }
 
@@ -23,9 +34,9 @@ class HistoryAdapter(private val historyList: List<HistoryItem>) : RecyclerView.
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val historyItem = historyList[position]
         holder.bind(historyItem)
+        val context = holder.itemView.context
 
         holder.itemView.setOnClickListener {
-            val context = holder.itemView.context
             val intent = Intent(context, AddPayment::class.java)
             intent.putExtra("paymentId", historyItem.id)
             context.startActivity(intent)
@@ -40,7 +51,13 @@ class HistoryAdapter(private val historyList: List<HistoryItem>) : RecyclerView.
         fun bind(historyItem: HistoryItem) {
             textTitle.text = historyItem.title
             textCategory.text = historyItem.category
-            textPrice.text = historyItem.price.toString()
+            textPrice.text = sharedCurrency.num2Money(historyItem.price)
+
+            if (historyItem.isPayment) {
+                textPrice.setTextColor(colorRed)
+            } else {
+                textPrice.setTextColor(colorGreen)
+            }
         }
     }
 }

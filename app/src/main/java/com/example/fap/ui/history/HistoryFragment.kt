@@ -48,7 +48,7 @@ class HistoryFragment : Fragment() {
             val db = FapDatabase.getInstance(requireContext())
             val payments = db.fapDao().getPayments(sharedPreferences.getCurUser(requireContext()))
             for (payment in payments) {
-                historyData.add(HistoryItem(payment.id, payment.title, payment.category ?: "", payment.price))
+                historyData.add(HistoryItem(payment.id, payment.title, payment.category ?: "", payment.price, payment.isPayment))
             }
             historyAdapter.notifyDataSetChanged()
         }

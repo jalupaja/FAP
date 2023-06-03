@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.fap.R
 import com.example.fap.data.FapDatabase
 import com.example.fap.databinding.FragmentHomeBinding
+import com.example.fap.utils.SharedCurrencyManager
 import com.example.fap.utils.SharedPreferencesManager
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
@@ -33,6 +34,7 @@ class HomeFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
     private lateinit var sharedPreferences: SharedPreferencesManager
+    private lateinit var sharedCurrency: SharedCurrencyManager
 
     private lateinit var db: FapDatabase
 
@@ -46,6 +48,7 @@ class HomeFragment : Fragment() {
 
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         sharedPreferences = SharedPreferencesManager.getInstance(requireContext())
+        sharedCurrency = SharedCurrencyManager.getInstance(requireContext())
 
         db = FapDatabase.getInstance(requireContext())
 
@@ -139,18 +142,13 @@ class HomeFragment : Fragment() {
         super.onResume()
         // update values
         lifecycleScope.launch {
-            lblTotal.text = num2Money(updateTotal())
+            lblTotal.text = sharedCurrency.num2Money(updateTotal())
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    private fun num2Money(num: Number): String {
-        val currency = '€'
-        return "%.2f".format(num) + currency
     }
 
     private suspend fun updateTotal(): Double {
