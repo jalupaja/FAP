@@ -40,7 +40,7 @@ abstract class FapDatabase: RoomDatabase() {
                     FapDatabase::class.java,
                     context.getString(R.string.database_name)
                 )
-                //FIXME .openHelperFactory(factory) /* use password */
+                .openHelperFactory(factory) /* use password */
                 .build()
             }
         }
