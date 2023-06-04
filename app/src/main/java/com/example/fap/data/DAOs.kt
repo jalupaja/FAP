@@ -13,7 +13,7 @@ import java.util.Date
 interface FapDao {
     // User
     @Insert
-    suspend fun insertUser(user: User): Long
+    suspend fun insertUser(user: User)
 
     @Query("SELECT * FROM user")
     suspend fun getUsers(): List<User>
@@ -23,7 +23,7 @@ interface FapDao {
     suspend fun getWallets(userId: String): List<Wallet>
 
     @Insert
-    suspend fun insertWallet(wallet: Wallet): Long
+    suspend fun insertWallet(wallet: Wallet)
 
     // Payment
     @Upsert
@@ -70,12 +70,12 @@ interface FapDao {
     suspend fun getCategories(): List<Category>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertCategory(category: Category): Long
+    suspend fun insertCategory(category: Category)
 
     // SavingsGoal
     @Query("SELECT * FROM SavingsGoal WHERE userId = :userId")
     suspend fun getSavingsGoals(userId: String): List<SavingsGoal>
 
     @Insert
-    suspend fun insertSavingsGoal(savingsGoal: SavingsGoal): Long
+    suspend fun insertSavingsGoal(savingsGoal: SavingsGoal)
 }
