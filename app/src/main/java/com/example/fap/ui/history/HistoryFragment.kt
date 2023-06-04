@@ -50,6 +50,11 @@ class HistoryFragment : Fragment() {
             for (payment in payments) {
                 historyData.add(HistoryItem(payment.id, payment.title, payment.category ?: "", payment.price, payment.isPayment))
             }
+            if (payments.isEmpty()) {
+                binding.lblHistoryEmpty.visibility = View.VISIBLE
+            } else {
+                binding.lblHistoryEmpty.visibility = View.GONE
+            }
             historyAdapter.notifyDataSetChanged()
         }
     }
