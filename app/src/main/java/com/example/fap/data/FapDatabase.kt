@@ -16,13 +16,15 @@ import net.sqlcipher.database.SupportFactory
         Category::class,
         Payment::class,
         Stock::class,
-        SavingsGoal::class
-               ],
+        SavingsGoal::class,
+        Currency::class,
+    ],
     version = 1
 )
 @TypeConverters(Converters::class)
 abstract class FapDatabase: RoomDatabase() {
     abstract fun fapDao(): FapDao
+    abstract fun currencyDao(): CurrencyDao
 
     companion object {
         private var instance: FapDatabase? = null
@@ -38,7 +40,7 @@ abstract class FapDatabase: RoomDatabase() {
                     FapDatabase::class.java,
                     context.getString(R.string.database_name)
                 )
-                .openHelperFactory(factory) /* use password */
+                //FIXME .openHelperFactory(factory) /* use password */
                 .build()
             }
         }

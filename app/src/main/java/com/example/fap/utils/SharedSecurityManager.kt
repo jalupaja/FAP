@@ -21,7 +21,7 @@ import java.util.concurrent.Executor
 class SharedSecurityManager(context: Context) {
 
     private val keystoreProvider = "AndroidKeyStore"
-    private val sharedPreferences:SharedPreferencesManager = SharedPreferencesManager.getInstance(context)
+    private val sharedPreferences: SharedPreferencesManager = SharedPreferencesManager.getInstance(context)
 
     /* ASYNCHRONOUS ENCRYPTION */
     fun startEncryption(str: String, context: Context): Boolean {

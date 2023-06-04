@@ -125,3 +125,10 @@ data class SavingsGoal(
     val endAmount: Double,
     val startAmount: Double,
 )
+
+@Entity
+data class Currency(
+    @PrimaryKey
+    val code: String,
+    val conversion: Double,
+)

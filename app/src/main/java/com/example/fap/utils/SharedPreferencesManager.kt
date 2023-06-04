@@ -37,6 +37,16 @@ class SharedPreferencesManager(context: Context) {
         return sharedPreferences.getString(context.getString(R.string.shared_prefs_cur_user), "") ?: ""
     }
 
+    fun saveLastCurrencyUpdate(context: Context, curDate: String) {
+        val editor = sharedPreferences.edit()
+        editor.putString(context.getString(R.string.shared_prefs_last_currency_update), curDate)
+        editor.apply()
+    }
+
+    fun getLastCurrencyUpdate(context: Context): String {
+        return sharedPreferences.getString(context.getString(R.string.shared_prefs_last_currency_update), "0000-00-00") ?: "0000-00-00"
+    }
+
     companion object {
         private var instance: SharedPreferencesManager? = null
 

@@ -23,6 +23,7 @@ import com.example.fap.data.FapDatabase
 import com.example.fap.data.User
 import com.example.fap.data.Wallet
 import com.example.fap.databinding.ActivityLoginBinding
+import com.example.fap.utils.SharedCurrencyManager
 import com.example.fap.utils.SharedPreferencesManager
 import com.example.fap.utils.SharedSecurityManager
 import com.google.android.material.textfield.TextInputEditText
@@ -245,6 +246,9 @@ class Login : AppCompatActivity() {
         when (registerState) {
             REGISTERSTATE.REGISTERED -> {
                 if (checkPassword(textLogin.text.toString())) {
+                    lifecycleScope.launch {
+                        SharedCurrencyManager.getInstance(applicationContext).tryUpdateCurrency(applicationContext)
+                    }
                     login()
                 } else {
                     lblLoginStatus.text = getString(R.string.wrong_password)
@@ -264,6 +268,8 @@ class Login : AppCompatActivity() {
 
                     val userId = UUID.randomUUID().toString()
                     sharedPreferences.saveCurUser(applicationContext, userId)
+                    sharedPreferences.saveString(application.getString(R.string.shared_prefs_current_currency), "EUR")
+
                     // save password hash
                     sharedPreferences.saveString(getString(R.string.shared_prefs_hash), calculateHash(tmpPass))
                     lifecycleScope.launch {
@@ -276,6 +282,8 @@ class Login : AppCompatActivity() {
                         db.fapDao().insertCategory(Category(name = "Income"))
                         db.fapDao().insertWallet(Wallet(userId = userId, name = "Bank"))
                         db.fapDao().insertWallet(Wallet(userId = userId, name = "Cash"))
+
+                        SharedCurrencyManager.getInstance(applicationContext).initCurrency(applicationContext)
                     }
                     login()
                 } else {

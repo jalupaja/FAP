@@ -32,6 +32,9 @@ interface FapDao {
     @Update
     suspend fun updatePayment(payment: Payment)
 
+    @Update
+    suspend fun updatePayments(payments: List<Payment>)
+
     @Delete
     suspend fun deletePayment(payment: Payment)
 
@@ -78,4 +81,13 @@ interface FapDao {
 
     @Insert
     suspend fun insertSavingsGoal(savingsGoal: SavingsGoal)
+}
+
+@Dao
+interface CurrencyDao {
+    @Upsert
+    suspend fun upsertCurrency(currency: Currency)
+
+    @Query("SELECT conversion FROM Currency WHERE code = :currencyFrom OR code = :currencyTo")
+    suspend fun getConversion(currencyFrom: String, currencyTo: String): List<Double>
 }

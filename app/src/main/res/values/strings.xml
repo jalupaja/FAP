@@ -34,6 +34,8 @@
     <string name="shared_prefs_cur_user">FAP_CUR_USER</string>
     <string name="shared_prefs_theme">FAP_THEME</string>
     <string name="shared_prefs_hash">FAP_HASH</string>
+    <string name="shared_prefs_current_currency">FAP_CURRENCY</string>
+    <string name="shared_prefs_last_currency_update">FAP_CURRENCY_DATE</string>
 
     <string name="theme_dialog">Change Theme</string>
     <string name="theme_default">Dark Theme</string>
