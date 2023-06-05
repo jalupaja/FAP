@@ -80,7 +80,7 @@
                     android:layout_height="wrap_content"
                     android:text="5.5555"
                     android:textAlignment="center"
-                    android:textColor="#008700"
+                    android:textColor="#59E237"
                     android:textSize="16dp" />
             </LinearLayout>
 
