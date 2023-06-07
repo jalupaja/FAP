@@ -6,6 +6,17 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.fap.R
+import com.example.fap.data.dao.FapDaoCategory
+import com.example.fap.data.dao.FapDaoPayment
+import com.example.fap.data.dao.FapDaoSavingGoal
+import com.example.fap.data.dao.FapDaoUser
+import com.example.fap.data.dao.FapDaoWallet
+import com.example.fap.data.entities.Category
+import com.example.fap.data.entities.Payment
+import com.example.fap.data.entities.SavingsGoal
+import com.example.fap.data.entities.Stock
+import com.example.fap.data.entities.User
+import com.example.fap.data.entities.Wallet
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
 
@@ -20,9 +31,14 @@ import net.sqlcipher.database.SupportFactory
                ],
     version = 1
 )
+
 @TypeConverters(Converters::class)
 abstract class FapDatabase: RoomDatabase() {
-    abstract fun fapDao(): FapDao
+    abstract fun fapDaoCategory(): FapDaoCategory
+    abstract fun fapDaoPayment(): FapDaoPayment
+    abstract fun fapDaoSavingGoal(): FapDaoSavingGoal
+    abstract fun fapDaoUser(): FapDaoUser
+    abstract fun fapDaoWallet(): FapDaoWallet
 
     companion object {
         private var instance: FapDatabase? = null

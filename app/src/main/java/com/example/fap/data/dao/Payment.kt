@@ -1,29 +1,16 @@
-package com.example.fap.data
+package com.example.fap.data.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import com.example.fap.data.entities.Payment
 import java.util.Date
 
 @Dao
-interface FapDao {
-    // User
-    @Insert
-    suspend fun insertUser(user: User): Long
+interface FapDaoPayment {
 
-    @Query("SELECT * FROM user")
-    suspend fun getUsers(): List<User>
-
-    // Wallet
-    @Query("SELECT * FROM Wallet WHERE userId = :userId")
-    suspend fun getWallets(userId: Int): List<Wallet>
-
-    @Insert
-    suspend fun insertWallet(wallet: Wallet): Long
-
-    // Payment
     @Insert
     suspend fun insertPayment(payment: Payment)
 
@@ -60,17 +47,4 @@ interface FapDao {
     @Query("SELECT * FROM payment WHERE userId = :userId AND isPayment = 1 AND date >= :startDate AND date <= :endDate AND categoryId = :categoryId")
     suspend fun getAmountSpentInRangeByCategory(userId: String, startDate: Date, endDate: Date, categoryId: Int): List<Payment>
 
-    // Category
-    @Query("SELECT * FROM Category WHERE userId = :userId")
-    suspend fun getCategories(userId: Int): List<Category>
-
-    @Insert
-    suspend fun insertCategory(category: Category): Long
-
-    // SavingsGoal
-    @Query("SELECT * FROM SavingsGoal WHERE userId = :userId")
-    suspend fun getSavingsGoals(userId: Int): List<SavingsGoal>
-
-    @Insert
-    suspend fun insertSavingsGoal(savingsGoal: SavingsGoal): Long
 }

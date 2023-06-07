@@ -18,10 +18,10 @@ import androidx.biometric.BiometricPrompt
 import androidx.lifecycle.lifecycleScope
 import com.example.fap.MainActivity
 import com.example.fap.R
-import com.example.fap.data.Category
+import com.example.fap.data.entities.Category
 import com.example.fap.data.FapDatabase
-import com.example.fap.data.User
-import com.example.fap.data.Wallet
+import com.example.fap.data.entities.User
+import com.example.fap.data.entities.Wallet
 import com.example.fap.databinding.ActivityLoginBinding
 import com.example.fap.utils.SharedPreferencesManager
 import com.example.fap.utils.SharedSecurityManager
@@ -270,11 +270,11 @@ class Login : AppCompatActivity() {
                         // create Database using the Password
                         val db = FapDatabase.getInstance(applicationContext, tmpPass)
                         // setup default values
-                        db.fapDao().insertUser(User(userId))
-                        db.fapDao().insertCategory(Category(userId = userId, name = "Groceries"))
-                        db.fapDao().insertCategory(Category(userId = userId, name = "Income"))
-                        db.fapDao().insertWallet(Wallet(userId = userId, name = "Bank"))
-                        db.fapDao().insertWallet(Wallet(userId = userId, name = "Cash"))
+                        db.fapDaoUser().insertUser(User(userId))
+                        db.fapDaoCategory().insertCategory(Category(userId = userId, name = "Groceries"))
+                        db.fapDaoCategory().insertCategory(Category(userId = userId, name = "Income"))
+                        db.fapDaoWallet().insertWallet(Wallet(userId = userId, name = "Bank"))
+                        db.fapDaoWallet().insertWallet(Wallet(userId = userId, name = "Cash"))
                     }
                     login()
                 } else {

@@ -95,7 +95,7 @@ class HomeFragment : Fragment() {
         chartBalance.invalidate()
         chartBalance.notifyDataSetChanged()
 
-    //Chart com.example.fap.data.Stock
+    //Chart com.example.fap.data.entities.Stock
         val entriesStock = listOf(
             Entry(1f, 10f),
             Entry(2f, 2f),
@@ -120,7 +120,7 @@ class HomeFragment : Fragment() {
         chartStock.axisRight.isEnabled = false
         chartStock.setTouchEnabled(false)
         chartStock.setPinchZoom(true)
-        chartStock.description.text = "com.example.fap.data.Stock"
+        chartStock.description.text = "com.example.fap.data.entities.Stock"
         chartStock.animateX(1000, Easing.EaseInExpo)
         chartStock.legend.textColor = colorOnSurface
 
@@ -145,8 +145,8 @@ class HomeFragment : Fragment() {
 
     private suspend fun updateTotal(): Double {
         // income and spent CAN be null even if Android Studio tells you otherwise
-        val income: Double? = db.fapDao().getTotalIncome(requireContext().getString(R.string.shared_prefs_cur_user))
-        val spent: Double? = db.fapDao().getTotalAmountSpent(requireContext().getString(R.string.shared_prefs_cur_user))
+        val income: Double? = db.fapDaoPayment().getTotalIncome(requireContext().getString(R.string.shared_prefs_cur_user))
+        val spent: Double? = db.fapDaoPayment().getTotalAmountSpent(requireContext().getString(R.string.shared_prefs_cur_user))
         return if (income != null && spent != null) {
             (income - spent)
         } else {
