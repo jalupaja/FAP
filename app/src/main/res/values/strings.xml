@@ -43,5 +43,6 @@
     <string name="theme_dark">dark</string>
     <string name="theme_oled">oled</string>
     <string name="history_empty">Nothing here yet.\nAdd something using the Button on the bottom right.</string>
+    <string name="select_category">Select or add a category</string>
 
 </resources>
