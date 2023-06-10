@@ -8,6 +8,7 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import com.example.fap.ui.login.Login
 import com.example.fap.R
+import com.example.fap.utils.SharedCurrencyManager
 import com.example.fap.utils.SharedPreferencesManager
 import com.example.fap.utils.SharedSecurityManager
 
@@ -17,6 +18,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private lateinit var sharedSecurity: SharedSecurityManager
     private lateinit var biometrics: SwitchPreferenceCompat
     private lateinit var theme: ListPreference
+    private lateinit var currency: ListPreference
 
     override fun onResume() {
         super.onResume()
@@ -29,6 +31,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         sharedSecurity = SharedSecurityManager.getInstance(requireContext())
         biometrics = findPreference("biometrics")!!
         theme = findPreference("theme")!!
+        currency = findPreference("currency")!!
 
         updateSettings()
 
@@ -64,6 +67,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
                 }
             }
+            true
+        }
+        currency.setOnPreferenceChangeListener { _, newValue ->
+            SharedCurrencyManager.getInstance(requireContext()).updateDefaultCurrency(newValue as String, requireContext())
             true
         }
     }

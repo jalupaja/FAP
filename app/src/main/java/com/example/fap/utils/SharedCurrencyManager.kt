@@ -2,11 +2,11 @@ package com.example.fap.utils
 
 import android.content.Context
 import android.util.Log
-import com.example.fap.R
+import com.example.fap.data.Currency
 import com.example.fap.data.FapDatabase
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
@@ -14,57 +14,52 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.Currency
 
 class SharedCurrencyManager(context: Context) {
 
-    private val availableCurrencies = arrayOf(
-        "AUD",
-        "BGN",
-        "BRL",
-        "CAD",
-        "CHF",
-        "CNY",
-        "CZK",
-        "DKK",
-        "EUR",
-        "GBP",
-        "HKD",
-        "HUF",
-        "IDR",
-        "ILS",
-        "INR",
-        "ISK",
-        "JPY",
-        "KRW",
-        "MXN",
-        "MYR",
-        "NOK",
-        "NZD",
-        "PHP",
-        "PLN",
-        "RON",
-        "SEK",
-        "SGD",
-        "THB",
-        "TRY",
-        "USD",
-        "ZAR",
+    private val availableCurrencies = hashMapOf(
+        "A$" to "AUD",
+        "BGN" to "BGN",
+        "R$" to "BRL",
+        "CA$" to "CAD",
+        "CHF" to "CHF",
+        "CN¥" to "CNY",
+        "CZK" to "CZK",
+        "DKK" to "DKK",
+        "€" to "EUR",
+        "£" to "GBP",
+        "HK$" to "HKD",
+        "HUF" to "HUF",
+        "IDR" to "IDR",
+        "₪" to "ILS",
+        "₹" to "INR",
+        "ISK" to "ISK",
+        "JP¥" to "JPY",
+        "₩" to "KRW",
+        "MX$" to "MXN",
+        "MYR" to "MYR",
+        "NOK" to "NOK",
+        "NZ$" to "NZD",
+        "PHP" to "PHP",
+        "PLN" to "PLN",
+        "RON" to "RON",
+        "SEK" to "SEK",
+        "SGD" to "SGD",
+        "THB" to "THB",
+        "TRY" to "TRY",
+        "US$" to "USD",
+        "ZAR" to "ZAR",
     )
     private val sharedPreferences = SharedPreferencesManager.getInstance(context)
-    private val defaultCurrency = sharedPreferences.getString(context.getString(R.string.shared_prefs_current_currency), "EUR") ?: "EUR"
+    private var defaultCurrency = sharedPreferences.getCurrency(context)
 
     fun num2Money(num: Number, currency: String = defaultCurrency): String {
-        return "%.2f".format(num) + Currency.getInstance(currency).symbol
+        return "%.2f".format(num) + currency
     }
 
-    private suspend fun updateCurrency(context: Context): Boolean {
+    private suspend fun updateCurrency(context: Context) {
         val url = URL("https://api.frankfurter.app/latest")
-        val errors = CompletableDeferred<Boolean>()
         GlobalScope.launch {
-
             with(withContext(Dispatchers.IO) {
                 url.openConnection()
             } as HttpURLConnection) {
@@ -85,22 +80,21 @@ class SharedCurrencyManager(context: Context) {
                     if (responseCode == HttpURLConnection.HTTP_OK) {
                         try {
                             val jsonObject = JSONObject(response.toString())
-                            val date = jsonObject.getString("date")
                             val rates = jsonObject.getJSONObject("rates")
 
-                            println("Date: $date") //TODO
                             val db = FapDatabase.getInstance(context)
                             for (currency in rates.keys()) {
-                                db.currencyDao().upsertCurrency(
-                                    com.example.fap.data.Currency(
-                                        currency,
+                                val newCurrency = availableCurrencies.filter { it.value == currency }.keys.first()
+                                db.currencyDao().updateCurrency(
+                                    Currency(
+                                        newCurrency,
                                         rates.getDouble(currency)
                                     )
                                 )
                             }
+                            sharedPreferences.saveLastCurrencyUpdate(context)
                         } catch (e: Exception) {
                             Log.d("SharedCurrencyManager", "Couldn't parse json: $e")
-                            errors.complete(true)
                             return@launch
                         }
                     } else {
@@ -108,7 +102,6 @@ class SharedCurrencyManager(context: Context) {
                             "SharedCurrencyManager",
                             "Couldn't update currency conversion: $responseCode"
                         )
-                        errors.complete(true)
                         return@launch
                     }
                 } catch (e: Exception) {
@@ -116,98 +109,79 @@ class SharedCurrencyManager(context: Context) {
                         "SharedCurrencyManager",
                         "Couldn't connect to API: $e"
                     )
-                    errors.complete(true)
                     return@launch
                 }
-                errors.complete(false)
                 return@launch
             }
         }
-        return errors.await()
     }
 
     suspend fun tryUpdateCurrency(context: Context) {
         // only update once per day as the API also only updates once per day
-        if (sharedPreferences.getLastCurrencyUpdate(context) != getDate()) {
+        if (! sharedPreferences.isCurrencyUpToDate(context)) {
             updateCurrency(context)
         }
     }
 
     suspend fun initCurrency(context: Context) {
-        if (updateCurrency(context)) {
-            // use default/old conversion if user doesn't have an Internet connection on first startup
-            val availableCurrencyConversion = listOf<Double>(
-                1.6248,
-                1.9558,
-                5.3752,
-                1.4443,
-                0.9758,
-                7.6065,
-                23.657,
-                7.4488,
-                1.00,
-                0.8593,
-                8.4346,
-                371.36,
-                15976.0,
-                4.0311,
-                88.64,
-                150.1,
-                149.46,
-                1401.66,
-                18.8527,
-                4.9268,
-                11.845,
-                1.7652,
-                60.132,
-                4.4975,
-                4.9622,
-                11.5505,
-                1.4474,
-                37.251,
-                22.474,
-                1.0763,
-                20.946,
-            )
-            val db = FapDatabase.getInstance(context)
-            for (i in availableCurrencies.indices) {
-                db.currencyDao().upsertCurrency(com.example.fap.data.Currency(availableCurrencies[i], availableCurrencyConversion[i]))
-            }
-            sharedPreferences.saveLastCurrencyUpdate(context, getDate())
-        } else {
-            sharedPreferences.saveLastCurrencyUpdate(context, "0000-00-00")
+        // use default/old conversion if user doesn't have an Internet connection on first startup
+        val availableCurrencyConversion = hashMapOf(
+            "A$" to 1.6023,
+            "BGN" to 1.9558,
+            "R$" to 5.2965,
+            "CA$" to 1.4362,
+            "CHF" to 0.9716,
+            "CN¥" to 7.6839,
+            "CZK" to 23.666,
+            "DKK" to 7.4505,
+            "€" to 1.0,
+            "£" to 0.85795,
+            "HK$" to 8.4493,
+            "HUF" to 368.73,
+            "IDR" to 15997.0,
+            "₪" to 3.8816,
+            "₹" to 88.89,
+            "ISK" to 149.5,
+            "JP¥" to 150.24,
+            "₩" to 1391.11,
+            "MX$" to 18.7356,
+            "MYR" to 4.9739,
+            "NOK" to 11.612,
+            "NZ$" to 1.7627,
+            "PHP" to 60.426,
+            "PLN" to 4.4605,
+            "RON" to 4.9566,
+            "SEK" to 11.673,
+            "SGD" to 1.448,
+            "THB" to 37.277,
+            "TRY" to 25.124,
+            "US$" to 1.078,
+            "ZAR" to 20.181,
+        )
+        val db = FapDatabase.getInstance(context)
+        var i = 0
+        for (currency in availableCurrencyConversion.keys) {
+            db.currencyDao().insertCurrency(Currency(currency, availableCurrencyConversion[currency]!!))
+            i += 1
         }
+        sharedPreferences.saveLastCurrencyUpdate(context, "0000-00-00")
+        tryUpdateCurrency(context)
     }
 
     suspend fun calculateFromCurrency(amount: Double, currencyFrom: String, context: Context): Double {
-        // TODO use in AddPayment
-        // TODO test
         val db = FapDatabase.getInstance(context)
-        return if (currencyFrom != defaultCurrency) {
-            val conversions = db.currencyDao().getConversion(currencyFrom, defaultCurrency)
-            (amount / conversions[0]) * conversions[1]
-        } else {
-            amount
-        }
+        val conversion = db.currencyDao().getConversion(defaultCurrency) / db.currencyDao().getConversion(currencyFrom)
+        return amount * conversion
     }
 
-    suspend fun calculateToCurrency(amount: Double, currencyTo: String, context: Context){
-        // TODO use in Settings (shouldn't create new db on every payment)
-        // TODO test
-        if (currencyTo != defaultCurrency) {
+    private suspend fun calculateToCurrency(currencyFrom: String, currencyTo: String, context: Context) {
+        if (currencyFrom != currencyTo) {
             val db = FapDatabase.getInstance(context)
             val curUser = sharedPreferences.getCurUser(context)
-            val conversions = db.currencyDao().getConversion(defaultCurrency, currencyTo)
-            val conversion = conversions[1] / conversions[0]
-            var newPrice = 0.0
+            val conversion = db.currencyDao().getConversion(currencyTo) / db.currencyDao().getConversion(currencyFrom)
+            var newPrice: Double
 
             val payments = db.fapDao().getPayments(curUser)
-            /*
-            for (payment in payments) {
-                newPrice = payment.price * conversion
-                db.fapDao().updatePayment(payment.copy(price = newPrice))
-            }*/
-            // TODO test this version too
             val updatedPayments = payments.map { payment ->
                 newPrice = payment.price * conversion
                 payment.copy(price = newPrice)
@@ -216,10 +190,20 @@ class SharedCurrencyManager(context: Context) {
         }
     }
 
-    private fun getDate(): String {
-        val currentDate = LocalDate.now()
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-        return currentDate.format(formatter)
+    fun updateDefaultCurrency(newCurrency: String, context: Context) {
+        MainScope().launch {
+            calculateToCurrency(defaultCurrency, newCurrency, context)
+            defaultCurrency = newCurrency
+        }
+        sharedPreferences.saveCurrency(context, newCurrency)
+    }
+
+    fun getDefaultCurrencyIndex(): Int {
+        return availableCurrencies.keys.indexOf(defaultCurrency)
+    }
+
+    fun getAvailableCurrencies(): MutableCollection<String> {
+        return availableCurrencies.keys
     }
 
     companion object {

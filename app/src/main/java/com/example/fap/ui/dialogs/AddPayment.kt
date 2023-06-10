@@ -18,6 +18,7 @@ import android.view.MenuItem
 import android.widget.ArrayAdapter
 import androidx.activity.OnBackPressedCallback
 import com.example.fap.data.Payment
+import com.example.fap.utils.SharedCurrencyManager
 import com.google.android.material.snackbar.Snackbar
 import java.time.ZoneId
 import java.util.*
@@ -25,10 +26,12 @@ import java.util.*
 class AddPayment : AppCompatActivity() {
 
     private lateinit var binding: ActivityAddPaymentBinding
+    private lateinit var currencyAdapter: ArrayAdapter<String>
     private lateinit var walletAdapter: ArrayAdapter<String>
     private lateinit var categoryAdapter: ArrayAdapter<String>
     private var isPayment: Boolean = true
     private lateinit var sharedPreferences: SharedPreferencesManager
+    private lateinit var sharedCurrency: SharedCurrencyManager
     private var curItemId = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,6 +42,8 @@ class AddPayment : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         sharedPreferences = SharedPreferencesManager.getInstance(applicationContext)
+        sharedCurrency = SharedCurrencyManager.getInstance(applicationContext)
+
         val db = FapDatabase.getInstance(applicationContext).fapDao()
         val curUser = sharedPreferences.getCurUser(applicationContext)
         val dateFormatPattern = "dd.MM.yyyy"
@@ -46,6 +51,7 @@ class AddPayment : AppCompatActivity() {
         val itemTitle = binding.titleInput
         val itemDate = binding.datePicker
         val itemPrice = binding.priceInput
+        val itemCurrency = binding.currencySpinner
         val itemCategory = binding.categorySpinner
         val itemWallet = binding.walletSpinner
         val btnIsPayment = binding.btnIsPayment
@@ -85,6 +91,7 @@ class AddPayment : AppCompatActivity() {
             val wallet = itemWallet.selectedItem?.toString() ?: ""
             val title = itemTitle.text?.toString() ?: ""
             val price = itemPrice.text?.toString() ?: ""
+            val currency = itemCurrency.selectedItem?.toString() ?: ""
             val description = itemDescription.text?.toString() ?: ""
             val date = Date.from(LocalDate.parse(itemDate.text.toString(), DateTimeFormatter.ofPattern(dateFormatPattern)).atStartOfDay().atZone( ZoneId.systemDefault()).toInstant())
             val category = itemCategory.text?.toString() ?: ""
@@ -93,20 +100,20 @@ class AddPayment : AppCompatActivity() {
             if (title.isEmpty() || price.isEmpty()) {
                 Snackbar.make(binding.root, "Please fill the title and price", Snackbar.LENGTH_SHORT).show()
             } else {
-                var newPayment = Payment(
-                    userId = curUser,
-                    wallet = wallet,
-                    title = title,
-                    description = description,
-                    price = price.toDouble(),
-                    date = date,
-                    isPayment = isPayment,
-                    category = category,
-                )
-                if (curItemId != -1) {
-                    newPayment = newPayment.copy(id = curItemId)
-                }
                 lifecycleScope.launch {
+                    var newPayment = Payment(
+                        userId = curUser,
+                        wallet = wallet,
+                        title = title,
+                        description = description,
+                        price = sharedCurrency.calculateFromCurrency(price.toDouble(), currency, applicationContext),
+                        date = date,
+                        isPayment = isPayment,
+                        category = category,
+                    )
+                    if (curItemId != -1) {
+                        newPayment = newPayment.copy(id = curItemId)
+                    }
                     db.insertCategory(Category(category))
                     db.upsertPayment(newPayment)
                 }
@@ -116,18 +123,22 @@ class AddPayment : AppCompatActivity() {
 
         curItemId = intent.getIntExtra("paymentId", -1)
 
+        currencyAdapter = ArrayAdapter(applicationContext, android.R.layout.simple_spinner_dropdown_item)
         walletAdapter = ArrayAdapter(applicationContext, android.R.layout.simple_spinner_dropdown_item)
         val categorySpinner = binding.categorySpinner
 
         var startTitle = ""
         var startDate = SimpleDateFormat(dateFormatPattern, Locale.getDefault()).format(Date())
         var startPrice = ""
+        val startCurrency = sharedCurrency.getDefaultCurrencyIndex()
         var startCategory = ""
         var startWallet = 0
         var startDescription = ""
 
         lifecycleScope.launch {
             // Setup existing wallets
+            currencyAdapter.addAll(sharedCurrency.getAvailableCurrencies())
+            itemCurrency.adapter = currencyAdapter
             val wallets = db.getWallets(curUser)
             itemWallet.adapter = walletAdapter
             for (wallet in wallets) {
@@ -158,6 +169,7 @@ class AddPayment : AppCompatActivity() {
             itemTitle.setText(startTitle)
             itemDate.setText(startDate)
             itemPrice.setText(startPrice)
+            itemCurrency.setSelection(startCurrency)
             itemCategory.setText(startCategory)
             itemWallet.setSelection(startWallet)
             if (isPayment) {

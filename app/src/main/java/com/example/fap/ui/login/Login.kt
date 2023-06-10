@@ -27,6 +27,7 @@ import com.example.fap.utils.SharedCurrencyManager
 import com.example.fap.utils.SharedPreferencesManager
 import com.example.fap.utils.SharedSecurityManager
 import com.google.android.material.textfield.TextInputEditText
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import java.security.MessageDigest
 import java.util.UUID
@@ -268,11 +269,11 @@ class Login : AppCompatActivity() {
 
                     val userId = UUID.randomUUID().toString()
                     sharedPreferences.saveCurUser(applicationContext, userId)
-                    sharedPreferences.saveString(application.getString(R.string.shared_prefs_current_currency), "EUR")
+                    sharedPreferences.saveString(application.getString(R.string.shared_prefs_current_currency), "€")
 
                     // save password hash
                     sharedPreferences.saveString(getString(R.string.shared_prefs_hash), calculateHash(tmpPass))
-                    lifecycleScope.launch {
+                    MainScope().launch {
                         // create Database using the Password
                         val db = FapDatabase.getInstance(applicationContext, tmpPass)
                         // setup default values

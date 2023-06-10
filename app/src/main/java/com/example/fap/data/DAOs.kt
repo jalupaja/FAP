@@ -85,9 +85,13 @@ interface FapDao {
 
 @Dao
 interface CurrencyDao {
-    @Upsert
-    suspend fun upsertCurrency(currency: Currency)
+    @Insert
+    suspend fun insertCurrency(currency: Currency)
 
-    @Query("SELECT conversion FROM Currency WHERE code = :currencyFrom OR code = :currencyTo")
-    suspend fun getConversion(currencyFrom: String, currencyTo: String): List<Double>
+    @Update
+    suspend fun updateCurrency(currency: Currency)
+
+    @Query("SELECT conversion FROM Currency WHERE code = :currency")
+    suspend fun getConversion(currency: String): Double
+
 }
