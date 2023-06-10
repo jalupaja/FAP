@@ -35,8 +35,8 @@ interface FapDao {
     @Update
     suspend fun updatePayments(payments: List<Payment>)
 
-    @Delete
-    suspend fun deletePayment(payment: Payment)
+    @Query("DELETE FROM Payment WHERE id = :id")
+    suspend fun deletePayment(id: Int)
 
     @Query("SELECT * FROM Payment WHERE userId = :userId")
     suspend fun getPayments(userId: String): List<Payment>

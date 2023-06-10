@@ -1,5 +1,6 @@
 package com.example.fap.ui.dialogs
 
+import android.app.AlertDialog
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -14,7 +15,9 @@ import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 import android.app.DatePickerDialog
+import android.opengl.Visibility
 import android.view.MenuItem
+import android.view.View
 import android.widget.ArrayAdapter
 import androidx.activity.OnBackPressedCallback
 import com.example.fap.R
@@ -49,6 +52,7 @@ class AddPayment : AppCompatActivity() {
         val curUser = sharedPreferences.getCurUser(applicationContext)
         val dateFormatPattern = "dd.MM.yyyy"
 
+        val btnDel = binding.btnDel
         val itemTitle = binding.titleInput
         val itemDate = binding.datePicker
         val itemPrice = binding.priceInput
@@ -61,6 +65,25 @@ class AddPayment : AppCompatActivity() {
         val btnSave = binding.btnSave
 
         // onClickListeners
+        btnDel.setOnClickListener {
+            val alert = AlertDialog.Builder(this)
+            alert.setMessage("Are you sure you want to delete this item?")
+            alert.setTitle("Confirmation")
+            alert.setPositiveButton("Yes") { dialog, _ ->
+                // TODO only show on curItemId
+                lifecycleScope.launch {
+                    db.deletePayment(curItemId)
+                }
+                dialog.dismiss()
+                backButtonCallback.handleOnBackPressed()
+            }
+            alert.setNegativeButton("No") { dialog, _ ->
+                dialog.dismiss()
+            }
+
+            alert.show()
+        }
+
         btnIsPayment.setOnClickListener {
             btnIsPayment.alpha = 1F
             btnIsIncome.alpha = 0.7F
@@ -156,6 +179,7 @@ class AddPayment : AppCompatActivity() {
 
             // Update default values if this is supposed to edit an existing item
             if (curItemId != -1) {
+                btnDel.visibility = View.VISIBLE
                 val item = db.getPayment(curItemId)
                 startTitle = item.title
                 startDate = SimpleDateFormat(dateFormatPattern, Locale.getDefault()).format(item.date)
