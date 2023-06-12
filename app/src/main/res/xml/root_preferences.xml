@@ -15,5 +15,12 @@
             android:entries="@array/theme"
             android:entryValues="@array/theme_values" />
 
+        <ListPreference
+            app:key="dbEI"
+            app:title="Export/Import Data"
+            android:dialogTitle="@string/dbEI_dialog"
+            android:entries="@array/dbEI"
+            android:entryValues="@array/dbEI_values"/>
+
     </PreferenceCategory>
 </PreferenceScreen>

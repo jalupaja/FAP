@@ -41,4 +41,8 @@
     <string name="theme_dark">dark</string>
     <string name="theme_oled">oled</string>
 
+    <string name="dbEI_dialog">Export/Import Data</string>
+    <string name="dbEI_import">import</string>
+    <string name="dbEI_export">export</string>
+
 </resources>

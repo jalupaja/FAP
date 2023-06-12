@@ -17,6 +17,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private lateinit var sharedSecurity: SharedSecurityManager
     private lateinit var biometrics: SwitchPreferenceCompat
     private lateinit var theme: ListPreference
+    private lateinit var exImportDB: ListPreference
 
     override fun onResume() {
         super.onResume()
@@ -29,6 +30,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         sharedSecurity = SharedSecurityManager.getInstance(requireContext())
         biometrics = findPreference<SwitchPreferenceCompat>("biometrics")!!
         theme = findPreference<ListPreference>("theme")!!
+        exImportDB = findPreference<ListPreference>("dbEI")!!
 
         updateSettings()
 
@@ -62,6 +64,23 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 }
                 else -> {
                     AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+                }
+            }
+            true
+        }
+
+        /*Export / Import Data*/
+        exImportDB.setOnPreferenceChangeListener {_, newValue ->
+            newValue as? String
+            when (newValue) {
+                getString(R.string.dbEI_import) -> {
+
+                }
+                getString(R.string.dbEI_export) -> {
+
+                }
+                else -> {
+
                 }
             }
             true
