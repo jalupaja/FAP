@@ -20,7 +20,7 @@
   <color name="red">#F44336</color>
   <color name="seed">#006493</color>
   <color name="md_theme_light_primary">#006493</color>
-  <color name="md_theme_light_onPrimary">#FFFFFF</color>
+  <color name="md_theme_light_onPrimary">#00344F</color>
   <color name="md_theme_light_primaryContainer">#CAE6FF</color>
   <color name="md_theme_light_onPrimaryContainer">#001E30</color>
   <color name="md_theme_light_secondary">#006783</color>
@@ -50,7 +50,7 @@
   <color name="md_theme_light_outlineVariant">#C1C7CE</color>
   <color name="md_theme_light_scrim">#000000</color>
   <color name="md_theme_dark_primary">#8DCDFF</color>
-  <color name="md_theme_dark_onPrimary">#00344F</color>
+  <color name="md_theme_dark_onPrimary">#FFFFFF</color>
   <color name="md_theme_dark_primaryContainer">#004B70</color>
   <color name="md_theme_dark_onPrimaryContainer">#CAE6FF</color>
   <color name="md_theme_dark_secondary">#61D4FF</color>

@@ -100,7 +100,6 @@ class Login : AppCompatActivity() {
                 REGISTERSTATE.CONFIRMING -> {
                     textLogin.text!!.clear()
                     registerState = REGISTERSTATE.REGISTERING
-                    lblLoginStatus.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20F)
                     lblLoginStatus.text = getString(R.string.register_password)
                 }
 
@@ -206,10 +205,8 @@ class Login : AppCompatActivity() {
 
         if (!checkRegistered(applicationContext)) {
             registerState = REGISTERSTATE.REGISTERING
-            lblLoginStatus.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20F)
             lblLoginStatus.text = getString(R.string.register_password)
         } else if (registerState == REGISTERSTATE.ACTIVATE_BIOMETRICS) {
-            lblLoginStatus.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20F)
             lblLoginStatus.text = getString(R.string.activate_biometrics)
         }
 
@@ -264,7 +261,6 @@ class Login : AppCompatActivity() {
 
             REGISTERSTATE.CONFIRMING -> {
                 if (textLogin.text!!.toString() == tmpPass) {
-                    lblLoginStatus.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14F)
                     registerState = REGISTERSTATE.REGISTERED
 
                     val userId = UUID.randomUUID().toString()
@@ -296,7 +292,6 @@ class Login : AppCompatActivity() {
             REGISTERSTATE.ACTIVATE_BIOMETRICS -> {
                 if (checkPassword(textLogin.text!!.toString())) {
                     tmpPass = textLogin.text!!.toString()
-                    lblLoginStatus.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14F)
                     lblLoginStatus.text = ""
                     authenticateWithBiometrics()
                 } else {
