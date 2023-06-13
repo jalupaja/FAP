@@ -60,4 +60,8 @@
 
     <style name="Theme.FAP.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="Theme.FAP.Add_Payment">
+        <item name="android:textColor">#777</item>
+    </style>
+
 </resources>

@@ -17,6 +17,7 @@ import android.app.DatePickerDialog
 import android.view.MenuItem
 import android.widget.ArrayAdapter
 import androidx.activity.OnBackPressedCallback
+import com.example.fap.R
 import com.example.fap.data.Payment
 import com.example.fap.utils.SharedCurrencyManager
 import com.google.android.material.snackbar.Snackbar
@@ -123,8 +124,8 @@ class AddPayment : AppCompatActivity() {
 
         curItemId = intent.getIntExtra("paymentId", -1)
 
-        currencyAdapter = ArrayAdapter(applicationContext, android.R.layout.simple_spinner_dropdown_item)
-        walletAdapter = ArrayAdapter(applicationContext, android.R.layout.simple_spinner_dropdown_item)
+        currencyAdapter = ArrayAdapter(applicationContext, R.layout.spinner_item)
+        walletAdapter = ArrayAdapter(applicationContext, R.layout.spinner_item)
         val categorySpinner = binding.categorySpinner
 
         var startTitle = ""
@@ -147,7 +148,7 @@ class AddPayment : AppCompatActivity() {
 
             // Setup existing categories
             val categories = db.getCategories()
-            categoryAdapter = ArrayAdapter<String>(applicationContext, android.R.layout.simple_dropdown_item_1line)
+            categoryAdapter = ArrayAdapter<String>(applicationContext, R.layout.spinner_item)
             categorySpinner.setAdapter(categoryAdapter)
             for (category in categories) {
                 categoryAdapter.add(category.name)
