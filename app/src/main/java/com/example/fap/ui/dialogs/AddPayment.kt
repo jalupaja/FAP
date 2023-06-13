@@ -158,7 +158,7 @@ class AddPayment : AppCompatActivity() {
                 val item = db.getPayment(curItemId)
                 startTitle = item.title
                 startDate = SimpleDateFormat(dateFormatPattern, Locale.getDefault()).format(item.date)
-                startPrice = item.price.toString()
+                startPrice = "%.2f".format(item.price.toString())
                 startCategory = item.category ?: ""
                 startWallet = walletAdapter.getPosition(item.wallet)
                 isPayment = item.isPayment
