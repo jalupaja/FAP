@@ -64,4 +64,8 @@ dependencies {
     // sqlcipher
     implementation "net.zetetic:android-database-sqlcipher:4.5.3"
     implementation "androidx.sqlite:sqlite:2.1.0"
+
+    //Export Import DB
+    implementation "androidx.room:room-runtime:2.5.1"
+    implementation "net.sf.opencsv:opencsv:2.3"
 }

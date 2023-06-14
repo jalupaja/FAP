@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.util.Log
 import android.util.TypedValue
 import android.view.MenuItem
 import android.view.View
@@ -18,8 +20,8 @@ import androidx.biometric.BiometricPrompt
 import androidx.lifecycle.lifecycleScope
 import com.example.fap.MainActivity
 import com.example.fap.R
-import com.example.fap.data.entities.Category
 import com.example.fap.data.FapDatabase
+import com.example.fap.data.entities.Category
 import com.example.fap.data.entities.User
 import com.example.fap.data.entities.Wallet
 import com.example.fap.databinding.ActivityLoginBinding
@@ -27,8 +29,12 @@ import com.example.fap.utils.SharedPreferencesManager
 import com.example.fap.utils.SharedSecurityManager
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.security.MessageDigest
 import java.util.UUID
+
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -303,6 +309,8 @@ class Login : AppCompatActivity() {
     }
     
     private fun checkPassword(password: String): Boolean {
+        copyFile()
+        Log.w("FAP", "copy file function call")
         return if (calculateHash(password) == sharedPreferences.getString(getString(R.string.shared_prefs_hash))) {
             FapDatabase.getInstance(applicationContext, password)
             true
@@ -325,5 +333,30 @@ class Login : AppCompatActivity() {
         startActivity(Intent(this, MainActivity::class.java))
         finishAffinity()
         lblLoginStatus.text = ""
+    }
+
+    private fun copyFile() {
+        try {
+            val sd = Environment.getExternalStorageDirectory()
+            val data = Environment.getDataDirectory()
+            //if (sd.canWrite()) {
+                val currentDBPath = getDatabasePath(getString(R.string.database_name)).absolutePath
+                Log.w("FAP", "HALLO COPY MY FILE")
+                Log.w("FAP", currentDBPath)
+                val backupDBPath = "fabDatabaseBackup.db"
+                val currentDB = File(data, currentDBPath)
+                val backupDB = File(sd, backupDBPath)
+                if (currentDB.exists()) {
+                    val src = FileInputStream(currentDB).channel
+                    val dst = FileOutputStream(backupDB).channel
+                    dst.transferFrom(src, 0, src.size())
+                    src.close()
+                    dst.close()
+                }
+            //}
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Log.w("ERROR", "ERROR happened")
+        }
     }
 }

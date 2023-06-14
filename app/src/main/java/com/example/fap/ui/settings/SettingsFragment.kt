@@ -1,15 +1,17 @@
 package com.example.fap.ui.settings
 
+import android.content.ContextWrapper
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.ListPreference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
-import com.example.fap.ui.login.Login
 import com.example.fap.R
+import com.example.fap.ui.login.Login
 import com.example.fap.utils.SharedPreferencesManager
 import com.example.fap.utils.SharedSecurityManager
+
 
 class SettingsFragment : PreferenceFragmentCompat() {
 
@@ -77,7 +79,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
                 }
                 getString(R.string.dbEI_export) -> {
-
+                    exportDbToCsv()
                 }
                 else -> {
 
@@ -96,5 +98,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
         sharedPreferences.saveInt(getString(R.string.shared_prefs_theme), mode)
         AppCompatDelegate.setDefaultNightMode(mode)
         requireActivity().recreate()
+    }
+
+    private fun exportDbToCsv(){
+        //val currentDBPath = getDatabasePath("photex_db.db").absolutePath
+
     }
 }
