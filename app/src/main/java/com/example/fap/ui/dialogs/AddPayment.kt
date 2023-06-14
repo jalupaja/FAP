@@ -52,6 +52,7 @@ class AddPayment : AppCompatActivity() {
         val curUser = sharedPreferences.getCurUser(applicationContext)
         val dateFormatPattern = "dd.MM.yyyy"
 
+        val btnBack = binding.btnBack
         val btnDel = binding.btnDel
         val itemTitle = binding.titleInput
         val itemDate = binding.datePicker
@@ -65,6 +66,9 @@ class AddPayment : AppCompatActivity() {
         val btnSave = binding.btnSave
 
         // onClickListeners
+        btnBack.setOnClickListener {
+            backButtonCallback.handleOnBackPressed()
+        }
         btnDel.setOnClickListener {
             val alert = AlertDialog.Builder(this)
             alert.setMessage("Are you sure you want to delete this item?")
