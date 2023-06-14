@@ -144,8 +144,8 @@ class AddPayment : AppCompatActivity() {
                     }
                     db.insertCategory(Category(category))
                     db.upsertPayment(newPayment)
+                    backButtonCallback.handleOnBackPressed()
                 }
-                backButtonCallback.handleOnBackPressed()
             }
         }
 
