@@ -8,6 +8,7 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import com.example.fap.ui.login.Login
 import com.example.fap.R
+import com.example.fap.utils.SharedCurrencyManager
 import com.example.fap.utils.SharedPreferencesManager
 import com.example.fap.utils.SharedSecurityManager
 
@@ -17,6 +18,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private lateinit var sharedSecurity: SharedSecurityManager
     private lateinit var biometrics: SwitchPreferenceCompat
     private lateinit var theme: ListPreference
+    private lateinit var currency: ListPreference
 
     override fun onResume() {
         super.onResume()
@@ -27,8 +29,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
         sharedPreferences = SharedPreferencesManager.getInstance(requireContext())
         sharedSecurity = SharedSecurityManager.getInstance(requireContext())
-        biometrics = findPreference<SwitchPreferenceCompat>("biometrics")!!
-        theme = findPreference<ListPreference>("theme")!!
+        biometrics = findPreference("biometrics")!!
+        theme = findPreference("theme")!!
+        currency = findPreference("currency")!!
 
         updateSettings()
 
@@ -66,11 +69,16 @@ class SettingsFragment : PreferenceFragmentCompat() {
             }
             true
         }
+        currency.setOnPreferenceChangeListener { _, newValue ->
+            SharedCurrencyManager.getInstance(requireContext()).updateDefaultCurrency(newValue as String, requireContext())
+            true
+        }
     }
 
     private fun updateSettings() {
-        biometrics.isChecked = ! sharedPreferences.getString(getString(R.string.shared_prefs_biometrics_key)).isNullOrEmpty()
-        biometrics.isEnabled = sharedSecurity.checkBiometric()
+        biometrics.isChecked =
+            sharedPreferences.getString(getString(R.string.shared_prefs_biometrics_key)).isNotEmpty()
+        biometrics.isEnabled = sharedSecurity.checkBiometric(requireContext())
     }
 
     private fun updateTheme(mode: Int) {

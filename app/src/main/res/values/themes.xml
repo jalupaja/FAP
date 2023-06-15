@@ -47,6 +47,7 @@
         <item name="colorOnCustomColor4Container">#0b2000</item>
         <item name="harmonizeCustomColor4">false</item>
         <item name="colorPrimaryInverse">@color/md_theme_light_inversePrimary</item>
+        <item name="tint">@color/md_theme_light_onPrimary</item>
     </style>
 
     <style name="Theme.FAP.NoActionBar">
@@ -59,10 +60,9 @@
 
     <style name="Theme.FAP.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <style name="Theme.FAP.Fullscreen" parent="Theme.FAP">
-        <item name="android:actionBarStyle">@style/Widget.Theme.FAP.ActionBar.Fullscreen</item>
-        <item name="android:windowActionBarOverlay">true</item>
-        <item name="android:windowBackground">@null</item>
+    <style name="Theme.FAP.Add_Payment">
+        <item name="android:textColor">#777</item>
+        <item name="android:textColorPrimary">#777</item>
     </style>
 
 </resources>

@@ -10,4 +10,42 @@
         <item>@string/theme_dark</item>
         <item>@string/theme_oled</item>
     </string-array>
+
+    <string-array name="currency">
+        <item>A$</item>
+        <item>BGN</item>
+        <item>R$</item>
+        <item>CA$</item>
+        <item>CHF</item>
+        <item>CN¥</item>
+        <item>CZK</item>
+        <item>DKK</item>
+        <item>€</item>
+        <item>£</item>
+        <item>HK$</item>
+        <item>HUF</item>
+        <item>IDR</item>
+        <item>₪</item>
+        <item>₹</item>
+        <item>ISK</item>
+        <item>JP¥</item>
+        <item>₩</item>
+        <item>MX$</item>
+        <item>MYR</item>
+        <item>NOK</item>
+        <item>NZ$</item>
+        <item>PHP</item>
+        <item>PLN</item>
+        <item>RON</item>
+        <item>SEK</item>
+        <item>SGD</item>
+        <item>THB</item>
+        <item>TRY</item>
+        <item>US$</item>
+        <item>ZAR</item>
+    </string-array>
+
+    <string-array name="empty_spinner">
+        <item></item>
+    </string-array>
 </resources>

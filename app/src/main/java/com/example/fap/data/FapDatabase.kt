@@ -16,13 +16,15 @@ import net.sqlcipher.database.SupportFactory
         Category::class,
         Payment::class,
         Stock::class,
-        SavingsGoal::class
-               ],
+        SavingsGoal::class,
+        Currency::class,
+    ],
     version = 1
 )
 @TypeConverters(Converters::class)
 abstract class FapDatabase: RoomDatabase() {
     abstract fun fapDao(): FapDao
+    abstract fun currencyDao(): CurrencyDao
 
     companion object {
         private var instance: FapDatabase? = null

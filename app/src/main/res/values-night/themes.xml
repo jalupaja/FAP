@@ -48,9 +48,16 @@
         <item name="colorOnCustomColor4Container">#92fc44</item>
         <item name="harmonizeCustomColor4">false</item>
         <item name="colorPrimaryInverse">@color/md_theme_dark_inversePrimary</item>
+        <item name="tint">@color/md_theme_dark_onPrimary</item>
     </style>
 
     <style name="menuItemAppearance" parent="@android:style/TextAppearance.Widget.IconMenu.Item">
         <item name="android:textColor">@color/md_theme_dark_onBackground</item>
     </style>
+
+    <style name="Theme.FAP.Add_Payment">
+        <item name="android:textColor">#777</item>
+        <item name="android:textColorPrimary">#777</item>
+    </style>
+
 </resources>

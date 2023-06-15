@@ -9,11 +9,19 @@
 
         <ListPreference
             app:key="theme"
-            app:title="Change Theme"
+            app:title="Theme"
             android:dialogTitle="@string/theme_dialog"
             android:defaultValue="@string/theme_default"
             android:entries="@array/theme"
             android:entryValues="@array/theme_values" />
+
+        <ListPreference
+            app:key="currency"
+            app:title="Default Currency"
+            android:dialogTitle="Change default Currency"
+            android:defaultValue="€"
+            android:entries="@array/currency"
+            android:entryValues="@array/currency" />
 
     </PreferenceCategory>
 </PreferenceScreen>
