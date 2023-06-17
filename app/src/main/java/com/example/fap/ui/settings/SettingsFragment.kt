@@ -2,7 +2,9 @@ package com.example.fap.ui.settings
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.app.ActivityCompat.recreate
 import androidx.preference.ListPreference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
@@ -21,6 +23,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
     override fun onResume() {
         super.onResume()
         updateSettings()
+        //requireActivity().setTheme(sharedPreferences.getTheme(requireContext()))
+        requireContext().setTheme(sharedPreferences.getTheme(requireContext()))
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -48,34 +52,37 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         /* Theme */
         theme.setOnPreferenceChangeListener { _, newValue ->
-            newValue as? String
+            newValue as String
             when (newValue) {
                 getString(R.string.theme_light) -> {
-                    updateTheme(AppCompatDelegate.MODE_NIGHT_NO)
+
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                 }
                 getString(R.string.theme_dark) -> {
-                    updateTheme(AppCompatDelegate.MODE_NIGHT_YES)
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
                 }
                 getString(R.string.theme_oled) -> {
-                    /* TODO Add Oled theme
-                        updateTheme() */
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
                 }
                 else -> {
                     AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
                 }
             }
+            sharedPreferences.saveTheme(requireContext(), newValue)
             true
         }
+<<<<<<< Updated upstream
+=======
+
+        currency.setOnPreferenceChangeListener { _, newValue ->
+            SharedCurrencyManager.getInstance(requireContext()).updateDefaultCurrency(newValue as String, requireContext())
+            true
+        }
+>>>>>>> Stashed changes
     }
 
     private fun updateSettings() {
         biometrics.isChecked = ! sharedPreferences.getString(getString(R.string.shared_prefs_biometrics_key)).isNullOrEmpty()
         biometrics.isEnabled = sharedSecurity.checkBiometric()
-    }
-
-    private fun updateTheme(mode: Int) {
-        sharedPreferences.saveInt(getString(R.string.shared_prefs_theme), mode)
-        AppCompatDelegate.setDefaultNightMode(mode)
-        requireActivity().recreate()
     }
 }

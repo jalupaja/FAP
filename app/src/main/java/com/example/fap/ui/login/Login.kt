@@ -115,12 +115,6 @@ class Login : AppCompatActivity() {
         sharedPreferences = SharedPreferencesManager.getInstance(applicationContext)
         sharedSecurity = SharedSecurityManager.getInstance(applicationContext)
 
-        val currentTheme = sharedPreferences.getInt(getString(R.string.shared_prefs_theme))
-        if (AppCompatDelegate.getDefaultNightMode() != currentTheme) {
-            AppCompatDelegate.setDefaultNightMode(currentTheme)
-            recreate()
-        }
-
         registerState = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent?.getSerializableExtra("STATE", REGISTERSTATE::class.java)
                 ?: REGISTERSTATE.REGISTERED
@@ -221,6 +215,11 @@ class Login : AppCompatActivity() {
 
         binding.useBiometrics.setOnClickListener {
             authenticateWithBiometrics()
+        }
+
+        val updatedTheme = sharedPreferences.getTheme(applicationContext)
+        if (! getTheme().equals(updatedTheme)) {
+            setTheme(R.style.Theme_FAP_Oled)
         }
 
         onBackPressedDispatcher.addCallback(this, backButtonCallback)
