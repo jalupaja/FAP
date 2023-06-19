@@ -17,11 +17,8 @@ import com.example.fap.utils.SharedPreferencesManager
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
-import com.github.mikephil.charting.animation.Easing
-import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.data.Entry
-import com.github.mikephil.charting.data.LineData
-import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.charts.PieChart
 import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment() {
@@ -36,6 +33,8 @@ class HomeFragment : Fragment() {
     private lateinit var db: FapDatabase
 
     private lateinit var lblTotal: TextView
+    private lateinit var chartBalance: PieChart
+    private lateinit var chartCategory: BarChart
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -52,8 +51,8 @@ class HomeFragment : Fragment() {
         val view = binding.root
 
         lblTotal = binding.lblTotal
-        val chartBalance = binding.chartBalance
-        val chartStock = binding.chartStock
+        chartBalance = binding.chartBalance
+        chartCategory = binding.chartCategory
     //get theme OnSurface Color
         val typedValue = TypedValue()
         val theme = requireContext().theme
@@ -70,12 +69,12 @@ class HomeFragment : Fragment() {
         chartBalance.setCenterTextSize(10f)
         chartBalance.setCenterTextColor(colorOnSurface)
 
-        var einnahmen = 30f
-        var ausgaben = 20f
+        var einnahmen = 0f//getTotalIncome()
+        var ausgaben = 0f//getTotalSpent()
         var saldo = einnahmen - ausgaben
         val entriesBalance = listOf(
-            PieEntry(einnahmen, "Einnahmen"),
-            PieEntry(ausgaben, "Ausgaben")
+            PieEntry(einnahmen.toFloat(), "Einnahmen"),
+            PieEntry(ausgaben.toFloat(), "Ausgaben")
         )
         val dataSet = PieDataSet(entriesBalance, "Finanzen")
         chartBalance.centerText = "Einnahmen: $einnahmen € \nAusgaben: $ausgaben €\n _______________________ \nSaldo: $saldo €"
@@ -97,40 +96,8 @@ class HomeFragment : Fragment() {
         chartBalance.invalidate()
         chartBalance.notifyDataSetChanged()
 
-        //Chart com.example.fap.data.Stock
-        val entriesStock = listOf(
-            Entry(1f, 10f),
-            Entry(2f, 2f),
-            Entry(3f, 7f),
-            Entry(4f, 20f),
-        )
-        val stockDataSet = LineDataSet(entriesStock, "Test1")
-        stockDataSet.lineWidth = 2f
-        stockDataSet.color = resources.getColor(R.color.yellow, context?.theme)
+        //Bar Chart Category
 
-        val entriesStock2 = listOf(
-            Entry(1f, 30f),
-            Entry(2f, 4f),
-            Entry(3f, 100f),
-            Entry(4f, 2f),
-        )
-        val stockDataSet2 = LineDataSet(entriesStock2, "Test2")
-        stockDataSet2.color = resources.getColor(R.color.purple_700, context?.theme)
-        stockDataSet2.lineWidth = 2f
-
-        chartStock.data = LineData(stockDataSet, stockDataSet2)
-        chartStock.axisRight.isEnabled = false
-        chartStock.setTouchEnabled(false)
-        chartStock.setPinchZoom(true)
-        chartStock.description.text = "com.example.fap.data.Stock"
-        chartStock.animateX(1000, Easing.EaseInExpo)
-        chartStock.legend.textColor = colorOnSurface
-
-        chartStock.xAxis.position = XAxis.XAxisPosition.BOTTOM
-        chartStock.xAxis.setDrawGridLines(false)
-
-        chartStock.invalidate()
-        chartStock.notifyDataSetChanged()
 
         return view
     }
@@ -140,6 +107,31 @@ class HomeFragment : Fragment() {
         // update values
         lifecycleScope.launch {
             lblTotal.text = sharedCurrency.num2Money(updateTotal())
+            // Pie Chart
+            var einnahmen = getTotalIncome()
+            var ausgaben = getTotalSpent()
+            val entriesBalance = listOf(
+                PieEntry(einnahmen.toFloat(), "Einnahmen"),
+                PieEntry(ausgaben.toFloat(), "Ausgaben")
+            )
+            var saldo = einnahmen - ausgaben
+            //TODO: change € to actual used currency
+            chartBalance.centerText = "Income: ${String.format("%.2f", einnahmen)} € \nSpent: ${String.format("%.2f", ausgaben)} €\n _______________________ \nSaldo: ${String.format("%.2f",saldo)} €"
+
+            val dataSet = PieDataSet(entriesBalance, "Finanzen")
+            dataSet.sliceSpace = 3f
+            dataSet.selectionShift = 5f
+            dataSet.colors = listOf(
+                resources.getColor(R.color.green, context?.theme),
+                resources.getColor(R.color.red, context?.theme)
+            )
+            dataSet.setValueTextColors(
+                listOf(
+                    resources.getColor(com.google.android.material.R.color.mtrl_btn_transparent_bg_color, context?.theme)
+                )
+            )
+            val chartData = PieData(dataSet)
+            chartBalance.data = chartData
         }
     }
 
@@ -158,5 +150,23 @@ class HomeFragment : Fragment() {
             spent = 0.0
 
         return income - spent
+    }
+
+    private suspend fun getTotalIncome(): Double {
+       var income: Double? = db.fapDao().getTotalIncome(sharedPreferences.getCurUser(requireContext()))
+
+        if (income == null)
+            income = 0.0
+
+        return income
+    }
+
+    private suspend fun getTotalSpent(): Double {
+        var spent: Double? = db.fapDao().getTotalAmountSpent(sharedPreferences.getCurUser(requireContext()))
+
+        if (spent == null)
+            spent = 0.0
+
+        return spent
     }
 }
