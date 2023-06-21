@@ -30,7 +30,7 @@
             android:padding="16dp">
 
             <TextView
-                android:id="@+id/lbl_total"
+                android:id="@+id/lbl_balance"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="0.00€"
@@ -76,14 +76,15 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Einnahmen"
+                    android:text="Income"
                     android:textAlignment="center"
                     android:textStyle="bold"
                     android:textSize="16dp"/>
                 <TextView
+                    android:id="@+id/lbl_income_month"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="5.5555"
+                    android:text="0.00"
                     android:textAlignment="center"
                     android:textColor="#59E237"
                     android:textSize="16dp" />
@@ -109,14 +110,15 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Saldo"
+                    android:text="Balance"
                     android:textAlignment="center"
                     android:textStyle="bold"
                     android:textSize="16dp"/>
                 <TextView
+                    android:id="@+id/lbl_balance_month"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="5.5555"
+                    android:text="0.00"
                     android:textAlignment="center"
                     android:textSize="15dp" />
             </LinearLayout>
@@ -141,14 +143,15 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Ausgaben"
+                    android:text="Expense"
                     android:textAlignment="center"
                     android:textStyle="bold"
                     android:textSize="16dp"/>
                 <TextView
+                    android:id="@+id/lbl_expense_month"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="5.5555"
+                    android:text="0.00"
                     android:textAlignment="center"
                     android:textColor="#ff0000"
                     android:textSize="15dp" />
@@ -161,7 +164,7 @@
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/chart_stock"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="600px"
         app:layout_constraintTop_toBottomOf="@+id/cards_overview"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="15dp"/>

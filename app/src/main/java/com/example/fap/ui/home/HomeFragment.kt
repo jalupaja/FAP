@@ -1,24 +1,17 @@
 package com.example.fap.ui.home
 
 import android.os.Bundle
-import android.util.Log
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.ColorInt
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager2.widget.ViewPager2
-import com.example.fap.R
 import com.example.fap.data.FapDatabase
-import com.example.fap.data.Wallet
 import com.example.fap.databinding.FragmentHomeBinding
 import com.example.fap.utils.SharedCurrencyManager
 import com.example.fap.utils.SharedPreferencesManager
 import kotlinx.coroutines.launch
+import java.util.Calendar
 
 class HomeFragment : Fragment() {
 
@@ -30,8 +23,8 @@ class HomeFragment : Fragment() {
     private lateinit var sharedCurrency: SharedCurrencyManager
 
     // TODO in HomeFragment:
-    private var wallets = ArrayList<Wallet>()
-    private lateinit var walletAdapter: ViewPagerAdapter
+    private var wallets = ArrayList<WalletInfo>()
+    private lateinit var walletAdapter: HomeAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,29 +39,61 @@ class HomeFragment : Fragment() {
         val view = binding.root
 
         val viewpager= binding.viewpagerHome
-        wallets.add(Wallet("alskdjf", ""))
-        walletAdapter = ViewPagerAdapter(wallets)
+        walletAdapter = HomeAdapter(wallets)
         viewpager.adapter = walletAdapter
-
 
         return view
     }
 
     override fun onResume() {
         super.onResume()
-        // TODO in HomeFragment:
-        wallets.clear()
-        wallets.add(Wallet("", sharedPreferences.getCurUser(requireContext())))
+
+        var totalSpent = 0.0
+        var totalIncome = 0.0
+        var totalSpentMonth = 0.0
+        var totalIncomeMonth = 0.0
+        val currency = sharedCurrency.getCurrency()
+        val currentYear = Calendar.getInstance().get(Calendar.YEAR)
+        val currentMonth = Calendar.getInstance().get(Calendar.MONTH)
+
         lifecycleScope.launch {
             val db = FapDatabase.getInstance(requireContext())
-            val wallet_list = db.fapDao().getWallets(sharedPreferences.getCurUser(requireContext()))
-            for (wallet in wallet_list) {
-                Log.d("Wallets", wallet.name)
-                wallets.add(wallet)
+            val list_paymentsByWallets = db.fapDao().getPaymentsByWallets(sharedPreferences.getCurUser(requireContext()))
+            wallets.clear()
+            for (paymentsByWallet in list_paymentsByWallets) {
+                var totalSpentWallet = 0.0
+                var totalIncomeWallet = 0.0
+                var totalSpentMonthWallet = 0.0
+                var totalIncomeMonthWallet = 0.0
+                val walletName = paymentsByWallet.wallet.name
+                for (payment in paymentsByWallet.payments) {
+                    val paymentYear = Calendar.getInstance().apply { time = payment.date }.get(Calendar.YEAR)
+                    val paymentMonth = Calendar.getInstance().apply { time = payment.date }.get(Calendar.MONTH)
+
+                    if (paymentYear == currentYear && paymentMonth == currentMonth) {
+                        if (payment.isPayment) {
+                            totalSpentMonthWallet += payment.price
+                        } else {
+                            totalIncomeMonthWallet += payment.price
+                        }
+                    }
+                    if (payment.isPayment) {
+                        totalSpentWallet += payment.price
+                    } else {
+                        totalIncomeWallet += payment.price
+                    }
+                }
+                totalIncomeMonth += totalIncomeMonthWallet
+                totalSpentMonth += totalSpentMonthWallet
+                totalIncome += totalIncomeWallet
+                totalSpent += totalSpentWallet
+
+                wallets.add(WalletInfo(walletName, totalIncomeWallet, totalSpentWallet, totalIncomeMonthWallet, totalSpentMonthWallet, currency))
             }
+            wallets.add(0, WalletInfo("", totalIncome, totalSpent, totalIncomeMonth, totalSpentMonth, currency))
+
+            walletAdapter.notifyDataSetChanged()
         }
-        // update values
-        walletAdapter.notifyDataSetChanged()
     }
 
     override fun onDestroyView() {
