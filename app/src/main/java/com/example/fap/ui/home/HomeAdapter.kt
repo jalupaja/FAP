@@ -119,16 +119,33 @@ class HomeAdapter(private val wallets: List<WalletInfo>) : RecyclerView.Adapter<
             updateChartData(wallet.incomeMonth, wallet.expenseMonth)
         }
         private fun updateChartData(income: Double, expense: Double) {
-            val nDataSet = PieDataSet(listOf(
-                PieEntry(income.toFloat(), "Income"),
-                PieEntry(expense.toFloat(), "Expense")
-            ), "monthly finances")
+            var nDataSet = PieDataSet(
+                listOf(
+                    PieEntry(income.toFloat(), "Income"),
+                    PieEntry(expense.toFloat(), "Expense")
+                ), "monthly finances"
+            )
+
+            if (income == 0.0 && expense == 0.0) {
+                nDataSet = PieDataSet(
+                    listOf(
+                        PieEntry(1F, "")
+                    ), "monthly finances"
+                )
+
+                nDataSet.colors = listOf(
+                    resources.getColor(R.color.gray, context?.theme)
+                )
+            } else {
+                nDataSet.colors = listOf(
+                    resources.getColor(R.color.green, context?.theme),
+                    resources.getColor(R.color.red, context?.theme)
+                )
+            }
+
             nDataSet.sliceSpace = 3f
             nDataSet.selectionShift = 5f
-            nDataSet.colors = listOf(
-                resources.getColor(R.color.green, context?.theme),
-                resources.getColor(R.color.red, context?.theme)
-            )
+
             nDataSet.setValueTextColors(
                 listOf(
                     resources.getColor(
@@ -137,20 +154,7 @@ class HomeAdapter(private val wallets: List<WalletInfo>) : RecyclerView.Adapter<
                     )
                 )
             )
-            nDataSet.sliceSpace = 3f
-            nDataSet.selectionShift = 5f
-            nDataSet.colors = listOf(
-                resources.getColor(R.color.green, context?.theme),
-                resources.getColor(R.color.red, context?.theme)
-            )
-            nDataSet.setValueTextColors(
-                listOf(
-                    resources.getColor(
-                        com.google.android.material.R.color.mtrl_btn_transparent_bg_color,
-                        context?.theme
-                    )
-                )
-            )
+
             chartBalance.data.dataSet = nDataSet
 
             chartBalance.invalidate()
