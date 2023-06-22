@@ -21,6 +21,7 @@ import com.example.fap.data.FapDatabase
 import com.example.fap.data.Wallet
 import com.example.fap.databinding.ActivityMainBinding
 import com.example.fap.ui.dialogs.AddPayment
+import com.example.fap.ui.dialogs.AddWallet
 import com.example.fap.ui.login.Login
 import com.example.fap.utils.SharedPreferencesManager
 import com.google.android.material.snackbar.Snackbar
@@ -89,38 +90,7 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.action_add_wallet -> {
-                // create add wallet dialog
-                val dialogBuilder = AlertDialog.Builder(this, R.style.Theme_FAP)
-                val dialogLayout =  LayoutInflater.from(this).inflate(R.layout.dialog_add_wallet, null)
-                val input: TextInputEditText = dialogLayout.findViewById(R.id.add_wallet_input)
-
-                dialogBuilder.setTitle("Add a new Wallet")
-
-                dialogBuilder.setView(dialogLayout)
-
-                dialogBuilder.setPositiveButton("Save") { dialog, _ ->
-                    if (input.text.isNullOrEmpty()) {
-                        Snackbar.make(
-                            binding.root,
-                            "Please fill field",
-                            Snackbar.LENGTH_SHORT
-                        ).show()
-                    } else {
-                        lifecycleScope.launch {
-                            val db = FapDatabase.getInstance(applicationContext).fapDao()
-                            val curUser = SharedPreferencesManager.getInstance(applicationContext)
-                                .getCurUser(applicationContext)
-                            db.insertWallet(Wallet(input.text.toString(), curUser))
-                        }
-                        dialog.dismiss()
-                    }
-                }
-                dialogBuilder.setNegativeButton("Cancel") { dialog, _ ->
-                    dialog.dismiss()
-                }
-
-                val dialog = dialogBuilder.create()
-                dialog.show()
+                startActivity(Intent(this, AddWallet::class.java))
                 true
             }
             else -> {
