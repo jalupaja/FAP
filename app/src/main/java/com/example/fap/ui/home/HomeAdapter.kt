@@ -208,7 +208,7 @@ class HomeAdapter(private val wallets: List<WalletInfo>) : RecyclerView.Adapter<
             chartStock.axisRight.isEnabled = false
             chartStock.setTouchEnabled(false)
             chartStock.setPinchZoom(true)
-            chartStock.description.text = "com.example.fap.data.Stock"
+            chartStock.description.text = ""
             chartStock.animateX(1000, Easing.EaseInExpo)
             chartStock.legend.textColor = colorOnSurface
 
