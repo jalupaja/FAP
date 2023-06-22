@@ -110,7 +110,6 @@ class HomeAdapter(private val wallets: List<WalletInfo>) : RecyclerView.Adapter<
             val balanceMonth = "%.2f".format(wallet.incomeMonth - wallet.expenseMonth)
             lblExpenseMonth.text = "%.2f".format(wallet.expenseMonth)
 
-
             // update values
             lblBalance.text = balanceCurrency
             lblIncomeMonth.text = incomeMonth
