@@ -74,7 +74,9 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return when (item.itemId) {
             R.id.action_settings -> {
-                navController.navigate(R.id.nav_settings)
+                if (navController.currentDestination?.id != R.id.nav_settings) {
+                    navController.navigate(R.id.nav_settings)
+                }
                 true
             }
             else -> {
