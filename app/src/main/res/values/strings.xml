@@ -19,6 +19,7 @@
     <string name="add_wallet">Add Wallet</string>
     <string name="add_a_wallet">Add a Wallet</string>
     <string name="hint_wallet">New Wallet</string>
+    <string name="all_wallets">All Wallets</string>
 
     <string name="login_input">Login</string>
     <string name="password_hint">Password</string>
