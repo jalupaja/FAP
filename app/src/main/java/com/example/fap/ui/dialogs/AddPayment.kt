@@ -15,7 +15,6 @@ import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 import android.app.DatePickerDialog
-import android.opengl.Visibility
 import android.view.MenuItem
 import android.view.View
 import android.widget.ArrayAdapter

@@ -2,9 +2,11 @@ package com.example.fap
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.WindowManager
+import androidx.appcompat.app.AlertDialog
 import com.google.android.material.navigation.NavigationView
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -14,9 +16,16 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
+import androidx.lifecycle.lifecycleScope
+import com.example.fap.data.FapDatabase
+import com.example.fap.data.Wallet
 import com.example.fap.databinding.ActivityMainBinding
 import com.example.fap.ui.dialogs.AddPayment
 import com.example.fap.ui.login.Login
+import com.example.fap.utils.SharedPreferencesManager
+import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.textfield.TextInputEditText
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
@@ -77,6 +86,41 @@ class MainActivity : AppCompatActivity() {
                 if (navController.currentDestination?.id != R.id.nav_settings) {
                     navController.navigate(R.id.nav_settings)
                 }
+                true
+            }
+            R.id.action_add_wallet -> {
+                // create add wallet dialog
+                val dialogBuilder = AlertDialog.Builder(this, R.style.Theme_FAP)
+                val dialogLayout =  LayoutInflater.from(this).inflate(R.layout.dialog_add_wallet, null)
+                val input: TextInputEditText = dialogLayout.findViewById(R.id.add_wallet_input)
+
+                dialogBuilder.setTitle("Add a new Wallet")
+
+                dialogBuilder.setView(dialogLayout)
+
+                dialogBuilder.setPositiveButton("Save") { dialog, _ ->
+                    if (input.text.isNullOrEmpty()) {
+                        Snackbar.make(
+                            binding.root,
+                            "Please fill field",
+                            Snackbar.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        lifecycleScope.launch {
+                            val db = FapDatabase.getInstance(applicationContext).fapDao()
+                            val curUser = SharedPreferencesManager.getInstance(applicationContext)
+                                .getCurUser(applicationContext)
+                            db.insertWallet(Wallet(input.text.toString(), curUser))
+                        }
+                        dialog.dismiss()
+                    }
+                }
+                dialogBuilder.setNegativeButton("Cancel") { dialog, _ ->
+                    dialog.dismiss()
+                }
+
+                val dialog = dialogBuilder.create()
+                dialog.show()
                 true
             }
             else -> {
