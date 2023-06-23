@@ -1,21 +1,21 @@
 package com.example.fap.ui.slideshow
 
+import android.graphics.Path.Direction
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.example.fap.R
-import com.example.fap.ui.history.HistoryAdapter
 import com.example.fap.utils.SharedCurrencyManager
 
 class CategoryAdapter(
-    private val categoryList: List<CategoryItem>/*,
-    private val onItemClick: (CategoryItem) -> Unit*/
-) : RecyclerView.Adapter<CategoryAdapter.ViewHolder>() {
+    private val categoryList: List<CategoryItem>
+    ) : RecyclerView.Adapter<CategoryAdapter.ViewHolder>() {
 
-
+    private var onItemClickListener: OnItemClickListener? = null
     private lateinit var sharedCurrency: SharedCurrencyManager
     private var colorRed = 0
     private var colorGreen = 0
@@ -33,22 +33,32 @@ class CategoryAdapter(
         val item = categoryList[position]
         holder.bind(item)
 
-        /*holder.itemView.setOnClickListener {
-            val position = adapterPosition
-            if (position != RecyclerView.NO_POSITION) {
-                val item = categoryList[position]
-                //onItemClick(item)
-            }
-        }*/
+        holder.itemView.setOnClickListener{
+            val action = CategoryFragmentDirections.actionCategoryToHistory()
+            holder.itemView.findNavController().navigate(action)
+        }
     }
 
     override fun getItemCount(): Int {
         return categoryList.size
     }
 
+    fun setOnItemClickListener(listener: OnItemClickListener) {
+        onItemClickListener = listener
+    }
+
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val titleTextView: TextView = itemView.findViewById(R.id.category_title)
         private val sumTextView: TextView = itemView.findViewById(R.id.category_sum)
+
+        init {
+            itemView.setOnClickListener{
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    onItemClickListener?.onItemClick(position)
+                }
+            }
+        }
 
         fun bind(item: CategoryItem) {
             titleTextView.text = item.title
@@ -61,6 +71,9 @@ class CategoryAdapter(
                 sumTextView.setTextColor(colorRed)
             }
         }
+    }
 
+    interface OnItemClickListener {
+        fun onItemClick(position: Int)
     }
 }

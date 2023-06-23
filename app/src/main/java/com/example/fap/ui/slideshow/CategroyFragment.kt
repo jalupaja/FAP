@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.fap.R
 import com.example.fap.data.FapDatabase
 import com.example.fap.utils.SharedPreferencesManager
@@ -27,7 +27,7 @@ class CategoryFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentCategoryBinding.inflate(inflater, container, false)
         val view: View = binding.root
 
@@ -35,19 +35,13 @@ class CategoryFragment : Fragment() {
 
         val recyclerView = binding.categoryRecyclerview
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-/*
-        // Load the list of items from DAO
-        val itemList = dao.getItems()
-
-        // Create and set up the adapter
-        categoryAdapter = CategoryAdapter(itemList) { selectedItem ->
-            // Perform action when item is clicked
-            // Replace with your desired action
-            // For example, navigate to a new fragment or activity
-        }*/
-
         categoryAdapter = CategoryAdapter(categoryData)
         recyclerView.adapter = categoryAdapter
+        categoryAdapter.setOnItemClickListener(object : CategoryAdapter.OnItemClickListener {
+            override fun onItemClick(position: Int) {
+                findNavController().navigate(R.id.history_category)
+            }
+        })
 
         return view
     }
