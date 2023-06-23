@@ -9,7 +9,7 @@
 
     <string name="menu_home">Home</string>
     <string name="menu_history">History</string>
-    <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_category">Category</string>
     <string name="title_activity_login">Login</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
