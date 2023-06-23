@@ -59,7 +59,8 @@ class CategoryFragment : Fragment() {
             val db = FapDatabase.getInstance(requireContext())
             val categorys = db.fapDao().getCategories()
             for (category in categorys) {
-                categoryData.add(CategoryItem(category.name, 0.0))
+                val sumCat = db.fapDao().getTotalAmountSpentByCategory(sharedPreferences.getCurUser(requireContext()), category.name)
+                categoryData.add(CategoryItem(category.name, sumCat?: 0.0))
             }
             if (categorys.isEmpty()) {
                 binding.textCategory.visibility = View.VISIBLE
