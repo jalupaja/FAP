@@ -56,6 +56,9 @@ interface FapDao {
     @Query("SELECT SUM(price) FROM Payment WHERE userId = :userId AND category = :category AND isPayment = 1")
     suspend fun getTotalAmountSpentByCategory(userId: String, category: String): Double?
 
+    @Query("SELECT SUM(CASE WHEN p.isPayment = 1 THEN -p.price ELSE p.price END) AS sumCat FROM Payment p WHERE p.userId = :userId AND p.category = :category")
+    suspend fun getTotalAmountByCategory(userId: String, category: String): Double?
+
     @Query("SELECT SUM(price) FROM Payment WHERE userId = :userId AND isPayment = 0")
     suspend fun getTotalIncome(userId: String): Double?
 

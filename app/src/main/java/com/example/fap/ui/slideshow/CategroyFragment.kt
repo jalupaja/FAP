@@ -59,7 +59,7 @@ class CategoryFragment : Fragment() {
             val db = FapDatabase.getInstance(requireContext())
             val categorys = db.fapDao().getCategories()
             for (category in categorys) {
-                val sumCat = db.fapDao().getTotalAmountSpentByCategory(sharedPreferences.getCurUser(requireContext()), category.name)
+                val sumCat = db.fapDao().getTotalAmountByCategory(sharedPreferences.getCurUser(requireContext()), category.name)
                 categoryData.add(CategoryItem(category.name, sumCat?: 0.0))
             }
             if (categorys.isEmpty()) {
