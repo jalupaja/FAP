@@ -1,6 +1,6 @@
 package com.example.fap.ui.slideshow
 
-import android.graphics.Path.Direction
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -34,7 +34,7 @@ class CategoryAdapter(
         holder.bind(item)
 
         holder.itemView.setOnClickListener{
-            val action = CategoryFragmentDirections.actionCategoryToHistory()
+            val action = CategoryFragmentDirections.actionCategoryToHistory(item.title)
             holder.itemView.findNavController().navigate(action)
         }
     }

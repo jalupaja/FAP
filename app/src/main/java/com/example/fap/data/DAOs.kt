@@ -47,6 +47,9 @@ interface FapDao {
     @Query("SELECT * FROM Payment WHERE userId = :userId AND wallet = :wallet")
     suspend fun getPaymentsByWallet(userId: String, wallet: String): List<Payment>
 
+    @Query("SELECT * FROM Payment WHERE userId = :userId AND category = :category")
+    suspend fun getPaymentsByCategory(userId: String, category: String): List<Payment>
+
     @Query("SELECT SUM(price) FROM Payment WHERE userId = :userId AND isPayment = 1")
     suspend fun getTotalAmountSpent(userId: String): Double?
 

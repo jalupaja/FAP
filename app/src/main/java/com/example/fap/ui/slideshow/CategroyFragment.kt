@@ -1,6 +1,7 @@
 package com.example.fap.ui.slideshow
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -37,13 +38,8 @@ class CategoryFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         categoryAdapter = CategoryAdapter(categoryData)
         recyclerView.adapter = categoryAdapter
-        categoryAdapter.setOnItemClickListener(object : CategoryAdapter.OnItemClickListener {
-            override fun onItemClick(position: Int) {
-                findNavController().navigate(R.id.history_category)
-            }
-        })
 
-        return view
+    return view
     }
 
     override fun onResume() {
@@ -67,6 +63,6 @@ class CategoryFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
+            _binding = null
+        }
     }
-}
