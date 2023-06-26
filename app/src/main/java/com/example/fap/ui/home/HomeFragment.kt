@@ -85,6 +85,7 @@ class HomeFragment : Fragment() {
         val currentMonth = Calendar.getInstance().get(Calendar.MONTH)
 
         lifecycleScope.launch {
+
             val db = FapDatabase.getInstance(requireContext())
             val list_paymentsByWallets = db.fapDao().getPaymentsByWallets(sharedPreferences.getCurUser(requireContext()))
             wallets.clear()
@@ -148,5 +149,23 @@ class HomeFragment : Fragment() {
         } else {
             indicatorRight.visibility = View.VISIBLE
         }
+    }
+
+    private suspend fun getTotalIncome(): Double {
+       var income: Double? = db.fapDao().getTotalIncome(sharedPreferences.getCurUser(requireContext()))
+
+        if (income == null)
+            income = 0.0
+
+        return income
+    }
+
+    private suspend fun getTotalSpent(): Double {
+        var spent: Double? = db.fapDao().getTotalAmountSpent(sharedPreferences.getCurUser(requireContext()))
+
+        if (spent == null)
+            spent = 0.0
+
+        return spent
     }
 }

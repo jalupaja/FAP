@@ -83,7 +83,6 @@ class AddPayment : AppCompatActivity() {
             alert.setNegativeButton("No") { dialog, _ ->
                 dialog.dismiss()
             }
-
             alert.show()
         }
 
@@ -133,7 +132,11 @@ class AddPayment : AppCompatActivity() {
                         wallet = wallet,
                         title = title,
                         description = description,
-                        price = sharedCurrency.calculateFromCurrency(price.toDouble(), currency, applicationContext),
+                        price = sharedCurrency.calculateFromCurrency(
+                            price.toDouble(),
+                            currency,
+                            applicationContext
+                        ),
                         date = date,
                         isPayment = isPayment,
                         category = category,
@@ -146,6 +149,7 @@ class AddPayment : AppCompatActivity() {
                     backButtonCallback.handleOnBackPressed()
                 }
             }
+            categoryAdapter.notifyDataSetChanged()
         }
 
         curItemId = intent.getIntExtra("paymentId", -1)
