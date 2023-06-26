@@ -11,6 +11,7 @@ import com.example.fap.data.dao.FapDaoPayment
 import com.example.fap.data.dao.FapDaoSavingGoal
 import com.example.fap.data.dao.FapDaoUser
 import com.example.fap.data.dao.FapDaoWallet
+import com.example.fap.data.dao.Currency
 import com.example.fap.data.entities.Category
 import com.example.fap.data.entities.Payment
 import com.example.fap.data.entities.SavingsGoal
@@ -27,8 +28,9 @@ import net.sqlcipher.database.SupportFactory
         Category::class,
         Payment::class,
         Stock::class,
-        SavingsGoal::class
-               ],
+        SavingsGoal::class,
+        Currency::class,
+    ],
     version = 1
 )
 
@@ -39,6 +41,7 @@ abstract class FapDatabase: RoomDatabase() {
     abstract fun fapDaoSavingGoal(): FapDaoSavingGoal
     abstract fun fapDaoUser(): FapDaoUser
     abstract fun fapDaoWallet(): FapDaoWallet
+    abstract fun currencyDao(): CurrencyDao
 
     companion object {
         private var instance: FapDatabase? = null

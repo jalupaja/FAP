@@ -12,5 +12,5 @@ interface FapDaoSavingGoal {
     suspend fun getSavingsGoals(userId: Int): List<SavingsGoal>
 
     @Insert
-    suspend fun insertSavingsGoal(savingsGoal: SavingsGoal): Long
+    suspend fun insertSavingsGoal(savingsGoal: SavingsGoal)
 }

@@ -14,8 +14,7 @@ import com.example.fap.data.entities.User
     )]
 )
 data class Wallet(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    @PrimaryKey
+    val name: String,
     val userId: String,
-    val name: String
 )

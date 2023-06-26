@@ -20,26 +20,25 @@ import java.util.concurrent.Executor
 
 class SharedSecurityManager(context: Context) {
 
-    private val KEYSTORE_PROVIDER = "AndroidKeyStore"
-    private val sharedPreferences:SharedPreferencesManager = SharedPreferencesManager.getInstance(context)
-    private var context: Context = context
+    private val keystoreProvider = "AndroidKeyStore"
+    private val sharedPreferences: SharedPreferencesManager = SharedPreferencesManager.getInstance(context)
 
     /* ASYNCHRONOUS ENCRYPTION */
-    public fun startEncryption(str: String): Boolean {
+    fun startEncryption(str: String, context: Context): Boolean {
         val (pub_key, _) = getKeys(context.getString(R.string.shared_prefs_biometrics_key))
         if (pub_key != null) {
             val encryptedString = encryptString(pub_key, str)
-            if (encryptedString.isNullOrEmpty()) {
-                return false
+            return if (encryptedString.isEmpty()) {
+                false
             } else {
-                saveEncryptedString(encryptedString)
-                return true
+                saveEncryptedString(encryptedString, context)
+                true
             }
         }
         return false
     }
 
-    public fun startDecryption(str: String): String {
+    fun startDecryption(str: String, context: Context): String {
         val (_, priv_key) = getKeys(context.getString(R.string.shared_prefs_biometrics_key))
         if (priv_key != null) {
             return decryptString(priv_key, str)
@@ -63,7 +62,7 @@ class SharedSecurityManager(context: Context) {
     }
 
     private fun getKeys(keyAlias: String): Pair<PublicKey?, PrivateKey?> {
-        val keyStore = KeyStore.getInstance(KEYSTORE_PROVIDER)
+        val keyStore = KeyStore.getInstance(keystoreProvider)
         keyStore.load(null)
 
         val privateKey = keyStore.getKey(keyAlias, null) as? PrivateKey
@@ -71,7 +70,7 @@ class SharedSecurityManager(context: Context) {
 
         if (privateKey == null || publicKey == null) {
             val keyPairGenerator =
-                KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_RSA, KEYSTORE_PROVIDER)
+                KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_RSA, keystoreProvider)
             val spec = KeyGenParameterSpec.Builder(
                 keyAlias,
                 KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
@@ -88,18 +87,19 @@ class SharedSecurityManager(context: Context) {
         return Pair(publicKey, privateKey)
     }
 
-    private fun saveEncryptedString(str: String) {
+    private fun saveEncryptedString(str: String, context: Context) {
         sharedPreferences.saveString(context.getString(R.string.shared_prefs_biometrics_key), str)
     }
 
-    public fun checkBiometric(): Boolean {
+    fun checkBiometric(context: Context): Boolean {
         return BiometricManager.from(context).canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG) == BiometricManager.BIOMETRIC_SUCCESS
     }
 
-    public fun authenticateWithBiometrics(
+    fun authenticateWithBiometrics(
         parent: AppCompatActivity,
         callback: Executor,
-        biometricAuthenticationCallback: BiometricPrompt.AuthenticationCallback
+        biometricAuthenticationCallback: BiometricPrompt.AuthenticationCallback,
+        context: Context,
     ) {
         val promptInfo = BiometricPrompt.PromptInfo.Builder()
             .setTitle(context.getString(R.string.app_name))
@@ -113,7 +113,7 @@ class SharedSecurityManager(context: Context) {
         biometricPrompt.authenticate(promptInfo)
     }
 
-    public fun showBiometricError(view: View, message: String) {
+    fun showBiometricError(view: View, message: String, context: Context) {
         val snackbar =
             Snackbar.make(view, message, Snackbar.LENGTH_LONG)
         snackbar.setActionTextColor(

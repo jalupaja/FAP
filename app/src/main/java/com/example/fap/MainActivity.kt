@@ -2,9 +2,11 @@ package com.example.fap
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
-import com.google.android.material.snackbar.Snackbar
+import android.view.WindowManager
+import androidx.appcompat.app.AlertDialog
 import com.google.android.material.navigation.NavigationView
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -14,8 +16,17 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
+import androidx.lifecycle.lifecycleScope
+import com.example.fap.data.FapDatabase
+import com.example.fap.data.Wallet
 import com.example.fap.databinding.ActivityMainBinding
+import com.example.fap.ui.dialogs.AddPayment
+import com.example.fap.ui.dialogs.AddWallet
 import com.example.fap.ui.login.Login
+import com.example.fap.utils.SharedPreferencesManager
+import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.textfield.TextInputEditText
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
@@ -30,9 +41,10 @@ class MainActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.appBarMain.toolbar)
 
-        binding.appBarMain.fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
+        window.setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
+
+        binding.appBarMain.fab.setOnClickListener {
+            startActivity(Intent(this, AddPayment::class.java))
         }
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
@@ -52,7 +64,7 @@ class MainActivity : AppCompatActivity() {
                     startActivity(Intent(this, Login::class.java))
                     finishAffinity()
                     true
-                 }
+                }
                 else -> {
                     navController.navigate(menuItem.itemId)
                     drawerLayout.closeDrawer(GravityCompat.START)
@@ -68,18 +80,24 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-        override fun onOptionsItemSelected(item: MenuItem): Boolean {
-                val navController = findNavController(R.id.nav_host_fragment_content_main)
-                when (item.itemId) {
-                        R.id.action_settings -> {
-                                navController.navigate(R.id.nav_settings)
-                                return true
-                            }
-                        else -> {
-                                return super.onOptionsItemSelected(item)
-                            }
-                    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val navController = findNavController(R.id.nav_host_fragment_content_main)
+        return when (item.itemId) {
+            R.id.action_settings -> {
+                if (navController.currentDestination?.id != R.id.nav_settings) {
+                    navController.navigate(R.id.nav_settings)
+                }
+                true
             }
+            R.id.action_add_wallet -> {
+                startActivity(Intent(this, AddWallet::class.java))
+                true
+            }
+            else -> {
+                super.onOptionsItemSelected(item)
+            }
+        }
+    }
 
 
     override fun onSupportNavigateUp(): Boolean {

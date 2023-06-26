@@ -4,9 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
-import android.util.Log
-import android.util.TypedValue
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.EditorInfo
@@ -25,9 +22,11 @@ import com.example.fap.data.entities.Category
 import com.example.fap.data.entities.User
 import com.example.fap.data.entities.Wallet
 import com.example.fap.databinding.ActivityLoginBinding
+import com.example.fap.utils.SharedCurrencyManager
 import com.example.fap.utils.SharedPreferencesManager
 import com.example.fap.utils.SharedSecurityManager
 import com.google.android.material.textfield.TextInputEditText
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileInputStream
@@ -75,27 +74,27 @@ class Login : AppCompatActivity() {
 
     // Implement biometry callbacks
     private val biometricAuthenticationCallback = object : BiometricPrompt.AuthenticationCallback() {
-            override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-                val encryptedCode = sharedPreferences.getString(getString(R.string.shared_prefs_biometrics_key))
+        override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+            val encryptedCode = sharedPreferences.getString(getString(R.string.shared_prefs_biometrics_key))
 
-                if (encryptedCode.isNullOrEmpty()) {
-                    // Encrypt
-                    if (!sharedSecurity.startEncryption(tmpPass)) {
-                        sharedSecurity.showBiometricError(findViewById(android.R.id.content), "Biometric failed")
-                    } else {
-                        backButtonCallback.handleOnBackPressed()
-                    }
+            if (encryptedCode.isEmpty()) {
+                // Encrypt
+                if (!sharedSecurity.startEncryption(tmpPass, applicationContext)) {
+                    sharedSecurity.showBiometricError(findViewById(android.R.id.content), "Biometric failed", applicationContext)
                 } else {
-                    // Decrypt
-                    val plaintext = sharedSecurity.startDecryption(encryptedCode)
-                    if (checkPassword(plaintext)) {
-                        login()
-                    } else {
-                        sharedSecurity.showBiometricError(findViewById(android.R.id.content), "There was a problem logging in. Please redo the biometry")
-                    }
+                    backButtonCallback.handleOnBackPressed()
+                }
+            } else {
+                // Decrypt
+                val plaintext = sharedSecurity.startDecryption(encryptedCode, applicationContext)
+                if (checkPassword(plaintext)) {
+                    login()
+                } else {
+                    sharedSecurity.showBiometricError(findViewById(android.R.id.content), "There was a problem logging in. Please redo the biometry", applicationContext)
                 }
             }
         }
+    }
 
     // Implement Back Button
     private val backButtonCallback = object : OnBackPressedCallback(true) {
@@ -104,7 +103,6 @@ class Login : AppCompatActivity() {
                 REGISTERSTATE.CONFIRMING -> {
                     textLogin.text!!.clear()
                     registerState = REGISTERSTATE.REGISTERING
-                    lblLoginStatus.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20F)
                     lblLoginStatus.text = getString(R.string.register_password)
                 }
 
@@ -210,15 +208,13 @@ class Login : AppCompatActivity() {
 
         if (!checkRegistered(applicationContext)) {
             registerState = REGISTERSTATE.REGISTERING
-            lblLoginStatus.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20F)
             lblLoginStatus.text = getString(R.string.register_password)
         } else if (registerState == REGISTERSTATE.ACTIVATE_BIOMETRICS) {
-            lblLoginStatus.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20F)
             lblLoginStatus.text = getString(R.string.activate_biometrics)
         }
 
 
-        if (sharedPreferences.getString(getString(R.string.shared_prefs_biometrics_key)) .isNullOrEmpty() ) {
+        if (sharedPreferences.getString(getString(R.string.shared_prefs_biometrics_key)).isEmpty() ) {
             binding.useBiometrics.visibility = View.INVISIBLE
         } else {
             authenticateWithBiometrics()
@@ -251,6 +247,9 @@ class Login : AppCompatActivity() {
         when (registerState) {
             REGISTERSTATE.REGISTERED -> {
                 if (checkPassword(textLogin.text.toString())) {
+                    lifecycleScope.launch {
+                        SharedCurrencyManager.getInstance(applicationContext).tryUpdateCurrency(applicationContext)
+                    }
                     login()
                 } else {
                     lblLoginStatus.text = getString(R.string.wrong_password)
@@ -265,22 +264,26 @@ class Login : AppCompatActivity() {
 
             REGISTERSTATE.CONFIRMING -> {
                 if (textLogin.text!!.toString() == tmpPass) {
-                    lblLoginStatus.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14F)
                     registerState = REGISTERSTATE.REGISTERED
 
                     val userId = UUID.randomUUID().toString()
-                    sharedPreferences.saveString(getString(R.string.shared_prefs_cur_user), userId)
+                    sharedPreferences.saveCurUser(applicationContext, userId)
+                    sharedPreferences.saveString(application.getString(R.string.shared_prefs_current_currency), "€")
+
                     // save password hash
                     sharedPreferences.saveString(getString(R.string.shared_prefs_hash), calculateHash(tmpPass))
-                    lifecycleScope.launch {
+                    MainScope().launch {
                         // create Database using the Password
                         val db = FapDatabase.getInstance(applicationContext, tmpPass)
                         // setup default values
                         db.fapDaoUser().insertUser(User(userId))
+                        db.fapDaoCategory().insertCategory(Category(name = "")) // use as 'not categorised' to avoid FOREIGN KEY constraint fails
                         db.fapDaoCategory().insertCategory(Category(userId = userId, name = "Groceries"))
                         db.fapDaoCategory().insertCategory(Category(userId = userId, name = "Income"))
                         db.fapDaoWallet().insertWallet(Wallet(userId = userId, name = "Bank"))
                         db.fapDaoWallet().insertWallet(Wallet(userId = userId, name = "Cash"))
+
+                        SharedCurrencyManager.getInstance(applicationContext).initCurrency(applicationContext)
                     }
                     login()
                 } else {
@@ -292,7 +295,6 @@ class Login : AppCompatActivity() {
             REGISTERSTATE.ACTIVATE_BIOMETRICS -> {
                 if (checkPassword(textLogin.text!!.toString())) {
                     tmpPass = textLogin.text!!.toString()
-                    lblLoginStatus.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14F)
                     lblLoginStatus.text = ""
                     authenticateWithBiometrics()
                 } else {
@@ -307,7 +309,7 @@ class Login : AppCompatActivity() {
         val ctx = context.applicationContext
         return ctx.getDatabasePath(ctx.getString(R.string.database_name)).exists()
     }
-    
+
     private fun checkPassword(password: String): Boolean {
         copyFile()
         Log.w("FAP", "copy file function call")
@@ -326,37 +328,12 @@ class Login : AppCompatActivity() {
     }
 
     private fun authenticateWithBiometrics() {
-        sharedSecurity.authenticateWithBiometrics(this, mainExecutor, biometricAuthenticationCallback)
+        sharedSecurity.authenticateWithBiometrics(this, mainExecutor, biometricAuthenticationCallback, applicationContext)
     }
 
     private fun login() {
         startActivity(Intent(this, MainActivity::class.java))
         finishAffinity()
         lblLoginStatus.text = ""
-    }
-
-    private fun copyFile() {
-        try {
-            val sd = Environment.getExternalStorageDirectory()
-            val data = Environment.getDataDirectory()
-            //if (sd.canWrite()) {
-                val currentDBPath = getDatabasePath(getString(R.string.database_name)).absolutePath
-                Log.w("FAP", "HALLO COPY MY FILE")
-                Log.w("FAP", currentDBPath)
-                val backupDBPath = "fabDatabaseBackup.db"
-                val currentDB = File(data, currentDBPath)
-                val backupDB = File(sd, backupDBPath)
-                if (currentDB.exists()) {
-                    val src = FileInputStream(currentDB).channel
-                    val dst = FileOutputStream(backupDB).channel
-                    dst.transferFrom(src, 0, src.size())
-                    src.close()
-                    dst.close()
-                }
-            //}
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Log.w("ERROR", "ERROR happened")
-        }
     }
 }

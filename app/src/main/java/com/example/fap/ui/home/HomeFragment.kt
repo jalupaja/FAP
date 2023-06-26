@@ -1,26 +1,23 @@
 package com.example.fap.ui.home
 
 import android.os.Bundle
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.ColorInt
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.viewpager2.widget.ViewPager2
 import com.example.fap.R
 import com.example.fap.data.FapDatabase
 import com.example.fap.databinding.FragmentHomeBinding
-import com.github.mikephil.charting.animation.Easing
-import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.data.Entry
-import com.github.mikephil.charting.data.LineData
-import com.github.mikephil.charting.data.LineDataSet
-import com.github.mikephil.charting.data.PieData
-import com.github.mikephil.charting.data.PieDataSet
-import com.github.mikephil.charting.data.PieEntry
+import com.example.fap.utils.SharedCurrencyManager
+import com.example.fap.utils.SharedPreferencesManager
 import kotlinx.coroutines.launch
+import java.util.Calendar
 
 class HomeFragment : Fragment() {
 
@@ -28,8 +25,16 @@ class HomeFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+    private lateinit var sharedPreferences: SharedPreferencesManager
+    private lateinit var sharedCurrency: SharedCurrencyManager
 
-    private lateinit var db: FapDatabase
+    // TODO in HomeFragment:
+    private var wallets = ArrayList<WalletInfo>()
+    private lateinit var walletAdapter: HomeAdapter
+    private lateinit var viewpager: ViewPager2
+    private lateinit var indicatorText: TextView
+    private lateinit var indicatorLeft: ImageView
+    private lateinit var indicatorRight: ImageView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,99 +43,82 @@ class HomeFragment : Fragment() {
     ): View {
 
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
-
-        db = FapDatabase.getInstance(requireContext())
+        sharedPreferences = SharedPreferencesManager.getInstance(requireContext())
+        sharedCurrency = SharedCurrencyManager.getInstance(requireContext())
 
         val view = binding.root
 
-        val homeViewModel =
-            ViewModelProvider(this)[HomeViewModel::class.java]
+        viewpager = binding.viewpagerHome
+        indicatorText = binding.indicatorText
+        indicatorLeft = binding.indicatorLeft
+        indicatorRight = binding.indicatorRight
 
-        val lblTotal = binding.lblTotal
-        val chartBalance = binding.chartBalance
-        val chartStock = binding.chartStock
-    //get theme OnSurface Color
-        val typedValue = TypedValue()
-        val theme = requireContext().theme
-        theme.resolveAttribute(com.google.android.material.R.attr.colorOnSurface, typedValue, true)
-        @ColorInt val colorOnSurface = typedValue.data
+        walletAdapter = HomeAdapter(wallets)
+        viewpager.adapter = walletAdapter
 
-        lifecycleScope.launch {
-            lblTotal.text = num2Money(updateTotal())
+        viewpager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                updateIndicator(position)
+            }
+        })
+
+        indicatorLeft.setOnClickListener {
+            viewpager.setCurrentItem(viewpager.currentItem - 1, true)
         }
 
-    //Balance Chart
-        chartBalance.setExtraOffsets(5f, 5f, 5f, 5f)
-        chartBalance.setDrawEntryLabels(false)
-        chartBalance.holeRadius = 70f
-        chartBalance.transparentCircleRadius = 75f
-        chartBalance.legend.isEnabled = false
-        chartBalance.setHoleColor(resources.getColor(com.google.android.material.R.color.mtrl_btn_transparent_bg_color, context?.theme))
-        chartBalance.setCenterTextSize(10f)
-        chartBalance.setCenterTextColor(colorOnSurface)
-
-        var einnahmen = 30f
-        var ausgaben = 20f
-        var saldo = einnahmen - ausgaben
-        val entriesBalance = listOf(
-            PieEntry(einnahmen, "Einnahmen"),
-            PieEntry(ausgaben, "Ausgaben")
-        )
-        val dataSet = PieDataSet(entriesBalance, "Finanzen")
-        chartBalance.centerText = "Einnahmen: $einnahmen € \nAusgaben: $ausgaben €\n _______________________ \nSaldo: $saldo €"
-
-        dataSet.sliceSpace = 3f
-        dataSet.selectionShift = 5f
-        dataSet.colors = listOf(
-            resources.getColor(R.color.green, context?.theme),
-            resources.getColor(R.color.red, context?.theme)
-        )
-        dataSet.setValueTextColors(
-            listOf(
-                resources.getColor(com.google.android.material.R.color.mtrl_btn_transparent_bg_color, context?.theme)
-            )
-        )
-        chartBalance.data = PieData(dataSet)
-        chartBalance.description.text = ""
-        chartBalance.invalidate()
-        chartBalance.notifyDataSetChanged()
-
-    //Chart com.example.fap.data.entities.Stock
-        val entriesStock = listOf(
-            Entry(1f, 10f),
-            Entry(2f, 2f),
-            Entry(3f, 7f),
-            Entry(4f, 20f),
-        )
-        val stockDataSet = LineDataSet(entriesStock, "Test1")
-        stockDataSet.lineWidth = 2f
-        stockDataSet.color = resources.getColor(R.color.yellow, context?.theme)
-
-        val entriesStock2 = listOf(
-            Entry(1f, 30f),
-            Entry(2f, 4f),
-            Entry(3f, 100f),
-            Entry(4f, 2f),
-        )
-        val stockDataSet2 = LineDataSet(entriesStock2, "Test2")
-        stockDataSet2.color = resources.getColor(R.color.purple_700, context?.theme)
-        stockDataSet2.lineWidth = 2f
-
-        chartStock.data = LineData(stockDataSet, stockDataSet2)
-        chartStock.axisRight.isEnabled = false
-        chartStock.setTouchEnabled(false)
-        chartStock.setPinchZoom(true)
-        chartStock.description.text = "com.example.fap.data.entities.Stock"
-        chartStock.animateX(1000, Easing.EaseInExpo)
-        chartStock.legend.textColor = colorOnSurface
-
-        chartStock.xAxis.position = XAxis.XAxisPosition.BOTTOM
-        chartStock.xAxis.setDrawGridLines(false)
-
-        chartStock.invalidate()
-        chartStock.notifyDataSetChanged()
-
         return view
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        var totalSpent = 0.0
+        var totalIncome = 0.0
+        var totalSpentMonth = 0.0
+        var totalIncomeMonth = 0.0
+        val currency = sharedCurrency.getCurrency()
+        val currentYear = Calendar.getInstance().get(Calendar.YEAR)
+        val currentMonth = Calendar.getInstance().get(Calendar.MONTH)
+
+        lifecycleScope.launch {
+
+            val db = FapDatabase.getInstance(requireContext())
+            val list_paymentsByWallets = db.fapDao().getPaymentsByWallets(sharedPreferences.getCurUser(requireContext()))
+            wallets.clear()
+            for (paymentsByWallet in list_paymentsByWallets) {
+                var totalSpentWallet = 0.0
+                var totalIncomeWallet = 0.0
+                var totalSpentMonthWallet = 0.0
+                var totalIncomeMonthWallet = 0.0
+                val walletName = paymentsByWallet.wallet.name
+                for (payment in paymentsByWallet.payments) {
+                    val paymentYear = Calendar.getInstance().apply { time = payment.date }.get(Calendar.YEAR)
+                    val paymentMonth = Calendar.getInstance().apply { time = payment.date }.get(Calendar.MONTH)
+
+                    if (paymentYear == currentYear && paymentMonth == currentMonth) {
+                        if (payment.isPayment) {
+                            totalSpentMonthWallet += payment.price
+                        } else {
+                            totalIncomeMonthWallet += payment.price
+                        }
+                    }
+                    if (payment.isPayment) {
+                        totalSpentWallet += payment.price
+                    } else {
+                        totalIncomeWallet += payment.price
+                    }
+                }
+                totalIncomeMonth += totalIncomeMonthWallet
+                totalSpentMonth += totalSpentMonthWallet
+                totalIncome += totalIncomeWallet
+                totalSpent += totalSpentWallet
+
+                wallets.add(WalletInfo(walletName, totalIncomeWallet, totalSpentWallet, totalIncomeMonthWallet, totalSpentMonthWallet, currency))
+            }
+            wallets.add(0, WalletInfo("", totalIncome, totalSpent, totalIncomeMonth, totalSpentMonth, currency))
+
+            walletAdapter.notifyDataSetChanged()
+        }
     }
 
     override fun onDestroyView() {
@@ -138,19 +126,42 @@ class HomeFragment : Fragment() {
         _binding = null
     }
 
-    private fun num2Money(num: Number): String {
-        val currency: Char = '€'
-        return "%.2f".format(num) + currency
+    private fun updateIndicator(position: Int) {
+        val amount = wallets.size
+
+        indicatorText.text = wallets[position].walletName
+
+        if (position == 0) {
+            // position 0 always means "All Wallets"
+            indicatorText.text = getString(R.string.all_wallets)
+
+            indicatorLeft.visibility = View.INVISIBLE
+        } else {
+            indicatorLeft.visibility = View.VISIBLE
+        }
+
+        if (position == amount - 1) {
+            indicatorRight.visibility = View.INVISIBLE
+        } else {
+            indicatorRight.visibility = View.VISIBLE
+        }
     }
 
-    private suspend fun updateTotal(): Double {
-        // income and spent CAN be null even if Android Studio tells you otherwise
-        val income: Double? = db.fapDaoPayment().getTotalIncome(requireContext().getString(R.string.shared_prefs_cur_user))
-        val spent: Double? = db.fapDaoPayment().getTotalAmountSpent(requireContext().getString(R.string.shared_prefs_cur_user))
-        return if (income != null && spent != null) {
-            (income - spent)
-        } else {
-            0.0
-        }
+    private suspend fun getTotalIncome(): Double {
+       var income: Double? = db.fapDao().getTotalIncome(sharedPreferences.getCurUser(requireContext()))
+
+        if (income == null)
+            income = 0.0
+
+        return income
+    }
+
+    private suspend fun getTotalSpent(): Double {
+        var spent: Double? = db.fapDao().getTotalAmountSpent(sharedPreferences.getCurUser(requireContext()))
+
+        if (spent == null)
+            spent = 0.0
+
+        return spent
     }
 }

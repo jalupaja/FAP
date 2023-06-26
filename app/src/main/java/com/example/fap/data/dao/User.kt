@@ -9,7 +9,7 @@ import com.example.fap.data.entities.User
 interface FapDaoUser {
 
     @Insert
-    suspend fun insertUser(user: User): Long
+    suspend fun insertUser(user: User)
 
     @Query("SELECT * FROM user")
     suspend fun getUsers(): List<User>

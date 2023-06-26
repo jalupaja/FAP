@@ -15,8 +15,8 @@ import androidx.room.PrimaryKey
         ),
         ForeignKey(
             entity = Wallet::class,
-            parentColumns = ["id"],
-            childColumns = ["walletId"],
+            parentColumns = ["name"],
+            childColumns = ["wallet"],
             onDelete = ForeignKey.CASCADE
         )
     ]
@@ -25,8 +25,8 @@ data class Stock(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val userId: String,
-    val walletId: Int,
+    val wallet: String,
     val name: String,
     val amount: Int,
-    val price: Double
+    val price: Double,
 )

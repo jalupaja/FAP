@@ -16,8 +16,8 @@ import java.util.Date
         ),
         ForeignKey(
             entity = Wallet::class,
-            parentColumns = ["id"],
-            childColumns = ["walletId"],
+            parentColumns = ["name"],
+            childColumns = ["wallet"],
             onDelete = ForeignKey.CASCADE
         )
     ]
@@ -27,12 +27,12 @@ data class SavingsGoal(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val userId: String,
-    val walletId: Int,
+    val wallet: String,
     val title: String,
     val description: String,
     val startDate: Date,
     val endDate: Date,
     val amountPerMonth: Double,
     val endAmount: Double,
-    val startAmount: Double
+    val startAmount: Double,
 )

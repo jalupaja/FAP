@@ -9,9 +9,9 @@ import com.example.fap.data.entities.Wallet
 interface FapDaoWallet {
 
     @Query("SELECT * FROM Wallet WHERE userId = :userId")
-    suspend fun getWallets(userId: Int): List<Wallet>
+    suspend fun getWallets(userId: String): List<Wallet>
 
     @Insert
-    suspend fun insertWallet(wallet: Wallet): Long
+    suspend fun insertWallet(wallet: Wallet)
 
 }

@@ -8,9 +8,9 @@ import com.example.fap.data.entities.Category
 @Dao
 interface FapDaoCategory {
 
-    @Query("SELECT * FROM Category WHERE userId = :userId")
-    suspend fun getCategories(userId: Int): List<Category>
+    @Query("SELECT * FROM Category")
+    suspend fun getCategories(): List<Category>
 
     @Insert
-    suspend fun insertCategory(category: Category): Long
+    suspend fun insertCategory(category: Category)
 }

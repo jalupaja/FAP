@@ -53,4 +53,14 @@
     <style name="menuItemAppearance" parent="@android:style/TextAppearance.Widget.IconMenu.Item">
         <item name="android:textColor">@color/md_theme_dark_onBackground</item>
     </style>
+
+    <style name="Theme.FAP.Add_Payment">
+        <item name="android:textColor">@color/gray</item>
+        <item name="android:textColorPrimary">@color/gray</item>
+    </style>
+
+    <style name="Theme.FAP.Login">
+        <item name="tint">@color/md_theme_dark_onPrimary</item>
+    </style>
+
 </resources>
