@@ -1,19 +1,16 @@
-package com.example.fap.ui.slideshow
+package com.example.fap.ui.category
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.TextView
-import androidx.compose.ui.text.toLowerCase
 import androidx.core.content.ContextCompat
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.example.fap.R
 import com.example.fap.utils.SharedCurrencyManager
 import java.util.Locale
-import java.util.*
 import kotlin.collections.ArrayList
 
 class CategoryAdapter(
@@ -97,7 +94,7 @@ class CategoryAdapter(
 
         fun bind(item: CategoryItem) {
             titleTextView.text = item.title
-            sumTextView.text = item.sum.toString()
+            sumTextView.text = sharedCurrency.num2Money(item.sum)
             val sum = sumTextView.text.toString()
 
             if (sum.toDouble() > 0.0) {

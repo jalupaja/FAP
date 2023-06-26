@@ -1,4 +1,4 @@
-package com.example.fap.ui.slideshow
+package com.example.fap.ui.category
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -60,13 +60,13 @@ class CategoryFragment : Fragment() {
         super.onResume()
         categoryData.clear()
         lifecycleScope.launch {
-            val db = FapDatabase.getInstance(requireContext())
-            val categorys = db.fapDao().getCategories()
-            for (category in categorys) {
-                val sumCat = db.fapDao().getTotalAmountByCategory(sharedPreferences.getCurUser(requireContext()), category.name)
+            val dbCategory = FapDatabase.getInstance(requireContext())
+            val categories = dbCategory.fapDaoCategory().getCategories()
+            for (category in categories) {
+                val sumCat = dbCategory.fapDaoPayment().getTotalAmountByCategory(sharedPreferences.getCurUser(requireContext()), category.name)
                 categoryData.add(CategoryItem(category.name, sumCat?: 0.0))
             }
-            if (categorys.isEmpty()) {
+            if (categories.isEmpty()) {
                 binding.textCategory.visibility = View.VISIBLE
             } else {
                 binding.textCategory.visibility = View.GONE

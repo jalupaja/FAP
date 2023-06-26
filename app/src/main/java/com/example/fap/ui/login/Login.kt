@@ -278,8 +278,8 @@ class Login : AppCompatActivity() {
                         // setup default values
                         db.fapDaoUser().insertUser(User(userId))
                         db.fapDaoCategory().insertCategory(Category(name = "")) // use as 'not categorised' to avoid FOREIGN KEY constraint fails
-                        db.fapDaoCategory().insertCategory(Category(userId = userId, name = "Groceries"))
-                        db.fapDaoCategory().insertCategory(Category(userId = userId, name = "Income"))
+                        db.fapDaoCategory().insertCategory(Category(name = "Groceries"))
+                        db.fapDaoCategory().insertCategory(Category(name = "Income"))
                         db.fapDaoWallet().insertWallet(Wallet(userId = userId, name = "Bank"))
                         db.fapDaoWallet().insertWallet(Wallet(userId = userId, name = "Cash"))
 
@@ -311,8 +311,6 @@ class Login : AppCompatActivity() {
     }
 
     private fun checkPassword(password: String): Boolean {
-        copyFile()
-        Log.w("FAP", "copy file function call")
         return if (calculateHash(password) == sharedPreferences.getString(getString(R.string.shared_prefs_hash))) {
             FapDatabase.getInstance(applicationContext, password)
             true

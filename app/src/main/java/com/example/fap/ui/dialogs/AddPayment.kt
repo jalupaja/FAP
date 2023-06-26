@@ -4,7 +4,6 @@ import android.app.AlertDialog
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.example.fap.data.Category
 import com.example.fap.data.FapDatabase
 import com.example.fap.databinding.DialogAddPaymentBinding
 import com.example.fap.utils.SharedPreferencesManager
@@ -20,7 +19,8 @@ import android.view.View
 import android.widget.ArrayAdapter
 import androidx.activity.OnBackPressedCallback
 import com.example.fap.R
-import com.example.fap.data.Payment
+import com.example.fap.data.entities.Category
+import com.example.fap.data.entities.Payment
 import com.example.fap.utils.SharedCurrencyManager
 import com.google.android.material.snackbar.Snackbar
 import java.time.ZoneId
@@ -47,7 +47,9 @@ class AddPayment : AppCompatActivity() {
         sharedPreferences = SharedPreferencesManager.getInstance(applicationContext)
         sharedCurrency = SharedCurrencyManager.getInstance(applicationContext)
 
-        val db = FapDatabase.getInstance(applicationContext).fapDao()
+        val dbPayment = FapDatabase.getInstance(applicationContext).fapDaoPayment()
+        val dbWallet = FapDatabase.getInstance(applicationContext).fapDaoWallet()
+        val dbCategory = FapDatabase.getInstance(applicationContext).fapDaoCategory()
         val curUser = sharedPreferences.getCurUser(applicationContext)
         val dateFormatPattern = "dd.MM.yyyy"
 
@@ -75,7 +77,7 @@ class AddPayment : AppCompatActivity() {
             alert.setPositiveButton("Yes") { dialog, _ ->
                 // TODO only show on curItemId
                 lifecycleScope.launch {
-                    db.deletePayment(curItemId)
+                    dbPayment.deletePayment(curItemId)
                 }
                 dialog.dismiss()
                 backButtonCallback.handleOnBackPressed()
@@ -144,8 +146,8 @@ class AddPayment : AppCompatActivity() {
                     if (curItemId != -1) {
                         newPayment = newPayment.copy(id = curItemId)
                     }
-                    db.insertCategory(Category(category))
-                    db.upsertPayment(newPayment)
+                    dbCategory.insertCategory(Category(category))
+                    dbPayment.upsertPayment(newPayment)
                     backButtonCallback.handleOnBackPressed()
                 }
             }
@@ -170,14 +172,14 @@ class AddPayment : AppCompatActivity() {
             // Setup existing wallets
             currencyAdapter.addAll(sharedCurrency.getAvailableCurrencies())
             itemCurrency.adapter = currencyAdapter
-            val wallets = db.getWallets(curUser)
+            val wallets = dbWallet.getWallets(curUser)
             itemWallet.adapter = walletAdapter
             for (wallet in wallets) {
                 walletAdapter.add(wallet.name)
             }
 
             // Setup existing categories
-            val categories = db.getCategories()
+            val categories = dbCategory.getCategories()
             categoryAdapter = ArrayAdapter<String>(applicationContext, R.layout.spinner_item)
             categorySpinner.setAdapter(categoryAdapter)
             for (category in categories) {
@@ -187,7 +189,7 @@ class AddPayment : AppCompatActivity() {
             // Update default values if this is supposed to edit an existing item
             if (curItemId != -1) {
                 btnDel.visibility = View.VISIBLE
-                val item = db.getPayment(curItemId)
+                val item = dbPayment.getPayment(curItemId)
                 startTitle = item.title
                 startDate = SimpleDateFormat(dateFormatPattern, Locale.getDefault()).format(item.date)
                 startPrice = "%.2f".format(item.price)

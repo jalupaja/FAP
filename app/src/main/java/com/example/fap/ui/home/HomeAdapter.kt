@@ -10,6 +10,7 @@ import androidx.annotation.ColorInt
 import androidx.recyclerview.widget.RecyclerView
 import com.example.fap.R
 import com.example.fap.data.FapDatabase
+import com.example.fap.data.entities.Payment
 import com.example.fap.utils.SharedPreferencesManager
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
@@ -25,13 +26,13 @@ import com.github.mikephil.charting.data.LineDataSet
 class HomeAdapter(private val wallets: List<WalletInfo>) : RecyclerView.Adapter<HomeAdapter.ViewHolder>() {
 
     private lateinit var sharedPreferences: SharedPreferencesManager
-    private lateinit var db: FapDatabase
+    private lateinit var dbPayment: FapDatabase
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val context = parent.context
         val view = LayoutInflater.from(context).inflate(R.layout.fragment_home_item, parent, false)
 
-        db = FapDatabase.getInstance(context)
+        dbPayment = FapDatabase.getInstance(context)
         sharedPreferences = SharedPreferencesManager.getInstance(context)
 
         return ViewHolder(view)
@@ -47,9 +48,9 @@ class HomeAdapter(private val wallets: List<WalletInfo>) : RecyclerView.Adapter<
     }
 
     private suspend fun updateTotal(context: Context): Double {
-        var income: Double? = db.fapDao().getTotalIncome(sharedPreferences.getCurUser(context))
+        var income: Double? = dbPayment.fapDaoPayment().getTotalIncome(sharedPreferences.getCurUser(context))
         var expense: Double? =
-            db.fapDao().getTotalAmountSpent(sharedPreferences.getCurUser(context))
+            dbPayment.fapDaoPayment().getTotalAmountSpent(sharedPreferences.getCurUser(context))
 
         if (income == null)
             income = 0.0
