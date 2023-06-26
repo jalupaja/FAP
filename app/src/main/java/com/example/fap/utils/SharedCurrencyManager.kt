@@ -198,6 +198,10 @@ class SharedCurrencyManager(context: Context) {
         sharedPreferences.saveCurrency(context, newCurrency)
     }
 
+    fun getCurrency(): String {
+        return defaultCurrency
+    }
+
     fun getDefaultCurrencyIndex(): Int {
         return availableCurrencies.keys.indexOf(defaultCurrency)
     }

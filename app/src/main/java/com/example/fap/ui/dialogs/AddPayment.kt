@@ -6,7 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.fap.data.Category
 import com.example.fap.data.FapDatabase
-import com.example.fap.databinding.ActivityAddPaymentBinding
+import com.example.fap.databinding.DialogAddPaymentBinding
 import com.example.fap.utils.SharedPreferencesManager
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -15,7 +15,6 @@ import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 import android.app.DatePickerDialog
-import android.opengl.Visibility
 import android.view.MenuItem
 import android.view.View
 import android.widget.ArrayAdapter
@@ -29,7 +28,7 @@ import java.util.*
 
 class AddPayment : AppCompatActivity() {
 
-    private lateinit var binding: ActivityAddPaymentBinding
+    private lateinit var binding: DialogAddPaymentBinding
     private lateinit var currencyAdapter: ArrayAdapter<String>
     private lateinit var walletAdapter: ArrayAdapter<String>
     private lateinit var categoryAdapter: ArrayAdapter<String>
@@ -41,7 +40,7 @@ class AddPayment : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityAddPaymentBinding.inflate(layoutInflater)
+        binding = DialogAddPaymentBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
