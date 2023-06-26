@@ -66,10 +66,6 @@ class HomeFragment : Fragment() {
             viewpager.setCurrentItem(viewpager.currentItem - 1, true)
         }
 
-        indicatorRight.setOnClickListener {
-            viewpager.setCurrentItem(viewpager.currentItem + 1, true)
-        }
-
         return view
     }
 

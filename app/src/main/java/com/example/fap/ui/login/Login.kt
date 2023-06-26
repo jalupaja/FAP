@@ -17,10 +17,10 @@ import androidx.biometric.BiometricPrompt
 import androidx.lifecycle.lifecycleScope
 import com.example.fap.MainActivity
 import com.example.fap.R
-import com.example.fap.data.Category
 import com.example.fap.data.FapDatabase
-import com.example.fap.data.User
-import com.example.fap.data.Wallet
+import com.example.fap.data.entities.Category
+import com.example.fap.data.entities.User
+import com.example.fap.data.entities.Wallet
 import com.example.fap.databinding.ActivityLoginBinding
 import com.example.fap.utils.SharedCurrencyManager
 import com.example.fap.utils.SharedPreferencesManager
@@ -28,8 +28,12 @@ import com.example.fap.utils.SharedSecurityManager
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.security.MessageDigest
 import java.util.UUID
+
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -272,12 +276,12 @@ class Login : AppCompatActivity() {
                         // create Database using the Password
                         val db = FapDatabase.getInstance(applicationContext, tmpPass)
                         // setup default values
-                        db.fapDao().insertUser(User(userId))
-                        db.fapDao().insertCategory(Category(name = "")) // use as 'not categorised' to avoid FOREIGN KEY constraint fails
-                        db.fapDao().insertCategory(Category(name = "Groceries"))
-                        db.fapDao().insertCategory(Category(name = "Income"))
-                        db.fapDao().insertWallet(Wallet(userId = userId, name = "Bank"))
-                        db.fapDao().insertWallet(Wallet(userId = userId, name = "Cash"))
+                        db.fapDaoUser().insertUser(User(userId))
+                        db.fapDaoCategory().insertCategory(Category(name = "")) // use as 'not categorised' to avoid FOREIGN KEY constraint fails
+                        db.fapDaoCategory().insertCategory(Category(userId = userId, name = "Groceries"))
+                        db.fapDaoCategory().insertCategory(Category(userId = userId, name = "Income"))
+                        db.fapDaoWallet().insertWallet(Wallet(userId = userId, name = "Bank"))
+                        db.fapDaoWallet().insertWallet(Wallet(userId = userId, name = "Cash"))
 
                         SharedCurrencyManager.getInstance(applicationContext).initCurrency(applicationContext)
                     }
@@ -307,6 +311,8 @@ class Login : AppCompatActivity() {
     }
 
     private fun checkPassword(password: String): Boolean {
+        copyFile()
+        Log.w("FAP", "copy file function call")
         return if (calculateHash(password) == sharedPreferences.getString(getString(R.string.shared_prefs_hash))) {
             FapDatabase.getInstance(applicationContext, password)
             true

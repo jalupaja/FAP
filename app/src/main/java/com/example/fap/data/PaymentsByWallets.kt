@@ -1,4 +1,4 @@
-package com.example.fap.data
+package com.example.fap.data.entities
 
 import androidx.room.Embedded
 import androidx.room.Relation

@@ -46,4 +46,14 @@
     <string-array name="empty_spinner">
         <item></item>
     </string-array>
+
+    <string-array name="dbEI">
+        <item>Import Data</item>
+        <item>Export Data to CSV</item>
+    </string-array>
+
+    <string-array name="dbEI_values">
+        <item>@string/dbEI_import</item>
+        <item>@string/dbEI_export</item>
+    </string-array>
 </resources>
