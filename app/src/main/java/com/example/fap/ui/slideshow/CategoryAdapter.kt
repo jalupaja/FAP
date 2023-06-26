@@ -24,9 +24,7 @@ class CategoryAdapter(
     private lateinit var sharedCurrency: SharedCurrencyManager
     private var colorRed = 0
     private var colorGreen = 0
-    private var initialCategoryList = ArrayList<CategoryItem>().apply {
-        categoryList?.let {addAll(it)}
-    }
+    private var initialCategoryList = categoryList
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryAdapter.ViewHolder {
         val context = parent.context
@@ -71,16 +69,14 @@ class CategoryAdapter(
                     }
                     val results = FilterResults()
                     results.values = filteredList
-                    for (result in results.values as ArrayList<CategoryItem>)
-                        Log.d("FAP" , "Resultzap ${result.title}")
                     return results
         }
 
         override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
             if (results?.values is ArrayList<*>) {
-                for (category in categoryList)
-                    Log.d("FAP", "zap ${category.title}")
-                categoryList = results.values as ArrayList<CategoryItem>
+                val filteredList = results.values as ArrayList<CategoryItem>
+                categoryList = ArrayList(filteredList)
+
                 notifyDataSetChanged()
             }
         }

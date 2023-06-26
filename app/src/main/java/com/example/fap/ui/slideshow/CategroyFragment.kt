@@ -1,15 +1,12 @@
 package com.example.fap.ui.slideshow
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.fap.R
 import com.example.fap.data.FapDatabase
@@ -61,6 +58,7 @@ class CategoryFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        categoryData.clear()
         lifecycleScope.launch {
             val db = FapDatabase.getInstance(requireContext())
             val categorys = db.fapDao().getCategories()
