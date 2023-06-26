@@ -3,10 +3,11 @@ package com.example.fap.data.dao
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import com.example.fap.data.entities.Currency
 
 @Dao
-interface CurrencyDao {
+interface FapDaoCurrency {
     @Insert
     suspend fun insertCurrency(currency: Currency)
 

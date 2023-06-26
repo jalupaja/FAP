@@ -2,8 +2,8 @@ package com.example.fap.utils
 
 import android.content.Context
 import android.util.Log
-import com.example.fap.data.Currency
 import com.example.fap.data.FapDatabase
+import com.example.fap.data.entities.Currency
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.MainScope
@@ -181,12 +181,12 @@ class SharedCurrencyManager(context: Context) {
             val conversion = db.currencyDao().getConversion(currencyTo) / db.currencyDao().getConversion(currencyFrom)
             var newPrice: Double
 
-            val payments = db.fapDao().getPayments(curUser)
+            val payments = db.fapDaoPayment().getPayments(curUser)
             val updatedPayments = payments.map { payment ->
                 newPrice = payment.price * conversion
                 payment.copy(price = newPrice)
             }
-            db.fapDao().updatePayments(updatedPayments)
+            db.fapDaoPayment().updatePayments(updatedPayments)
         }
     }
 

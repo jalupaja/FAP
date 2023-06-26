@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.WindowManager
-import androidx.appcompat.app.AlertDialog
 import com.google.android.material.navigation.NavigationView
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -16,9 +15,6 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
-import androidx.lifecycle.lifecycleScope
-import com.example.fap.data.FapDatabase
-import com.example.fap.data.Wallet
 import com.example.fap.databinding.ActivityMainBinding
 import com.example.fap.ui.dialogs.AddPayment
 import com.example.fap.ui.dialogs.AddWallet

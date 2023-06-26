@@ -1,19 +1,14 @@
 package com.example.fap.ui.dialogs
 
 import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
 import androidx.activity.OnBackPressedCallback
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.example.fap.R
 import com.example.fap.data.FapDatabase
-import com.example.fap.data.Wallet
+import com.example.fap.data.entities.Wallet
 import com.example.fap.databinding.DialogAddWalletBinding
 import com.example.fap.utils.SharedPreferencesManager
 import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.launch
 
 class AddWallet : AppCompatActivity() {
@@ -40,10 +35,10 @@ class AddWallet : AppCompatActivity() {
                 ).show()
             } else {
                 lifecycleScope.launch {
-                    val db = FapDatabase.getInstance(applicationContext).fapDao()
+                    val dbWallet = FapDatabase.getInstance(applicationContext).fapDaoWallet()
                     val curUser = SharedPreferencesManager.getInstance(applicationContext)
                         .getCurUser(applicationContext)
-                    db.insertWallet(Wallet(input.text.toString(), curUser))
+                    dbWallet.insertWallet(Wallet(input.text.toString(), curUser))
                 }
                 backButtonCallback.handleOnBackPressed()
             }

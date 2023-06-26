@@ -9,7 +9,7 @@ import androidx.room.Update
 import com.example.fap.data.entities.Payment
 import java.util.Date
 import androidx.room.Upsert
-import java.util.Date
+import com.example.fap.data.entities.PaymentsByWallets
 
 @Dao
 interface FapDaoPayment {
