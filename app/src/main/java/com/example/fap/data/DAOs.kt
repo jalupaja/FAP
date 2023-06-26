@@ -74,6 +74,9 @@ interface FapDao {
     @Query("SELECT * FROM payment WHERE userId = :userId AND isPayment = 1 AND date >= :startDate AND date <= :endDate AND category = :category")
     suspend fun getAmountSpentInRangeByCategory(userId: String, startDate: Date, endDate: Date, category: String): List<Payment>
 
+    @Query("SELECT * FROM Wallet WHERE userId = :userId")
+    suspend fun getPaymentsByWallets(userId: String): List<PaymentsByWallets>
+
     // Category
     @Query("SELECT * FROM Category")
     suspend fun getCategories(): List<Category>

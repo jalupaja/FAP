@@ -16,6 +16,10 @@
 
     <string name="title_activity_settings">SettingsActivity</string>
     <string name="settings">Settings</string>
+    <string name="add_wallet">Add Wallet</string>
+    <string name="add_a_wallet">Add a Wallet</string>
+    <string name="hint_wallet">New Wallet</string>
+    <string name="all_wallets">All Wallets</string>
 
     <string name="login_input">Login</string>
     <string name="password_hint">Password</string>
@@ -41,6 +45,7 @@
     <string name="theme_light">light</string>
     <string name="theme_dark">dark</string>
     <string name="theme_oled">oled</string>
+
     <string name="history_empty">Nothing here yet.\nAdd something using the Button on the bottom right.</string>
 
 </resources>

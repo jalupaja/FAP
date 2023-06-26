@@ -1,25 +1,23 @@
 package com.example.fap.ui.home
 
 import android.os.Bundle
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.ColorInt
+import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.viewpager2.widget.ViewPager2
 import com.example.fap.R
 import com.example.fap.data.FapDatabase
 import com.example.fap.databinding.FragmentHomeBinding
 import com.example.fap.utils.SharedCurrencyManager
 import com.example.fap.utils.SharedPreferencesManager
-import com.github.mikephil.charting.data.PieData
-import com.github.mikephil.charting.data.PieDataSet
-import com.github.mikephil.charting.data.PieEntry
-import com.github.mikephil.charting.charts.BarChart
-import com.github.mikephil.charting.charts.PieChart
 import kotlinx.coroutines.launch
+import java.util.Calendar
 
 class HomeFragment : Fragment() {
 
@@ -30,11 +28,13 @@ class HomeFragment : Fragment() {
     private lateinit var sharedPreferences: SharedPreferencesManager
     private lateinit var sharedCurrency: SharedCurrencyManager
 
-    private lateinit var db: FapDatabase
-
-    private lateinit var lblTotal: TextView
-    private lateinit var chartBalance: PieChart
-    private lateinit var chartCategory: BarChart
+    // TODO in HomeFragment:
+    private var wallets = ArrayList<WalletInfo>()
+    private lateinit var walletAdapter: HomeAdapter
+    private lateinit var viewpager: ViewPager2
+    private lateinit var indicatorText: TextView
+    private lateinit var indicatorLeft: ImageView
+    private lateinit var indicatorRight: ImageView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,92 +46,82 @@ class HomeFragment : Fragment() {
         sharedPreferences = SharedPreferencesManager.getInstance(requireContext())
         sharedCurrency = SharedCurrencyManager.getInstance(requireContext())
 
-        db = FapDatabase.getInstance(requireContext())
-
         val view = binding.root
 
-        lblTotal = binding.lblTotal
-        chartBalance = binding.chartBalance
-        chartCategory = binding.chartCategory
-    //get theme OnSurface Color
-        val typedValue = TypedValue()
-        val theme = requireContext().theme
-        theme.resolveAttribute(com.google.android.material.R.attr.colorOnSurface, typedValue, true)
-        @ColorInt val colorOnSurface = typedValue.data
+        viewpager = binding.viewpagerHome
+        indicatorText = binding.indicatorText
+        indicatorLeft = binding.indicatorLeft
+        indicatorRight = binding.indicatorRight
 
-        //Balance Chart
-        chartBalance.setExtraOffsets(5f, 5f, 5f, 5f)
-        chartBalance.setDrawEntryLabels(false)
-        chartBalance.holeRadius = 70f
-        chartBalance.transparentCircleRadius = 75f
-        chartBalance.legend.isEnabled = false
-        chartBalance.setHoleColor(resources.getColor(com.google.android.material.R.color.mtrl_btn_transparent_bg_color, context?.theme))
-        chartBalance.setCenterTextSize(10f)
-        chartBalance.setCenterTextColor(colorOnSurface)
+        walletAdapter = HomeAdapter(wallets)
+        viewpager.adapter = walletAdapter
 
-        var einnahmen = 0f//getTotalIncome()
-        var ausgaben = 0f//getTotalSpent()
-        var saldo = einnahmen - ausgaben
-        val entriesBalance = listOf(
-            PieEntry(einnahmen.toFloat(), "Einnahmen"),
-            PieEntry(ausgaben.toFloat(), "Ausgaben")
-        )
-        val dataSet = PieDataSet(entriesBalance, "Finanzen")
-        chartBalance.centerText = "Einnahmen: $einnahmen € \nAusgaben: $ausgaben €\n _______________________ \nSaldo: $saldo €"
+        viewpager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                updateIndicator(position)
+            }
+        })
 
-        dataSet.sliceSpace = 3f
-        dataSet.selectionShift = 5f
-        dataSet.colors = listOf(
-            resources.getColor(R.color.green, context?.theme),
-            resources.getColor(R.color.red, context?.theme)
-        )
-        dataSet.setValueTextColors(
-            listOf(
-                resources.getColor(com.google.android.material.R.color.mtrl_btn_transparent_bg_color, context?.theme)
-            )
-        )
-        val chartData = PieData(dataSet)
-        chartBalance.data = chartData
-        chartBalance.description.text = ""
-        chartBalance.invalidate()
-        chartBalance.notifyDataSetChanged()
+        indicatorLeft.setOnClickListener {
+            viewpager.setCurrentItem(viewpager.currentItem - 1, true)
+        }
 
-        //Bar Chart Category
-
+        indicatorRight.setOnClickListener {
+            viewpager.setCurrentItem(viewpager.currentItem + 1, true)
+        }
 
         return view
     }
 
     override fun onResume() {
         super.onResume()
-        // update values
-        lifecycleScope.launch {
-            lblTotal.text = sharedCurrency.num2Money(updateTotal())
-            // Pie Chart
-            var einnahmen = getTotalIncome()
-            var ausgaben = getTotalSpent()
-            val entriesBalance = listOf(
-                PieEntry(einnahmen.toFloat(), "Einnahmen"),
-                PieEntry(ausgaben.toFloat(), "Ausgaben")
-            )
-            var saldo = einnahmen - ausgaben
-            //TODO: change € to actual used currency
-            chartBalance.centerText = "Income: ${String.format("%.2f", einnahmen)} € \nSpent: ${String.format("%.2f", ausgaben)} €\n _______________________ \nSaldo: ${String.format("%.2f",saldo)} €"
 
-            val dataSet = PieDataSet(entriesBalance, "Finanzen")
-            dataSet.sliceSpace = 3f
-            dataSet.selectionShift = 5f
-            dataSet.colors = listOf(
-                resources.getColor(R.color.green, context?.theme),
-                resources.getColor(R.color.red, context?.theme)
-            )
-            dataSet.setValueTextColors(
-                listOf(
-                    resources.getColor(com.google.android.material.R.color.mtrl_btn_transparent_bg_color, context?.theme)
-                )
-            )
-            val chartData = PieData(dataSet)
-            chartBalance.data = chartData
+        var totalSpent = 0.0
+        var totalIncome = 0.0
+        var totalSpentMonth = 0.0
+        var totalIncomeMonth = 0.0
+        val currency = sharedCurrency.getCurrency()
+        val currentYear = Calendar.getInstance().get(Calendar.YEAR)
+        val currentMonth = Calendar.getInstance().get(Calendar.MONTH)
+
+        lifecycleScope.launch {
+
+            val db = FapDatabase.getInstance(requireContext())
+            val list_paymentsByWallets = db.fapDao().getPaymentsByWallets(sharedPreferences.getCurUser(requireContext()))
+            wallets.clear()
+            for (paymentsByWallet in list_paymentsByWallets) {
+                var totalSpentWallet = 0.0
+                var totalIncomeWallet = 0.0
+                var totalSpentMonthWallet = 0.0
+                var totalIncomeMonthWallet = 0.0
+                val walletName = paymentsByWallet.wallet.name
+                for (payment in paymentsByWallet.payments) {
+                    val paymentYear = Calendar.getInstance().apply { time = payment.date }.get(Calendar.YEAR)
+                    val paymentMonth = Calendar.getInstance().apply { time = payment.date }.get(Calendar.MONTH)
+
+                    if (paymentYear == currentYear && paymentMonth == currentMonth) {
+                        if (payment.isPayment) {
+                            totalSpentMonthWallet += payment.price
+                        } else {
+                            totalIncomeMonthWallet += payment.price
+                        }
+                    }
+                    if (payment.isPayment) {
+                        totalSpentWallet += payment.price
+                    } else {
+                        totalIncomeWallet += payment.price
+                    }
+                }
+                totalIncomeMonth += totalIncomeMonthWallet
+                totalSpentMonth += totalSpentMonthWallet
+                totalIncome += totalIncomeWallet
+                totalSpent += totalSpentWallet
+
+                wallets.add(WalletInfo(walletName, totalIncomeWallet, totalSpentWallet, totalIncomeMonthWallet, totalSpentMonthWallet, currency))
+            }
+            wallets.add(0, WalletInfo("", totalIncome, totalSpent, totalIncomeMonth, totalSpentMonth, currency))
+
+            walletAdapter.notifyDataSetChanged()
         }
     }
 
@@ -140,16 +130,25 @@ class HomeFragment : Fragment() {
         _binding = null
     }
 
-    private suspend fun updateTotal(): Double {
-        var income: Double? = db.fapDao().getTotalIncome(sharedPreferences.getCurUser(requireContext()))
-        var spent: Double? = db.fapDao().getTotalAmountSpent(sharedPreferences.getCurUser(requireContext()))
+    private fun updateIndicator(position: Int) {
+        val amount = wallets.size
 
-        if (income == null)
-            income = 0.0
-        if (spent == null)
-            spent = 0.0
+        indicatorText.text = wallets[position].walletName
 
-        return income - spent
+        if (position == 0) {
+            // position 0 always means "All Wallets"
+            indicatorText.text = getString(R.string.all_wallets)
+
+            indicatorLeft.visibility = View.INVISIBLE
+        } else {
+            indicatorLeft.visibility = View.VISIBLE
+        }
+
+        if (position == amount - 1) {
+            indicatorRight.visibility = View.INVISIBLE
+        } else {
+            indicatorRight.visibility = View.VISIBLE
+        }
     }
 
     private suspend fun getTotalIncome(): Double {
