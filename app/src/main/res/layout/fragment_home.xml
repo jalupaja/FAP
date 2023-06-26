@@ -1,164 +1,165 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".ui.home.HomeFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:layout_marginVertical="30dp"
-    android:layout_marginHorizontal="15dp">
-
-    <com.google.android.material.card.MaterialCardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/card_balance"
-        app:cardCornerRadius="10dp"
-        app:cardElevation="5dp"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <TextView
-                android:id="@+id/lbl_total"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="0.00€"
-                android:textAlignment="center"
-                android:textStyle="bold"
-                android:textSize="48dp" />
-
-        </LinearLayout>
-
-    </com.google.android.material.card.MaterialCardView>
-
-    <com.github.mikephil.charting.charts.PieChart
-        android:id="@+id/chart_balance"
-        android:layout_width="match_parent"
-        android:layout_height="250dp"
-        app:layout_constraintTop_toBottomOf="@+id/card_balance"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="15dp"/>
+    tools:context=".ui.home.HomeFragment">
 
     <LinearLayout
-        android:id="@+id/cards_overview"
-        app:layout_constraintTop_toBottomOf="@id/chart_balance"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="15dp">
+        android:orientation="vertical"
+        android:padding="15dp">
 
         <com.google.android.material.card.MaterialCardView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:layout_marginRight="5dp"
-            android:layout_marginBottom="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/card_balance"
             app:cardCornerRadius="10dp"
-            app:cardElevation="5dp">
+            app:cardElevation="5dp"
+            app:layout_constraintTop_toTopOf="parent">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="16dp">
 
                 <TextView
+                    android:id="@+id/lbl_total"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Einnahmen"
+                    android:text="0.00€"
                     android:textAlignment="center"
                     android:textStyle="bold"
-                    android:textSize="16dp"/>
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="5.5555"
-                    android:textAlignment="center"
-                    android:textColor="#59E237"
-                    android:textSize="16dp" />
+                    android:textSize="48sp" />
+
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
 
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:layout_marginHorizontal="5dp"
-            android:layout_marginBottom="5dp"
-            app:cardCornerRadius="10dp"
-            app:cardElevation="5dp">
+        <com.github.mikephil.charting.charts.PieChart
+            android:id="@+id/chart_balance"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            app:layout_constraintTop_toBottomOf="@+id/card_balance"
+            android:layout_marginTop="15dp"/>
 
-            <LinearLayout
-                android:layout_width="match_parent"
+        <LinearLayout
+            android:id="@+id/cards_overview"
+            app:layout_constraintTop_toBottomOf="@id/chart_balance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="15dp">
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:padding="15dp">
+                android:layout_weight="1"
+                android:layout_marginRight="5sp"
+                android:layout_marginBottom="5dp"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="5dp">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Saldo"
-                    android:textAlignment="center"
-                    android:textStyle="bold"
-                    android:textSize="16dp"/>
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="5.5555"
-                    android:textAlignment="center"
-                    android:textSize="15dp" />
-            </LinearLayout>
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
-        </com.google.android.material.card.MaterialCardView>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Einnahmen"
+                        android:textAlignment="center"
+                        android:textStyle="bold"
+                        android:textSize="16sp"/>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="5.5555"
+                        android:textAlignment="center"
+                        android:textColor="#59E237"
+                        android:textSize="16sp" />
+                </LinearLayout>
 
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:layout_marginHorizontal="5dp"
-            android:layout_marginBottom="5dp"
-            app:cardCornerRadius="10dp"
-            app:cardElevation="5dp">
+            </com.google.android.material.card.MaterialCardView>
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:padding="15dp">
+                android:layout_weight="1"
+                android:layout_marginHorizontal="5dp"
+                android:layout_marginBottom="5dp"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="5dp">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Ausgaben"
-                    android:textAlignment="center"
-                    android:textStyle="bold"
-                    android:textSize="16dp"/>
-                <TextView
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:padding="15dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Saldo"
+                        android:textAlignment="center"
+                        android:textStyle="bold"
+                        android:textSize="16sp"/>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="5.5555"
+                        android:textAlignment="center"
+                        android:textSize="15sp" />
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginHorizontal="5dp"
+                android:layout_marginBottom="5dp"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="5dp">
+
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="5.5555"
-                    android:textAlignment="center"
-                    android:textColor="#ff0000"
-                    android:textSize="15dp" />
-            </LinearLayout>
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:padding="15dp">
 
-        </com.google.android.material.card.MaterialCardView>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Ausgaben"
+                        android:textAlignment="center"
+                        android:textStyle="bold"
+                        android:textSize="16sp"/>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="5.5555"
+                        android:textAlignment="center"
+                        android:textColor="#ff0000"
+                        android:textSize="15sp" />
+                </LinearLayout>
 
-    </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-    <com.github.mikephil.charting.charts.BarChart
-        android:id="@+id/chart_category"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintTop_toBottomOf="@+id/cards_overview"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="15dp"/>
+        </LinearLayout>
 
-</LinearLayout>
+        <com.github.mikephil.charting.charts.BarChart
+          android:id="@+id/chart_category"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          app:layout_constraintTop_toBottomOf="@+id/cards_overview"
+          android:layout_centerHorizontal="true"
+          android:layout_marginTop="15dp"/>
+  </LinearLayout>
+</ScrollView>
