@@ -34,7 +34,6 @@ class HistoryFragment : Fragment() {
         _binding = FragmentHistoryBinding.inflate(inflater, container, false)
         val view: View = binding.root
         categoryHistory = arguments?.getString("categoryNameHistory", "showAll").toString()
-        Log.d("FAP", categoryHistory + "zap")
         sharedPreferences = SharedPreferencesManager.getInstance(requireContext())
 
         val recyclerView = binding.historyRecyclerview

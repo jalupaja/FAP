@@ -5,6 +5,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -23,6 +25,7 @@ class CategoryFragment : Fragment() {
     private lateinit var sharedPreferences: SharedPreferencesManager
     private var categoryData = ArrayList<CategoryItem>()
     private lateinit var categoryAdapter: CategoryAdapter
+    private lateinit var searchView: SearchView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,12 +42,25 @@ class CategoryFragment : Fragment() {
         categoryAdapter = CategoryAdapter(categoryData)
         recyclerView.adapter = categoryAdapter
 
+        searchView = view.findViewById(R.id.category_searchView)
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                categoryAdapter?.getFilter()?.filter(query)
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                categoryAdapter?.getFilter()?.filter(newText)
+                return true
+            }
+        })
+
+
     return view
     }
 
     override fun onResume() {
         super.onResume()
-        categoryData.clear()
         lifecycleScope.launch {
             val db = FapDatabase.getInstance(requireContext())
             val categorys = db.fapDao().getCategories()

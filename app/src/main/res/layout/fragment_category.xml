@@ -16,12 +16,17 @@
         android:textSize="20sp"
         android:visibility="gone"/>
 
+    <SearchView
+        android:id="@+id/category_searchView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:queryHint="Category"
+        android:iconifiedByDefault="false"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/category_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_below="@+id/category_searchView"
+        app:layout_constraintTop_toBottomOf="@id/category_searchView" />
 </RelativeLayout>
