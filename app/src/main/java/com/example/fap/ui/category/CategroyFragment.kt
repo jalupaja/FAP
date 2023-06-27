@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.fap.R
 import com.example.fap.data.FapDatabase
+import com.example.fap.data.entities.Category
 import com.example.fap.utils.SharedPreferencesManager
 import com.example.fap.databinding.FragmentCategoryBinding
 import kotlinx.coroutines.launch
@@ -20,8 +21,8 @@ class CategoryFragment : Fragment() {
 
     private val binding get() = _binding!!
     private lateinit var sharedPreferences: SharedPreferencesManager
-    private var categoryData = ArrayList<CategoryItem>()
     private lateinit var categoryAdapter: CategoryAdapter
+    private lateinit var categoryData: List<CategoryItem>
     private lateinit var searchView: SearchView
 
     override fun onCreateView(
@@ -58,15 +59,11 @@ class CategoryFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        categoryData.clear()
         lifecycleScope.launch {
             val dbCategory = FapDatabase.getInstance(requireContext())
-            val categories = dbCategory.fapDaoCategory().getCategories()
-            for (category in categories) {
-                val sumCat = dbCategory.fapDaoPayment().getTotalAmountByCategory(sharedPreferences.getCurUser(requireContext()), category.name)
-                categoryData.add(CategoryItem(category.name, sumCat?: 0.0))
-            }
-            if (categories.isEmpty()) {
+            val categoryData = dbCategory.fapDaoPayment().getTotalAmountByCategory(sharedPreferences.getCurUser(requireContext()))
+
+            if (categoryData.isEmpty()) {
                 binding.textCategory.visibility = View.VISIBLE
             } else {
                 binding.textCategory.visibility = View.GONE

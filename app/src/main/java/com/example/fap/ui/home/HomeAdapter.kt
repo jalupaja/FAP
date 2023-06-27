@@ -10,15 +10,18 @@ import androidx.annotation.ColorInt
 import androidx.recyclerview.widget.RecyclerView
 import com.example.fap.R
 import com.example.fap.data.FapDatabase
-import com.example.fap.data.entities.Payment
+import com.example.fap.ui.category.CategoryItem
 import com.example.fap.utils.SharedPreferencesManager
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.animation.Easing
-import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
@@ -66,7 +69,7 @@ class HomeAdapter(private val wallets: List<WalletInfo>) : RecyclerView.Adapter<
         private var lblBalanceMonth: TextView = itemView.findViewById(R.id.lbl_balance_month)
         private var lblExpenseMonth: TextView = itemView.findViewById(R.id.lbl_expense_month)
         private var chartBalance: PieChart = itemView.findViewById(R.id.chart_balance)
-        private var chartStock: LineChart = itemView.findViewById(R.id.chart_stock)
+        private var chartCategory : BarChart = itemView.findViewById(R.id.chart_category)
 
         val resources = itemView.resources
         val context = itemView.context
@@ -77,24 +80,6 @@ class HomeAdapter(private val wallets: List<WalletInfo>) : RecyclerView.Adapter<
 
         @ColorInt
         val colorOnSurface = typedValue.data
-
-
-        //Chart com.example.fap.data.Stock
-        val entriesStock = listOf(
-            Entry(1f, 10f),
-            Entry(2f, 2f),
-            Entry(3f, 7f),
-            Entry(4f, 20f),
-        )
-        val stockDataSet = LineDataSet(entriesStock, "Test1")
-
-        val entriesStock2 = listOf(
-            Entry(1f, 30f),
-            Entry(2f, 4f),
-            Entry(3f, 100f),
-            Entry(4f, 2f),
-        )
-        val stockDataSet2 = LineDataSet(entriesStock2, "Test2")
 
         init {
             setupChartBalance()
@@ -109,6 +94,7 @@ class HomeAdapter(private val wallets: List<WalletInfo>) : RecyclerView.Adapter<
             val incomeMonth = "%.2f".format(wallet.incomeMonth)
             val expenseMonth = "%.2f".format(wallet.expenseMonth)
             val balanceMonth = "%.2f".format(wallet.incomeMonth - wallet.expenseMonth)
+            val categories = wallet.category
             lblExpenseMonth.text = "%.2f".format(wallet.expenseMonth)
 
             // update values
@@ -118,7 +104,9 @@ class HomeAdapter(private val wallets: List<WalletInfo>) : RecyclerView.Adapter<
             lblBalanceMonth.text = balanceMonth
             //chartBalance.centerText = "Income: ${wallet.income}${wallet.currency} \nExpense: ${wallet.expense}}${wallet.currency}"
             updateChartData(wallet.incomeMonth, wallet.expenseMonth)
+            updateCategoryData(wallet.category)
         }
+
         private fun updateChartData(income: Double, expense: Double) {
             var nDataSet = PieDataSet(
                 listOf(
@@ -162,6 +150,24 @@ class HomeAdapter(private val wallets: List<WalletInfo>) : RecyclerView.Adapter<
             chartBalance.notifyDataSetChanged()
         }
 
+        private fun updateCategoryData(categories: List<CategoryItem>) {
+            var nDataEntries = mutableListOf<BarEntry>()
+
+            categories.forEachIndexed{ index, categoryItem ->
+                nDataEntries.add(BarEntry(index.toFloat(), categoryItem.sum.toFloat()))
+            }
+
+            var nDataSet = BarDataSet(nDataEntries, "categories")
+
+            nDataSet.formLineWidth = 2f
+
+            nDataSet.color = resources.getColor(R.color.light_blue_900, context?.theme)
+
+            chartCategory.data.addDataSet(nDataSet)
+            chartCategory.invalidate()
+            chartCategory.notifyDataSetChanged()
+        }
+
         private fun setupOther() {
             theme.resolveAttribute(
                 com.google.android.material.R.attr.colorOnSurface,
@@ -199,25 +205,29 @@ class HomeAdapter(private val wallets: List<WalletInfo>) : RecyclerView.Adapter<
         }
 
         private fun setupChartStock() {
-            stockDataSet.lineWidth = 2f
-            stockDataSet.color = resources.getColor(R.color.yellow, context?.theme)
+            chartCategory.setDrawBarShadow(false)
+            chartCategory.setDrawValueAboveBar(true)
+            chartCategory.description.isEnabled = false
+            chartCategory.setPinchZoom(false)
+            chartCategory.setDrawGridBackground(false)
 
-            stockDataSet2.color = resources.getColor(R.color.purple_700, context?.theme)
-            stockDataSet2.lineWidth = 2f
+            val xAxis = chartCategory.xAxis
+            xAxis.position = XAxis.XAxisPosition.BOTTOM
+            xAxis.setDrawGridLines(false)
 
-            chartStock.data = LineData(stockDataSet, stockDataSet2)
-            chartStock.axisRight.isEnabled = false
-            chartStock.setTouchEnabled(false)
-            chartStock.setPinchZoom(true)
-            chartStock.description.text = ""
-            chartStock.animateX(1000, Easing.EaseInExpo)
-            chartStock.legend.textColor = colorOnSurface
+            val leftAxis = chartCategory.axisLeft
+            leftAxis.setDrawGridLines(false)
 
-            chartStock.xAxis.position = XAxis.XAxisPosition.BOTTOM
-            chartStock.xAxis.setDrawGridLines(false)
+            val rightAxis = chartCategory.axisRight
+            rightAxis.setDrawGridLines(false)
 
-            chartStock.invalidate()
-            chartStock.notifyDataSetChanged()
+            val dataSet = BarDataSet(listOf(
+                BarEntry(0F, 0F)
+            ), "Categories")
+            val chartData = BarData(dataSet)
+            chartCategory.data = chartData
+            chartCategory.invalidate()
+            chartCategory.notifyDataSetChanged()
         }
     }
 }

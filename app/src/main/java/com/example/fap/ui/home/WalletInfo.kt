@@ -1,5 +1,7 @@
 package com.example.fap.ui.home
 
+import com.example.fap.ui.category.CategoryItem
+
 data class WalletInfo(
     val walletName: String,
     val income: Double,
@@ -7,4 +9,5 @@ data class WalletInfo(
     val incomeMonth: Double,
     val expenseMonth: Double,
     val currency: String,
+    val category: List<CategoryItem>
 )

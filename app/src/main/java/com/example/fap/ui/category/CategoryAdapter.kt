@@ -14,7 +14,7 @@ import java.util.Locale
 import kotlin.collections.ArrayList
 
 class CategoryAdapter(
-    private var categoryList: ArrayList<CategoryItem>
+    private var categoryList: List<CategoryItem>
     ) : RecyclerView.Adapter<CategoryAdapter.ViewHolder>() {
 
     private var onItemClickListener: OnItemClickListener? = null

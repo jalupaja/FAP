@@ -165,8 +165,8 @@
 
         </LinearLayout>
 
-        <com.github.mikephil.charting.charts.LineChart
-            android:id="@+id/chart_stock"
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/chart_category"
             android:layout_width="match_parent"
             android:layout_height="600px"
             app:layout_constraintTop_toBottomOf="@+id/cards_overview"
