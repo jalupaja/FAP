@@ -39,4 +39,5 @@ data class Payment(
     val date: Date,
     val isPayment: Boolean,
     val category: String?,
+    val savingsGoalIndex: Int = -1,
 )

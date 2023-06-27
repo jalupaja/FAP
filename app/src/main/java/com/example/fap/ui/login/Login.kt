@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.EditorInfo
@@ -18,9 +19,13 @@ import androidx.lifecycle.lifecycleScope
 import com.example.fap.MainActivity
 import com.example.fap.R
 import com.example.fap.data.FapDatabase
+import com.example.fap.data.TimeSpan
+import com.example.fap.data.calculateNextDate
 import com.example.fap.data.entities.Category
+import com.example.fap.data.entities.Payment
 import com.example.fap.data.entities.User
 import com.example.fap.data.entities.Wallet
+import com.example.fap.data.timeSpanTitle
 import com.example.fap.databinding.ActivityLoginBinding
 import com.example.fap.utils.SharedCurrencyManager
 import com.example.fap.utils.SharedPreferencesManager
@@ -28,17 +33,11 @@ import com.example.fap.utils.SharedSecurityManager
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.security.MessageDigest
+import java.time.LocalDate
+import java.time.ZoneId
+import java.util.Date
 import java.util.UUID
-
-
-/**
- * An example full-screen activity that shows and hides the system UI (i.e.
- * status bar and navigation/system bar) with user interaction.
- */
 
 class Login : AppCompatActivity() {
 
@@ -249,6 +248,52 @@ class Login : AppCompatActivity() {
                 if (checkPassword(textLogin.text.toString())) {
                     lifecycleScope.launch {
                         SharedCurrencyManager.getInstance(applicationContext).tryUpdateCurrency(applicationContext)
+                    }
+
+                    lifecycleScope.launch {
+                        // renew repeating Payments/ SavingGoals
+                        val db = FapDatabase.getInstance(applicationContext, textLogin.text.toString())
+                        val dbSavingsGoal = db.fapDaoSavingGoal()
+                        val dbPayment = db.fapDaoPayment()
+                        val curUser = SharedPreferencesManager.getInstance(applicationContext).getCurUser(applicationContext)
+                        val today = Date.from(LocalDate.now().atTime(23,59, 59).atZone(ZoneId.systemDefault()).toInstant())
+
+                        val savingsGoals = dbSavingsGoal.getSavingsGoals(curUser)
+
+                        Log.d("savingsgoal: today",today.toString())
+                        Log.d("savingsgoal: today", calculateNextDate(today, TimeSpan.Daily).toString())
+                        Log.d("savingsgoal: today",calculateNextDate(today, TimeSpan.Daily).after(today ).toString())
+                        for (savingsGoal in savingsGoals) {
+
+                            Log.d("savingsgoal", savingsGoal.nextDate.toString())
+                            Log.d("savingsgoal", today.after(savingsGoal.nextDate).toString())
+                            Log.d("savingsgoal", savingsGoal.nextDate.after(today).toString())
+
+                            if (today.after(savingsGoal.nextDate)) {
+                                val nextDate = calculateNextDate(today, savingsGoal.timeSpanPerTime)
+
+                                dbSavingsGoal.updateSavingsGoal(
+                                    savingsGoal.copy(
+                                        nextDate = nextDate
+                                    )
+                                )
+
+                                dbPayment.insertPayment(Payment(
+                                    userId = curUser,
+                                    wallet = savingsGoal.wallet,
+                                    title = timeSpanTitle(savingsGoal.title, savingsGoal.timeSpanPerTime),
+                                    description = savingsGoal.description,
+                                    price = savingsGoal.amountPerTime,
+                                    date = today,
+                                    isPayment = savingsGoal.isPayment,
+                                    category = savingsGoal.category,
+                                ))
+                            }
+
+                            if (savingsGoal.endDate == today) {
+                                dbSavingsGoal.deleteSavingsGoal(savingsGoal)
+                            }
+                        }
                     }
                     login()
                 } else {

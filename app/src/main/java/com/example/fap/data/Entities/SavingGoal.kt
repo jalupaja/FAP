@@ -3,6 +3,7 @@ package com.example.fap.data.entities
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import com.example.fap.data.TimeSpan
 import java.util.Date
 
 @Entity(
@@ -19,6 +20,12 @@ import java.util.Date
             parentColumns = ["name"],
             childColumns = ["wallet"],
             onDelete = ForeignKey.CASCADE
+        ),
+        ForeignKey(
+            entity = Category::class,
+            parentColumns = ["name"],
+            childColumns = ["category"],
+            onDelete = ForeignKey.CASCADE
         )
     ]
 )
@@ -30,9 +37,12 @@ data class SavingsGoal(
     val wallet: String,
     val title: String,
     val description: String,
-    val startDate: Date,
-    val endDate: Date,
-    val amountPerMonth: Double,
-    val endAmount: Double,
-    val startAmount: Double,
+    val nextDate: Date,
+    val endDate: Date?,
+    val timeSpanPerTime: TimeSpan,
+    val amountPerTime: Double,
+    val endAmount: Double?,
+    val startAmount: Double?,
+    val category: String?,
+    val isPayment: Boolean,
 )

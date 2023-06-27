@@ -19,8 +19,12 @@ import android.view.View
 import android.widget.ArrayAdapter
 import androidx.activity.OnBackPressedCallback
 import com.example.fap.R
+import com.example.fap.data.TimeSpan
+import com.example.fap.data.calculateNextDate
 import com.example.fap.data.entities.Category
 import com.example.fap.data.entities.Payment
+import com.example.fap.data.entities.SavingsGoal
+import com.example.fap.data.timeSpanTitle
 import com.example.fap.utils.SharedCurrencyManager
 import com.google.android.material.snackbar.Snackbar
 import java.time.ZoneId
@@ -50,8 +54,10 @@ class AddPayment : AppCompatActivity() {
         val dbPayment = FapDatabase.getInstance(applicationContext).fapDaoPayment()
         val dbWallet = FapDatabase.getInstance(applicationContext).fapDaoWallet()
         val dbCategory = FapDatabase.getInstance(applicationContext).fapDaoCategory()
+        val dbSavingsGoal = FapDatabase.getInstance(applicationContext).fapDaoSavingGoal()
         val curUser = sharedPreferences.getCurUser(applicationContext)
         val dateFormatPattern = "dd.MM.yyyy"
+        val repetitionPrefix = "Repetition: "
 
         val btnBack = binding.btnBack
         val btnDel = binding.btnDel
@@ -62,6 +68,7 @@ class AddPayment : AppCompatActivity() {
         val itemCategory = binding.categorySpinner
         val itemWallet = binding.walletSpinner
         val btnIsPayment = binding.btnIsPayment
+        val itemRepetition = binding.repetitionPicker
         val btnIsIncome = binding.btnIsIncome
         val itemDescription = binding.descriptionInput
         val btnSave = binding.btnSave
@@ -115,39 +122,116 @@ class AddPayment : AppCompatActivity() {
             datePickerDialog.show()
         }
 
+        itemRepetition.setOnClickListener {
+            val options = TimeSpan.values().map { it.label }.toTypedArray()
+
+            val builder = AlertDialog.Builder(this@AddPayment)
+            builder.setItems(options) { dialog, selected ->
+                val selectedOption = TimeSpan.values()[selected]
+                itemRepetition.setText(repetitionPrefix + selectedOption.label)
+                dialog.dismiss()
+            }
+            builder.setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss()
+            }
+
+            val dialog = builder.create()
+            dialog.show()
+        }
+
         btnSave.setOnClickListener {
             val wallet = itemWallet.selectedItem?.toString() ?: ""
             val title = itemTitle.text?.toString() ?: ""
             val price = itemPrice.text?.toString() ?: ""
             val currency = itemCurrency.selectedItem?.toString() ?: ""
             val description = itemDescription.text?.toString() ?: ""
-            val date = Date.from(LocalDate.parse(itemDate.text.toString(), DateTimeFormatter.ofPattern(dateFormatPattern)).atStartOfDay().atZone( ZoneId.systemDefault()).toInstant())
+            val date = Date.from(
+                LocalDate.parse(
+                    itemDate.text.toString(),
+                    DateTimeFormatter.ofPattern(dateFormatPattern)
+                ).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()
+            )
             val category = itemCategory.text?.toString() ?: ""
+            val repetition = TimeSpan.valueOf(
+                itemRepetition.text?.toString()?.removePrefix(repetitionPrefix) ?: TimeSpan.None.label
+            )
+            val endDate = null
+            val startAmount = 0.0
+            val endAmount = 0.0
 
             // check if important fields are filled
             if (title.isEmpty() || price.isEmpty()) {
-                Snackbar.make(binding.root, "Please fill the title and price", Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(
+                    binding.root,
+                    "Please fill the title and price",
+                    Snackbar.LENGTH_SHORT
+                ).show()
             } else {
                 lifecycleScope.launch {
-                    var newPayment = Payment(
-                        userId = curUser,
-                        wallet = wallet,
-                        title = title,
-                        description = description,
-                        price = sharedCurrency.calculateFromCurrency(
-                            price.toDouble(),
-                            currency,
-                            applicationContext
-                        ),
-                        date = date,
-                        isPayment = isPayment,
-                        category = category,
-                    )
-                    if (curItemId != -1) {
-                        newPayment = newPayment.copy(id = curItemId)
+                    if (repetition == TimeSpan.None) {
+                        var newPayment = Payment(
+                            userId = curUser,
+                            wallet = wallet,
+                            title = title,
+                            description = description,
+                            price = sharedCurrency.calculateFromCurrency(
+                                price.toDouble(),
+                                currency,
+                                applicationContext
+                            ),
+                            date = date,
+                            isPayment = isPayment,
+                            category = category,
+                        )
+                        if (curItemId != -1) {
+                            newPayment = newPayment.copy(id = curItemId)
+                        }
+                        dbCategory.insertCategory(Category(category))
+                        dbPayment.upsertPayment(newPayment)
+                    } else {
+                        // Repeating payment
+                        val newRepeatingPayment = SavingsGoal(
+                            userId = curUser,
+                            wallet = wallet,
+                            title = title,
+                            description = description,
+                            nextDate = calculateNextDate(date, repetition),
+                            timeSpanPerTime = repetition,
+                            amountPerTime = sharedCurrency.calculateFromCurrency(
+                                price.toDouble(),
+                                currency,
+                                applicationContext
+                            ),
+                            isPayment = isPayment,
+                            category = category,
+                            endDate = endDate,
+                            startAmount = startAmount,
+                            endAmount = endAmount,
+                        )
+                        dbCategory.insertCategory(Category(category))
+                        val savingsGoalIndex = dbSavingsGoal.insertSavingsGoal(newRepeatingPayment).toInt()
+
+                        var newPayment = Payment(
+                            userId = curUser,
+                            wallet = wallet,
+                            title = timeSpanTitle(title, repetition),
+                            description = description,
+                            price = sharedCurrency.calculateFromCurrency(
+                                price.toDouble(),
+                                currency,
+                                applicationContext
+                            ),
+                            date = date,
+                            isPayment = isPayment,
+                            category = category,
+                            savingsGoalIndex = savingsGoalIndex,
+                        )
+                        if (curItemId != -1) {
+                            newPayment = newPayment.copy(id = curItemId)
+                            // TODO change this, this and all future occurrences, all
+                        }
+                        dbPayment.upsertPayment(newPayment)
                     }
-                    dbCategory.insertCategory(Category(category))
-                    dbPayment.upsertPayment(newPayment)
                     backButtonCallback.handleOnBackPressed()
                 }
             }
@@ -166,6 +250,7 @@ class AddPayment : AppCompatActivity() {
         val startCurrency = sharedCurrency.getDefaultCurrencyIndex()
         var startCategory = ""
         var startWallet = 0
+        val startRepetition = TimeSpan.None.label
         var startDescription = ""
 
         lifecycleScope.launch {
@@ -211,6 +296,7 @@ class AddPayment : AppCompatActivity() {
             } else {
                 btnIsIncome.callOnClick()
             }
+            itemRepetition.setText(repetitionPrefix + startRepetition)
             itemDescription.setText(startDescription)
         }
 
@@ -231,4 +317,5 @@ class AddPayment : AppCompatActivity() {
         }
         return super.onOptionsItemSelected(item)
     }
+
 }

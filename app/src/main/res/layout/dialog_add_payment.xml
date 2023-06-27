@@ -211,6 +211,21 @@
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
+                android:layout_height="60sp"
+                android:layout_margin="2dp">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/repetition_picker"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:focusable="false"
+                    android:inputType="none"
+                    android:paddingVertical="1dp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="2dp"
                 android:hint="Description">
