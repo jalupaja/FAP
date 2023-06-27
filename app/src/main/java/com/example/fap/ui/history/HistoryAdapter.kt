@@ -53,9 +53,9 @@ class HistoryAdapter(private val historyList: List<HistoryItem>) : RecyclerView.
             textCategory.text = historyItem.category
             textPrice.text = sharedCurrency.num2Money(historyItem.price)
 
-            if (historyItem.isPayment) {
+            if (historyItem.price < 0) {
                 textPrice.setTextColor(colorRed)
-            } else {
+            } else if (historyItem.price > 0){
                 textPrice.setTextColor(colorGreen)
             }
         }
