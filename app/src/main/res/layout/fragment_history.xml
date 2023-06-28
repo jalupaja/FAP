@@ -17,13 +17,38 @@
             android:textSize="15sp"
             android:visibility="gone" />
 
+        <SearchView
+                android:id="@+id/history_searchView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:queryHint="Item Name"
+                android:iconifiedByDefault="false"/>
+
+        <Button
+            android:id="@+id/history_startDateBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_calendar"
+            android:drawablePadding="8dp"
+            android:text="Select Start Date"
+            android:textSize="16sp"
+            android:layout_below="@+id/history_searchView"/>
+
+        <Button
+            android:id="@+id/history_endDateBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_calendar"
+            android:drawablePadding="8dp"
+            android:text="Select End Date"
+            android:textSize="16sp"
+            android:layout_below="@+id/history_startDateBtn"/>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/history_recyclerview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_below="@+id/history_endDateBtn"
+            app:layout_constraintTop_toBottomOf="@+id/history_endDateBtn" />
 
 </RelativeLayout>

@@ -40,7 +40,7 @@ class CategoryFragment : Fragment() {
         categoryAdapter = CategoryAdapter(categoryData)
         recyclerView.adapter = categoryAdapter
 
-        searchView = view.findViewById(R.id.category_searchView)
+        searchView = binding.categorySearchView
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 categoryAdapter?.getFilter()?.filter(query)
