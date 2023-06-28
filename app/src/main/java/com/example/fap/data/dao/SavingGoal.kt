@@ -25,4 +25,7 @@ interface FapDaoSavingGoal {
 
     @Delete
     suspend fun deleteSavingsGoal(savingsGoal: SavingsGoal)
+
+    @Query("DELETE FROM SavingsGoal WHERE id = :savingsGoalId")
+    suspend fun deleteSavingsGoalById(savingsGoalId: Int)
 }

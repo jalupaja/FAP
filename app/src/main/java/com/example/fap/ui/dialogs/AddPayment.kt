@@ -39,6 +39,7 @@ class AddPayment : AppCompatActivity() {
     private lateinit var sharedCurrency: SharedCurrencyManager
     private lateinit var sharedSavingsGoal: SharedSavingsGoalManager
     private var curItemId = -1
+    private var curSavingsGoalId = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,21 +79,55 @@ class AddPayment : AppCompatActivity() {
             backButtonCallback.handleOnBackPressed()
         }
         btnDel.setOnClickListener {
-            val alert = AlertDialog.Builder(this)
-            alert.setMessage("Are you sure you want to delete this item?")
-            alert.setTitle("Confirmation")
-            alert.setPositiveButton("Yes") { dialog, _ ->
-                // TODO only show on curItemId
-                lifecycleScope.launch {
-                    dbPayment.deletePayment(curItemId)
+            if (curSavingsGoalId == -1) {
+                val alert = AlertDialog.Builder(this)
+                alert.setMessage("Are you sure you want to delete this item?")
+                alert.setTitle("Confirmation")
+                alert.setPositiveButton("Yes") { dialog, _ ->
+                    lifecycleScope.launch {
+                        dbPayment.deletePayment(curItemId)
+                    }
+                    dialog.dismiss()
+                    backButtonCallback.handleOnBackPressed()
                 }
-                dialog.dismiss()
-                backButtonCallback.handleOnBackPressed()
+                alert.setNegativeButton("No") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                alert.show()
+            } else {
+                val options = arrayOf("Delete the selected occurrence only", "Delete this and all future occurrences", "Delete all occurrences")
+
+                val alert = AlertDialog.Builder(this@AddPayment)
+                alert.setItems(options) { dialog, selected ->
+                    when (selected) {
+                        0 -> {
+                            lifecycleScope.launch {
+                                dbPayment.deletePayment(curItemId)
+                            }
+                        }
+                        1 -> {
+                            lifecycleScope.launch {
+                                // TODO test
+                                dbPayment.removeSavingsGoalIdBeforePayment(curSavingsGoalId, curItemId)
+                                dbSavingsGoal.deleteSavingsGoalById(curSavingsGoalId)
+                            }
+                        }
+                        2 -> {
+                            lifecycleScope.launch {
+                                dbSavingsGoal.deleteSavingsGoalById(curSavingsGoalId)
+                            }
+                        }
+                        else -> { }
+                    }
+                    dialog.dismiss()
+                    backButtonCallback.handleOnBackPressed()
+                }
+                alert.setNegativeButton("Cancel") { dialog, _ ->
+                    dialog.dismiss()
+                }
+
+                alert.show()
             }
-            alert.setNegativeButton("No") { dialog, _ ->
-                dialog.dismiss()
-            }
-            alert.show()
         }
 
         btnIsPayment.setOnClickListener {
@@ -120,30 +155,22 @@ class AddPayment : AppCompatActivity() {
             }, curDate.year, curDate.monthValue, curDate.dayOfMonth)
 
             datePickerDialog.show()
-
-            val date = Date.from(
-                LocalDate.parse(
-                    itemDate.text.toString(),
-                    DateTimeFormatter.ofPattern(dateFormatPattern)
-                ).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()
-            )
         }
 
         itemRepetition.setOnClickListener {
             val options = SharedSavingsGoalManager.TimeSpan.values().map { it.label }.toTypedArray()
 
-            val builder = AlertDialog.Builder(this@AddPayment)
-            builder.setItems(options) { dialog, selected ->
+            val alert = AlertDialog.Builder(this@AddPayment)
+            alert.setItems(options) { dialog, selected ->
                 val selectedOption = SharedSavingsGoalManager.TimeSpan.values()[selected]
                 itemRepetition.setText(repetitionPrefix + selectedOption.label)
                 dialog.dismiss()
             }
-            builder.setNegativeButton("Cancel") { dialog, _ ->
+            alert.setNegativeButton("Cancel") { dialog, _ ->
                 dialog.dismiss()
             }
 
-            val dialog = builder.create()
-            dialog.show()
+            alert.show()
         }
 
         btnSave.setOnClickListener {
@@ -216,7 +243,7 @@ class AddPayment : AppCompatActivity() {
                             endAmount = endAmount,
                         )
                         dbCategory.insertCategory(Category(category))
-                        val savingsGoalIndex = dbSavingsGoal.insertSavingsGoal(newRepeatingPayment).toInt()
+                        val savingsGoalId = dbSavingsGoal.insertSavingsGoal(newRepeatingPayment).toInt()
 
                         var newPayment = Payment(
                             userId = curUser,
@@ -231,7 +258,7 @@ class AddPayment : AppCompatActivity() {
                             date = date,
                             isPayment = isPayment,
                             category = category,
-                            savingsGoalIndex = savingsGoalIndex,
+                            savingsGoalId = savingsGoalId,
                         )
                         if (curItemId != -1) {
                             newPayment = newPayment.copy(id = curItemId)
@@ -288,8 +315,9 @@ class AddPayment : AppCompatActivity() {
                 startCategory = item.category ?: ""
                 startWallet = walletAdapter.getPosition(item.wallet)
                 isPayment = item.isPayment
-                if (item.savingsGoalIndex != -1) {
-                    startRepetition = dbSavingsGoal.getTimeSpan(item.savingsGoalIndex)
+                curSavingsGoalId = item.savingsGoalId
+                if (curSavingsGoalId != -1) {
+                    startRepetition = dbSavingsGoal.getTimeSpan(curSavingsGoalId).label
                 }
                 startDescription = item.description ?: ""
             }

@@ -4,7 +4,6 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.example.fap.utils.SharedSavingsGoalManager
-import com.example.fap.utils.TimeSpan
 import java.util.Date
 
 @Entity(

@@ -83,7 +83,7 @@ class SharedSavingsGoalManager(context: Context) {
                     date = nextDate,
                     isPayment = savingsGoal.isPayment,
                     category = savingsGoal.category,
-                    savingsGoalIndex = savingsGoal.id,
+                    savingsGoalId = savingsGoal.id,
                 ))
             }
 

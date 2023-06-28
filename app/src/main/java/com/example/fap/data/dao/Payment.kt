@@ -1,9 +1,7 @@
 package com.example.fap.data.dao
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.example.fap.data.entities.Payment
@@ -22,6 +20,9 @@ interface FapDaoPayment {
 
     @Update
     suspend fun updatePayments(payments: List<Payment>)
+
+    @Query("UPDATE Payment set savingsGoalId = -1 WHERE savingsGoalId = :savingsGoalId AND date < (SELECT date FROM Payment WHERE id = :paymentId)")
+    suspend fun removeSavingsGoalIdBeforePayment(savingsGoalId: Int, paymentId: Int)
 
     @Query("DELETE FROM Payment WHERE id = :id")
     suspend fun deletePayment(id: Int)
