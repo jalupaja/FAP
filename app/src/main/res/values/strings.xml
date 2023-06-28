@@ -42,6 +42,7 @@
 
     <string name="theme_dialog">Change Theme</string>
     <string name="theme_default">Dark Theme</string>
+    <string name="theme_auto">auto</string>
     <string name="theme_light">light</string>
     <string name="theme_dark">dark</string>
     <string name="theme_oled">oled</string>

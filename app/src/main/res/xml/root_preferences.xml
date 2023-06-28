@@ -8,20 +8,21 @@
             app:title="Use Biometrics" />
 
         <ListPreference
-            app:key="theme"
-            app:title="Theme"
-            android:dialogTitle="@string/theme_dialog"
             android:defaultValue="@string/theme_default"
+            android:dialogTitle="@string/theme_dialog"
             android:entries="@array/theme"
-            android:entryValues="@array/theme_values" />
+            android:entryValues="@array/theme_values"
+            app:defaultValue="@string/theme_auto"
+            app:key="theme"
+            app:title="Theme" />
 
         <ListPreference
-            app:key="currency"
-            app:title="Default Currency"
-            android:dialogTitle="Change default Currency"
             android:defaultValue="€"
+            android:dialogTitle="Change default Currency"
             android:entries="@array/currency"
-            android:entryValues="@array/currency" />
+            android:entryValues="@array/currency"
+            app:key="currency"
+            app:title="Default Currency" />
 
     </PreferenceCategory>
 </PreferenceScreen>

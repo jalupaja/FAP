@@ -119,7 +119,7 @@ class Login : AppCompatActivity() {
         sharedPreferences = SharedPreferencesManager.getInstance(applicationContext)
         sharedSecurity = SharedSecurityManager.getInstance(applicationContext)
 
-        val currentTheme = sharedPreferences.getInt(getString(R.string.shared_prefs_theme))
+        val currentTheme = sharedPreferences.getInt(getString(R.string.shared_prefs_theme), -1)
         if (AppCompatDelegate.getDefaultNightMode() != currentTheme) {
             AppCompatDelegate.setDefaultNightMode(currentTheme)
             recreate()
