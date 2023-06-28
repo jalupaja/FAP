@@ -229,7 +229,7 @@ class AddPayment : AppCompatActivity() {
                             wallet = wallet,
                             title = title,
                             description = description,
-                            nextDate = sharedSavingsGoal.calculateNextDate(date, repetition),
+                            nextDate = date,
                             timeSpanPerTime = repetition,
                             amountPerTime = sharedCurrency.calculateFromCurrency(
                                 price.toDouble(),
@@ -243,28 +243,10 @@ class AddPayment : AppCompatActivity() {
                             endAmount = endAmount,
                         )
                         dbCategory.insertCategory(Category(category))
-                        val savingsGoalId = dbSavingsGoal.insertSavingsGoal(newRepeatingPayment).toInt()
+                        dbSavingsGoal.insertSavingsGoal(newRepeatingPayment).toInt()
 
-                        var newPayment = Payment(
-                            userId = curUser,
-                            wallet = wallet,
-                            title = sharedSavingsGoal.timeSpanTitle(title, repetition),
-                            description = description,
-                            price = sharedCurrency.calculateFromCurrency(
-                                price.toDouble(),
-                                currency,
-                                applicationContext
-                            ),
-                            date = date,
-                            isPayment = isPayment,
-                            category = category,
-                            savingsGoalId = savingsGoalId,
-                        )
-                        if (curItemId != -1) {
-                            newPayment = newPayment.copy(id = curItemId)
-                            // TODO change this, this and all future occurrences, all
-                        }
-                        dbPayment.upsertPayment(newPayment)
+                        // TODO only when new
+                        sharedSavingsGoal.updateSavingsGoals(applicationContext)
                     }
                     backButtonCallback.handleOnBackPressed()
                 }
