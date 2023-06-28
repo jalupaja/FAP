@@ -45,5 +45,5 @@ data class Payment(
     val date: Date,
     val isPayment: Boolean,
     val category: String?,
-    val savingsGoalId: Int = -1,
+    val savingsGoalId: Int? = null,
 )
