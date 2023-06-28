@@ -3,7 +3,8 @@ package com.example.fap.data.entities
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import com.example.fap.data.TimeSpan
+import com.example.fap.utils.SharedSavingsGoalManager
+import com.example.fap.utils.TimeSpan
 import java.util.Date
 
 @Entity(
@@ -39,7 +40,7 @@ data class SavingsGoal(
     val description: String,
     val nextDate: Date,
     val endDate: Date?,
-    val timeSpanPerTime: TimeSpan,
+    val timeSpanPerTime: SharedSavingsGoalManager.TimeSpan,
     val amountPerTime: Double,
     val endAmount: Double?,
     val startAmount: Double?,

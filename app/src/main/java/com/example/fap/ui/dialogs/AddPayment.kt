@@ -19,13 +19,11 @@ import android.view.View
 import android.widget.ArrayAdapter
 import androidx.activity.OnBackPressedCallback
 import com.example.fap.R
-import com.example.fap.data.TimeSpan
-import com.example.fap.data.calculateNextDate
 import com.example.fap.data.entities.Category
 import com.example.fap.data.entities.Payment
 import com.example.fap.data.entities.SavingsGoal
-import com.example.fap.data.timeSpanTitle
 import com.example.fap.utils.SharedCurrencyManager
+import com.example.fap.utils.SharedSavingsGoalManager
 import com.google.android.material.snackbar.Snackbar
 import java.time.ZoneId
 import java.util.*
@@ -39,6 +37,7 @@ class AddPayment : AppCompatActivity() {
     private var isPayment: Boolean = true
     private lateinit var sharedPreferences: SharedPreferencesManager
     private lateinit var sharedCurrency: SharedCurrencyManager
+    private lateinit var sharedSavingsGoal: SharedSavingsGoalManager
     private var curItemId = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,6 +49,7 @@ class AddPayment : AppCompatActivity() {
 
         sharedPreferences = SharedPreferencesManager.getInstance(applicationContext)
         sharedCurrency = SharedCurrencyManager.getInstance(applicationContext)
+        sharedSavingsGoal = SharedSavingsGoalManager.getInstance(applicationContext)
 
         val dbPayment = FapDatabase.getInstance(applicationContext).fapDaoPayment()
         val dbWallet = FapDatabase.getInstance(applicationContext).fapDaoWallet()
@@ -112,7 +112,7 @@ class AddPayment : AppCompatActivity() {
             val datePickerDialog = DatePickerDialog(this@AddPayment, { _, year, month, dayOfMonth ->
                 val selectedDate = Calendar.getInstance()
                 selectedDate.set(Calendar.YEAR, year)
-                selectedDate.set(Calendar.MONTH, month)
+                selectedDate.set(Calendar.MONTH, month - 1)
                 selectedDate.set(Calendar.DAY_OF_MONTH, dayOfMonth)
                 val formattedDate = SimpleDateFormat(dateFormatPattern, Locale.getDefault()).format(selectedDate.time)
 
@@ -120,14 +120,21 @@ class AddPayment : AppCompatActivity() {
             }, curDate.year, curDate.monthValue, curDate.dayOfMonth)
 
             datePickerDialog.show()
+
+            val date = Date.from(
+                LocalDate.parse(
+                    itemDate.text.toString(),
+                    DateTimeFormatter.ofPattern(dateFormatPattern)
+                ).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()
+            )
         }
 
         itemRepetition.setOnClickListener {
-            val options = TimeSpan.values().map { it.label }.toTypedArray()
+            val options = SharedSavingsGoalManager.TimeSpan.values().map { it.label }.toTypedArray()
 
             val builder = AlertDialog.Builder(this@AddPayment)
             builder.setItems(options) { dialog, selected ->
-                val selectedOption = TimeSpan.values()[selected]
+                val selectedOption = SharedSavingsGoalManager.TimeSpan.values()[selected]
                 itemRepetition.setText(repetitionPrefix + selectedOption.label)
                 dialog.dismiss()
             }
@@ -152,8 +159,8 @@ class AddPayment : AppCompatActivity() {
                 ).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()
             )
             val category = itemCategory.text?.toString() ?: ""
-            val repetition = TimeSpan.valueOf(
-                itemRepetition.text?.toString()?.removePrefix(repetitionPrefix) ?: TimeSpan.None.label
+            val repetition = SharedSavingsGoalManager.TimeSpan.valueOf(
+                itemRepetition.text?.toString()?.removePrefix(repetitionPrefix) ?: SharedSavingsGoalManager.TimeSpan.None.label
             )
             val endDate = null
             val startAmount = 0.0
@@ -168,7 +175,7 @@ class AddPayment : AppCompatActivity() {
                 ).show()
             } else {
                 lifecycleScope.launch {
-                    if (repetition == TimeSpan.None) {
+                    if (repetition == SharedSavingsGoalManager.TimeSpan.None) {
                         var newPayment = Payment(
                             userId = curUser,
                             wallet = wallet,
@@ -195,7 +202,7 @@ class AddPayment : AppCompatActivity() {
                             wallet = wallet,
                             title = title,
                             description = description,
-                            nextDate = calculateNextDate(date, repetition),
+                            nextDate = sharedSavingsGoal.calculateNextDate(date, repetition),
                             timeSpanPerTime = repetition,
                             amountPerTime = sharedCurrency.calculateFromCurrency(
                                 price.toDouble(),
@@ -214,7 +221,7 @@ class AddPayment : AppCompatActivity() {
                         var newPayment = Payment(
                             userId = curUser,
                             wallet = wallet,
-                            title = timeSpanTitle(title, repetition),
+                            title = sharedSavingsGoal.timeSpanTitle(title, repetition),
                             description = description,
                             price = sharedCurrency.calculateFromCurrency(
                                 price.toDouble(),
@@ -250,7 +257,7 @@ class AddPayment : AppCompatActivity() {
         val startCurrency = sharedCurrency.getDefaultCurrencyIndex()
         var startCategory = ""
         var startWallet = 0
-        val startRepetition = TimeSpan.None.label
+        var startRepetition = SharedSavingsGoalManager.TimeSpan.None.label
         var startDescription = ""
 
         lifecycleScope.launch {
@@ -281,6 +288,9 @@ class AddPayment : AppCompatActivity() {
                 startCategory = item.category ?: ""
                 startWallet = walletAdapter.getPosition(item.wallet)
                 isPayment = item.isPayment
+                if (item.savingsGoalIndex != -1) {
+                    startRepetition = dbSavingsGoal.getTimeSpan(item.savingsGoalIndex)
+                }
                 startDescription = item.description ?: ""
             }
 
