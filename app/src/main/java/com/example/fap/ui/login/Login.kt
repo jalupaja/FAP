@@ -244,10 +244,10 @@ class Login : AppCompatActivity() {
         when (registerState) {
             REGISTERSTATE.REGISTERED -> {
                 if (checkPassword(textLogin.text.toString())) {
-                    login()
                     lifecycleScope.launch {
-                        SharedCurrencyManager.getInstance(applicationContext).tryUpdateCurrency(applicationContext)
                         SharedSavingsGoalManager.getInstance(applicationContext).updateSavingsGoals(applicationContext)
+                        login()
+                        SharedCurrencyManager.getInstance(applicationContext).tryUpdateCurrency(applicationContext)
                     }
                 } else {
                     lblLoginStatus.text = getString(R.string.wrong_password)
