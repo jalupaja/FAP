@@ -45,7 +45,7 @@ class SharedSavingsGoalManager() {
         return calendar.time
     }
 
-    fun timeSpanTitle(title: String, timeSpan: TimeSpan): String {
+    private fun timeSpanTitle(title: String, timeSpan: TimeSpan): String {
         return "$title (${timeSpan.label})"
     }
 

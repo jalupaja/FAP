@@ -202,7 +202,8 @@ class AddPayment : AppCompatActivity() {
                 ).show()
             } else {
                 lifecycleScope.launch {
-                    if (repetition == SharedSavingsGoalManager.TimeSpan.None) {
+                    if (curSavingsGoalId == null && repetition == SharedSavingsGoalManager.TimeSpan.None) {
+                        /* is and never was a repeating payment */
                         var newPayment = Payment(
                             userId = curUser,
                             wallet = wallet,
@@ -222,7 +223,11 @@ class AddPayment : AppCompatActivity() {
                         }
                         dbCategory.insertCategory(Category(category))
                         dbPayment.upsertPayment(newPayment)
-                    } else {
+                    } else if (curSavingsGoalId != null && repetition == SharedSavingsGoalManager.TimeSpan.None) {
+                        /* it was a repeating payment */
+                        //TODO tell user: this will delete all other payments???
+                    } else if (curSavingsGoalId == null && repetition != SharedSavingsGoalManager.TimeSpan.None) {
+                        /* it is now a repeating payment */
                         // Repeating payment
                         val newRepeatingPayment = SavingsGoal(
                             userId = curUser,
@@ -245,8 +250,12 @@ class AddPayment : AppCompatActivity() {
                         dbCategory.insertCategory(Category(category))
                         dbSavingsGoal.insertSavingsGoal(newRepeatingPayment).toInt()
 
-                        // TODO only when new
+                        // TODO only when new, if old: update this single one here as well as nextDate and the rest later
                         sharedSavingsGoal.updateSavingsGoals(applicationContext)
+                    } else if (curSavingsGoalId != null && repetition != SharedSavingsGoalManager.TimeSpan.None) {
+                        /* this was a repeating payment but the TimeSpan might be changed */
+                        // TODO if change: tell user might changed
+                        // if not changed ask whether to change this, this and next, all
                     }
                     backButtonCallback.handleOnBackPressed()
                 }
