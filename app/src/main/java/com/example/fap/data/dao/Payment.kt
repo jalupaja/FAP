@@ -21,7 +21,7 @@ interface FapDaoPayment {
     @Update
     suspend fun updatePayments(payments: List<Payment>)
 
-    @Query("UPDATE Payment set savingsGoalId = -1 WHERE savingsGoalId = :savingsGoalId AND date < (SELECT date FROM Payment WHERE id = :paymentId)")
+    @Query("UPDATE Payment set savingsGoalId = null WHERE savingsGoalId = :savingsGoalId AND date < (SELECT date FROM Payment WHERE id = :paymentId)")
     suspend fun removeSavingsGoalIdBeforePayment(savingsGoalId: Int, paymentId: Int)
 
     @Query("DELETE FROM Payment WHERE id = :id")

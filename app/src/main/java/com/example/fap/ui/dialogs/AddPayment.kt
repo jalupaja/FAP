@@ -39,7 +39,7 @@ class AddPayment : AppCompatActivity() {
     private lateinit var sharedCurrency: SharedCurrencyManager
     private lateinit var sharedSavingsGoal: SharedSavingsGoalManager
     private var curItemId = -1
-    private var curSavingsGoalId = -1
+    private var curSavingsGoalId: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,7 +79,7 @@ class AddPayment : AppCompatActivity() {
             backButtonCallback.handleOnBackPressed()
         }
         btnDel.setOnClickListener {
-            if (curSavingsGoalId == -1) {
+            if (curSavingsGoalId == null) {
                 val alert = AlertDialog.Builder(this)
                 alert.setMessage("Are you sure you want to delete this item?")
                 alert.setTitle("Confirmation")
@@ -108,13 +108,13 @@ class AddPayment : AppCompatActivity() {
                         1 -> {
                             lifecycleScope.launch {
                                 // TODO test
-                                dbPayment.removeSavingsGoalIdBeforePayment(curSavingsGoalId, curItemId)
-                                dbSavingsGoal.deleteSavingsGoalById(curSavingsGoalId)
+                                dbPayment.removeSavingsGoalIdBeforePayment(curSavingsGoalId!!, curItemId)
+                                dbSavingsGoal.deleteSavingsGoalById(curSavingsGoalId!!)
                             }
                         }
                         2 -> {
                             lifecycleScope.launch {
-                                dbSavingsGoal.deleteSavingsGoalById(curSavingsGoalId)
+                                dbSavingsGoal.deleteSavingsGoalById(curSavingsGoalId!!)
                             }
                         }
                         else -> { }
@@ -316,8 +316,8 @@ class AddPayment : AppCompatActivity() {
                 startWallet = walletAdapter.getPosition(item.wallet)
                 isPayment = item.isPayment
                 curSavingsGoalId = item.savingsGoalId
-                if (curSavingsGoalId != -1) {
-                    startRepetition = dbSavingsGoal.getTimeSpan(curSavingsGoalId).label
+                if (curSavingsGoalId != null) {
+                    startRepetition = dbSavingsGoal.getTimeSpan(curSavingsGoalId!!).label
                 }
                 startDescription = item.description ?: ""
             }
