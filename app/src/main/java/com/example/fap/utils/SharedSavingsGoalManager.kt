@@ -9,7 +9,7 @@ import java.time.ZoneId
 import java.util.Calendar
 import java.util.Date
 
-class SharedSavingsGoalManager(context: Context) {
+class SharedSavingsGoalManager() {
     enum class TimeSpan(val label: String) {
         None("None"),
         Daily("Daily"),
@@ -59,21 +59,9 @@ class SharedSavingsGoalManager(context: Context) {
         val savingsGoals = dbSavingsGoal.getSavingsGoals(curUser)
 
         for (savingsGoal in savingsGoals) {
-
-            Log.d("savingsgoal", savingsGoal.nextDate.toString())
-            Log.d("savingsgoal", today.after(savingsGoal.nextDate).toString())
-            Log.d("savingsgoal", savingsGoal.nextDate.after(today).toString())
-
             var nextDate = savingsGoal.nextDate
+
             while (today.after(nextDate)) {
-                nextDate = calculateNextDate(today, savingsGoal.timeSpanPerTime)
-
-                dbSavingsGoal.updateSavingsGoal(
-                    savingsGoal.copy(
-                        nextDate = nextDate
-                    )
-                )
-
                 dbPayment.insertPayment(Payment(
                     userId = curUser,
                     wallet = savingsGoal.wallet,
@@ -85,6 +73,14 @@ class SharedSavingsGoalManager(context: Context) {
                     category = savingsGoal.category,
                     savingsGoalId = savingsGoal.id,
                 ))
+
+                dbSavingsGoal.updateSavingsGoal(
+                    savingsGoal.copy(
+                        nextDate = nextDate
+                    )
+                )
+
+                nextDate = calculateNextDate(nextDate, savingsGoal.timeSpanPerTime)
             }
 
             if (savingsGoal.endDate == today) {
@@ -98,7 +94,7 @@ class SharedSavingsGoalManager(context: Context) {
 
         fun getInstance(context: Context): SharedSavingsGoalManager {
             if (instance == null) {
-                instance = SharedSavingsGoalManager(context.applicationContext)
+                instance = SharedSavingsGoalManager()
             }
             return instance as SharedSavingsGoalManager
         }
