@@ -57,6 +57,7 @@ class AddPayment : AppCompatActivity() {
         val dbCategory = FapDatabase.getInstance(applicationContext).fapDaoCategory()
         val dbSavingsGoal = FapDatabase.getInstance(applicationContext).fapDaoSavingGoal()
         val curUser = sharedPreferences.getCurUser(applicationContext)
+        var previousReptition = SharedSavingsGoalManager.TimeSpan.None
         val dateFormatPattern = "dd.MM.yyyy"
         val repetitionPrefix = "Repetition: "
 
@@ -107,7 +108,7 @@ class AddPayment : AppCompatActivity() {
                         }
                         1 -> {
                             lifecycleScope.launch {
-                                // TODO test
+                                // TODO test (if wrong also change in change!)
                                 dbPayment.removeSavingsGoalIdBeforePayment(curSavingsGoalId!!, curItemId)
                                 dbSavingsGoal.deleteSavingsGoalById(curSavingsGoalId!!)
                             }
@@ -202,149 +203,237 @@ class AddPayment : AppCompatActivity() {
                 ).show()
             } else {
                 lifecycleScope.launch {
-                    if (curSavingsGoalId == null && repetition == SharedSavingsGoalManager.TimeSpan.None) {
+                    var newPayment = Payment(
+                        userId = curUser,
+                        wallet = wallet,
+                        title = title,
+                        description = description,
+                        price = sharedCurrency.calculateFromCurrency(
+                            price.toDouble(),
+                            currency,
+                            applicationContext
+                        ),
+                        date = date,
+                        isPayment = isPayment,
+                        category = category,
+                        savingsGoalId = curSavingsGoalId,
+                    )
+                    if (curItemId != -1) {
+                        newPayment = newPayment.copy(id = curItemId)
+                    }
+
+                    val newTitle = sharedSavingsGoal.reTimSpanTitle(title, repetition)
+                    var newRepeatingPayment = SavingsGoal(
+                        userId = curUser,
+                        wallet = wallet,
+                        title = newTitle,
+                        description = description,
+                        nextDate = date,
+                        timeSpanPerTime = repetition,
+                        amountPerTime = sharedCurrency.calculateFromCurrency(
+                            price.toDouble(),
+                            currency,
+                            applicationContext
+                        ),
+                        isPayment = isPayment,
+                        category = category,
+                        endDate = endDate,
+                        startAmount = startAmount,
+                        endAmount = endAmount,
+                    )
+                    if (curSavingsGoalId != null) {
+                        newRepeatingPayment = newRepeatingPayment.copy(id = curSavingsGoalId!!)
+                    }
+
+                    dbCategory.insertCategory(Category(category))
+
+                    if (previousReptition == SharedSavingsGoalManager.TimeSpan.None && repetition == SharedSavingsGoalManager.TimeSpan.None) {
                         /* is and never was a repeating payment */
-                        var newPayment = Payment(
-                            userId = curUser,
-                            wallet = wallet,
-                            title = title,
-                            description = description,
-                            price = sharedCurrency.calculateFromCurrency(
-                                price.toDouble(),
-                                currency,
-                                applicationContext
-                            ),
-                            date = date,
-                            isPayment = isPayment,
-                            category = category,
-                        )
-                        if (curItemId != -1) {
-                            newPayment = newPayment.copy(id = curItemId)
-                        }
-                        dbCategory.insertCategory(Category(category))
                         dbPayment.upsertPayment(newPayment)
-                    } else if (curSavingsGoalId != null && repetition == SharedSavingsGoalManager.TimeSpan.None) {
-                        /* it was a repeating payment */
-                        //TODO tell user: this will delete all other payments???
-                    } else if (curSavingsGoalId == null && repetition != SharedSavingsGoalManager.TimeSpan.None) {
+                        backButtonCallback.handleOnBackPressed()
+                    } else if (previousReptition == SharedSavingsGoalManager.TimeSpan.None && repetition != SharedSavingsGoalManager.TimeSpan.None) {
                         /* it is now a repeating payment */
-                        // Repeating payment
-                        val newRepeatingPayment = SavingsGoal(
-                            userId = curUser,
-                            wallet = wallet,
-                            title = title,
-                            description = description,
-                            nextDate = date,
-                            timeSpanPerTime = repetition,
-                            amountPerTime = sharedCurrency.calculateFromCurrency(
-                                price.toDouble(),
-                                currency,
-                                applicationContext
-                            ),
-                            isPayment = isPayment,
-                            category = category,
-                            endDate = endDate,
-                            startAmount = startAmount,
-                            endAmount = endAmount,
-                        )
                         dbCategory.insertCategory(Category(category))
                         dbSavingsGoal.insertSavingsGoal(newRepeatingPayment).toInt()
 
-                        // TODO only when new, if old: update this single one here as well as nextDate and the rest later
                         sharedSavingsGoal.updateSavingsGoals(applicationContext)
-                    } else if (curSavingsGoalId != null && repetition != SharedSavingsGoalManager.TimeSpan.None) {
-                        /* this was a repeating payment but the TimeSpan might be changed */
-                        // TODO if change: tell user might changed
-                        // if not changed ask whether to change this, this and next, all
+                        backButtonCallback.handleOnBackPressed()
+                    } else if (previousReptition != SharedSavingsGoalManager.TimeSpan.None && repetition == SharedSavingsGoalManager.TimeSpan.None) {
+                        /* it was a repeating payment */
+                        val alert = AlertDialog.Builder(applicationContext)
+                        alert.setMessage("This will remove this Payment from the repetition but continue the repetition.")
+                        alert.setTitle("Confirmation")
+                        alert.setPositiveButton("Yes") { dialog, _ ->
+                            lifecycleScope.launch {
+                                dbPayment.upsertPayment(
+                                    newPayment.copy(savingsGoalId = null)
+                                )
+                                backButtonCallback.handleOnBackPressed()
+                            }
+                            dialog.dismiss()
+                        }
+                        alert.setNegativeButton("No") { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        alert.show()
+                    } else if (previousReptition != SharedSavingsGoalManager.TimeSpan.None && previousReptition == repetition) {
+                        /* this was a repeating payment is staying the same */
+                        val options = arrayOf("Change the selected occurrence only", "Change this and all future occurrences", "Change all occurrences")
+
+                        val alert = AlertDialog.Builder(this@AddPayment)
+                        alert.setItems(options) { dialog, selected ->
+                            when (selected) {
+                                0 -> {
+                                    lifecycleScope.launch {
+                                        dbPayment.upsertPayment(newPayment.copy(title = newTitle))
+                                    }
+                                }
+
+                                1 -> {
+                                    lifecycleScope.launch {
+                                        // TODO test (if wrong also change in delete!)
+                                        dbPayment.removeSavingsGoalIdBeforePayment(
+                                            curSavingsGoalId!!,
+                                            curItemId
+                                        )
+                                        // TODO test
+                                        dbPayment.updatePaymentsBySavingsGoalFromPayment(newPayment.wallet, newTitle, newPayment.description!!, newPayment.price, newPayment.isPayment, newPayment.category!!, curSavingsGoalId!!, curItemId)
+                                        dbSavingsGoal.updateSavingsGoal(newRepeatingPayment)
+                                    }
+                                }
+
+                                2 -> {
+                                    lifecycleScope.launch {
+                                        //TODO test
+                                        dbPayment.updatePaymentsBySavingsGoal(newPayment.wallet, newTitle, newPayment.description!!, newPayment.price, newPayment.isPayment, newPayment.category!!, curSavingsGoalId!!)
+                                        dbSavingsGoal.updateSavingsGoal(newRepeatingPayment)
+                                    }
+                                }
+
+                                else -> {}
+                            }
+                            dialog.dismiss()
+                            backButtonCallback.handleOnBackPressed()
+                        }
+                        alert.setNegativeButton("Cancel") { dialog, _ ->
+                            dialog.dismiss()
+                        }
+
+                        alert.show()
+                    } else if (previousReptition != SharedSavingsGoalManager.TimeSpan.None && previousReptition != repetition) {
+                        /* this was a repeating payment but repetition changed */
+                        // TODO fix title
+                        // TODO if change: tell user: this will delete all after
+                        // if not changed: upsert thing, add SavingsID!!!
+                        val alert = AlertDialog.Builder(applicationContext)
+                        alert.setMessage("This will remove this and all following payments from the previous repetition and create a new repetition.")
+                        alert.setTitle("Confirmation")
+                        alert.setPositiveButton("Yes") { dialog, _ ->
+                            lifecycleScope.launch {
+                                dbPayment.removeSavingsGoalIdBeforePayment(curSavingsGoalId!!, curItemId)
+                                dbSavingsGoal.deleteSavingsGoalById(curSavingsGoalId!!)
+
+                                dbCategory.insertCategory(Category(category))
+                                dbSavingsGoal.insertSavingsGoal(newRepeatingPayment).toInt()
+
+                                sharedSavingsGoal.updateSavingsGoals(applicationContext)
+                                backButtonCallback.handleOnBackPressed()
+                            }
+                            dialog.dismiss()
+                        }
+                        alert.setNegativeButton("No") { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        alert.show()
                     }
-                    backButtonCallback.handleOnBackPressed()
                 }
             }
             categoryAdapter.notifyDataSetChanged()
         }
 
-        curItemId = intent.getIntExtra("paymentId", -1)
+    curItemId = intent.getIntExtra("paymentId", -1)
 
-        currencyAdapter = ArrayAdapter(applicationContext, R.layout.spinner_item)
-        walletAdapter = ArrayAdapter(applicationContext, R.layout.spinner_item)
-        val categorySpinner = binding.categorySpinner
+    currencyAdapter = ArrayAdapter(applicationContext, R.layout.spinner_item)
+    walletAdapter = ArrayAdapter(applicationContext, R.layout.spinner_item)
+    val categorySpinner = binding.categorySpinner
 
-        var startTitle = ""
-        var startDate = SimpleDateFormat(dateFormatPattern, Locale.getDefault()).format(Date())
-        var startPrice = ""
-        val startCurrency = sharedCurrency.getDefaultCurrencyIndex()
-        var startCategory = ""
-        var startWallet = 0
-        var startRepetition = SharedSavingsGoalManager.TimeSpan.None.label
-        var startDescription = ""
+    var startTitle = ""
+    var startDate = SimpleDateFormat(dateFormatPattern, Locale.getDefault()).format(Date())
+    var startPrice = ""
+    val startCurrency = sharedCurrency.getDefaultCurrencyIndex()
+    var startCategory = ""
+    var startWallet = 0
+    var startRepetition = SharedSavingsGoalManager.TimeSpan.None.label
+    var startDescription = ""
 
-        lifecycleScope.launch {
-            // Setup existing wallets
-            currencyAdapter.addAll(sharedCurrency.getAvailableCurrencies())
-            itemCurrency.adapter = currencyAdapter
-            val wallets = dbWallet.getWallets(curUser)
-            itemWallet.adapter = walletAdapter
-            for (wallet in wallets) {
-                walletAdapter.add(wallet.name)
-            }
-
-            // Setup existing categories
-            val categories = dbCategory.getCategories()
-            categoryAdapter = ArrayAdapter<String>(applicationContext, R.layout.spinner_item)
-            categorySpinner.setAdapter(categoryAdapter)
-            for (category in categories) {
-                categoryAdapter.add(category.name)
-            }
-
-            // Update default values if this is supposed to edit an existing item
-            if (curItemId != -1) {
-                btnDel.visibility = View.VISIBLE
-                val item = dbPayment.getPayment(curItemId)
-                startTitle = item.title
-                startDate = SimpleDateFormat(dateFormatPattern, Locale.getDefault()).format(item.date)
-                startPrice = "%.2f".format(item.price)
-                startCategory = item.category ?: ""
-                startWallet = walletAdapter.getPosition(item.wallet)
-                isPayment = item.isPayment
-                curSavingsGoalId = item.savingsGoalId
-                if (curSavingsGoalId != null) {
-                    startRepetition = dbSavingsGoal.getTimeSpan(curSavingsGoalId!!).label
-                }
-                startDescription = item.description ?: ""
-            }
-
-            // Setup default values
-            itemTitle.setText(startTitle)
-            itemDate.setText(startDate)
-            itemPrice.setText(startPrice)
-            itemCurrency.setSelection(startCurrency)
-            itemCategory.setText(startCategory)
-            itemWallet.setSelection(startWallet)
-            if (isPayment) {
-                btnIsPayment.callOnClick()
-            } else {
-                btnIsIncome.callOnClick()
-            }
-            itemRepetition.setText(repetitionPrefix + startRepetition)
-            itemDescription.setText(startDescription)
+    lifecycleScope.launch {
+        // Setup existing wallets
+        currencyAdapter.addAll(sharedCurrency.getAvailableCurrencies())
+        itemCurrency.adapter = currencyAdapter
+        val wallets = dbWallet.getWallets(curUser)
+        itemWallet.adapter = walletAdapter
+        for (wallet in wallets) {
+            walletAdapter.add(wallet.name)
         }
 
-        onBackPressedDispatcher.addCallback(this, backButtonCallback)
+        // Setup existing categories
+        val categories = dbCategory.getCategories()
+        categoryAdapter = ArrayAdapter<String>(applicationContext, R.layout.spinner_item)
+        categorySpinner.setAdapter(categoryAdapter)
+        for (category in categories) {
+            categoryAdapter.add(category.name)
+        }
+
+        // Update default values if this is supposed to edit an existing item
+        if (curItemId != -1) {
+            btnDel.visibility = View.VISIBLE
+            val item = dbPayment.getPayment(curItemId)
+            startTitle = item.title
+            startDate = SimpleDateFormat(dateFormatPattern, Locale.getDefault()).format(item.date)
+            startPrice = "%.2f".format(item.price)
+            startCategory = item.category ?: ""
+            startWallet = walletAdapter.getPosition(item.wallet)
+            isPayment = item.isPayment
+            curSavingsGoalId = item.savingsGoalId
+            if (curSavingsGoalId != null) {
+                previousReptition = dbSavingsGoal.getTimeSpan(curSavingsGoalId!!)
+                startRepetition = previousReptition.label
+            }
+            startDescription = item.description ?: ""
+        }
+
+        // Setup default values
+        itemTitle.setText(startTitle)
+        itemDate.setText(startDate)
+        itemPrice.setText(startPrice)
+        itemCurrency.setSelection(startCurrency)
+        itemCategory.setText(startCategory)
+        itemWallet.setSelection(startWallet)
+        if (isPayment) {
+            btnIsPayment.callOnClick()
+        } else {
+            btnIsIncome.callOnClick()
+        }
+        itemRepetition.setText(repetitionPrefix + startRepetition)
+        itemDescription.setText(startDescription)
     }
 
-    private val backButtonCallback = object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            finish()
-        }
-    }
+    onBackPressedDispatcher.addCallback(this, backButtonCallback)
+}
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Fix Back Button in Toolbar
-        if (item.itemId == android.R.id.home) {
-            backButtonCallback.handleOnBackPressed()
-            return true
-        }
-        return super.onOptionsItemSelected(item)
+private val backButtonCallback = object : OnBackPressedCallback(true) {
+    override fun handleOnBackPressed() {
+        finish()
     }
+}
+
+override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    // Fix Back Button in Toolbar
+    if (item.itemId == android.R.id.home) {
+        backButtonCallback.handleOnBackPressed()
+        return true
+    }
+    return super.onOptionsItemSelected(item)
+}
 
 }

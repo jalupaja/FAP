@@ -49,6 +49,11 @@ class SharedSavingsGoalManager() {
         return "$title (${timeSpan.label})"
     }
 
+    fun reTimSpanTitle(title: String, timeSpan: TimeSpan): String {
+        //TODO implement thing removal
+        return "$title (${timeSpan.label})"
+    }
+
     suspend fun updateSavingsGoals(context: Context) {
         val db = FapDatabase.getInstance(context)
         val dbSavingsGoal = db.fapDaoSavingGoal()

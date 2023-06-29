@@ -21,9 +21,6 @@ interface FapDaoPayment {
     @Update
     suspend fun updatePayments(payments: List<Payment>)
 
-    @Query("UPDATE Payment set savingsGoalId = null WHERE savingsGoalId = :savingsGoalId AND date < (SELECT date FROM Payment WHERE id = :paymentId)")
-    suspend fun removeSavingsGoalIdBeforePayment(savingsGoalId: Int, paymentId: Int)
-
     @Query("DELETE FROM Payment WHERE id = :id")
     suspend fun deletePayment(id: Int)
 
@@ -65,4 +62,13 @@ interface FapDaoPayment {
 
     @Query("SELECT * FROM Wallet WHERE userId = :userId")
     suspend fun getPaymentsByWallets(userId: String): List<PaymentsByWallets>
+
+    @Query("UPDATE Payment set savingsGoalId = null WHERE savingsGoalId = :savingsGoalId AND date < (SELECT date FROM Payment WHERE id = :paymentId)")
+    suspend fun removeSavingsGoalIdBeforePayment(savingsGoalId: Int, paymentId: Int)
+
+    @Query("UPDATE Payment set wallet = :wallet AND title = :title AND description = :description AND price = :price AND isPayment = :isPayment AND category = :category WHERE savingsGoalId = :savingsGoalId")
+    suspend fun updatePaymentsBySavingsGoal(wallet: String, title: String, description: String, price: Double, isPayment: Boolean, category: String, savingsGoalId: Int)
+
+    @Query("UPDATE Payment set wallet = :wallet AND title = :title AND description = :description AND price = :price AND isPayment = :isPayment AND category = :category WHERE savingsGoalId = :savingsGoalId AND date >= (SELECT date FROM Payment WHERE id = :curPaymentId)")
+    suspend fun updatePaymentsBySavingsGoalFromPayment(wallet: String, title: String, description: String, price: Double, isPayment: Boolean, category: String, savingsGoalId: Int, curPaymentId: Int)
 }
