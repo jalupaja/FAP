@@ -1,7 +1,6 @@
 package com.example.fap.utils
 
 import android.content.Context
-import android.util.Log
 import com.example.fap.data.FapDatabase
 import com.example.fap.data.entities.Payment
 import java.time.LocalDate
@@ -45,13 +44,18 @@ class SharedSavingsGoalManager() {
         return calendar.time
     }
 
-    private fun timeSpanTitle(title: String, timeSpan: TimeSpan): String {
+    fun timeSpanTitle(title: String, timeSpan: TimeSpan): String {
         return "$title (${timeSpan.label})"
     }
 
-    fun reTimSpanTitle(title: String, timeSpan: TimeSpan): String {
-        //TODO implement thing removal
-        return "$title (${timeSpan.label})"
+    fun removeTimSpanTitle(title: String, newTimeSpan: TimeSpan, oldTimeSpan: TimeSpan = TimeSpan.None): String {
+        return if (title.endsWith(" (" + newTimeSpan.label + ")")) {
+            title.substring(0, title.length - (newTimeSpan.label.length + 3))
+        } else if (title.endsWith(" (" + oldTimeSpan.label + ")")) {
+            title.substring(0, title.length - (oldTimeSpan.label.length + 3))
+        } else {
+            title
+        }
     }
 
     suspend fun updateSavingsGoals(context: Context) {
@@ -79,13 +83,13 @@ class SharedSavingsGoalManager() {
                     savingsGoalId = savingsGoal.id,
                 ))
 
+                nextDate = calculateNextDate(nextDate, savingsGoal.timeSpanPerTime)
+
                 dbSavingsGoal.updateSavingsGoal(
                     savingsGoal.copy(
                         nextDate = nextDate
                     )
                 )
-
-                nextDate = calculateNextDate(nextDate, savingsGoal.timeSpanPerTime)
             }
 
             if (savingsGoal.endDate == today) {

@@ -57,7 +57,7 @@ class AddPayment : AppCompatActivity() {
         val dbCategory = FapDatabase.getInstance(applicationContext).fapDaoCategory()
         val dbSavingsGoal = FapDatabase.getInstance(applicationContext).fapDaoSavingGoal()
         val curUser = sharedPreferences.getCurUser(applicationContext)
-        var previousReptition = SharedSavingsGoalManager.TimeSpan.None
+        var previousRepetition = SharedSavingsGoalManager.TimeSpan.None
         val dateFormatPattern = "dd.MM.yyyy"
         val repetitionPrefix = "Repetition: "
 
@@ -108,7 +108,6 @@ class AddPayment : AppCompatActivity() {
                         }
                         1 -> {
                             lifecycleScope.launch {
-                                // TODO test (if wrong also change in change!)
                                 dbPayment.removeSavingsGoalIdBeforePayment(curSavingsGoalId!!, curItemId)
                                 dbSavingsGoal.deleteSavingsGoalById(curSavingsGoalId!!)
                             }
@@ -222,7 +221,7 @@ class AddPayment : AppCompatActivity() {
                         newPayment = newPayment.copy(id = curItemId)
                     }
 
-                    val newTitle = sharedSavingsGoal.reTimSpanTitle(title, repetition)
+                    var newTitle = sharedSavingsGoal.removeTimSpanTitle(title, repetition, previousRepetition)
                     var newRepeatingPayment = SavingsGoal(
                         userId = curUser,
                         wallet = wallet,
@@ -245,22 +244,25 @@ class AddPayment : AppCompatActivity() {
                         newRepeatingPayment = newRepeatingPayment.copy(id = curSavingsGoalId!!)
                     }
 
+                    newTitle = sharedSavingsGoal.timeSpanTitle(newTitle, repetition)
+
                     dbCategory.insertCategory(Category(category))
 
-                    if (previousReptition == SharedSavingsGoalManager.TimeSpan.None && repetition == SharedSavingsGoalManager.TimeSpan.None) {
+                    if (previousRepetition == SharedSavingsGoalManager.TimeSpan.None && repetition == SharedSavingsGoalManager.TimeSpan.None) {
                         /* is and never was a repeating payment */
                         dbPayment.upsertPayment(newPayment)
                         backButtonCallback.handleOnBackPressed()
-                    } else if (previousReptition == SharedSavingsGoalManager.TimeSpan.None && repetition != SharedSavingsGoalManager.TimeSpan.None) {
+                    } else if (previousRepetition == SharedSavingsGoalManager.TimeSpan.None && repetition != SharedSavingsGoalManager.TimeSpan.None) {
                         /* it is now a repeating payment */
                         dbCategory.insertCategory(Category(category))
                         dbSavingsGoal.insertSavingsGoal(newRepeatingPayment).toInt()
 
+                        dbPayment.deletePayment(curItemId)
                         sharedSavingsGoal.updateSavingsGoals(applicationContext)
                         backButtonCallback.handleOnBackPressed()
-                    } else if (previousReptition != SharedSavingsGoalManager.TimeSpan.None && repetition == SharedSavingsGoalManager.TimeSpan.None) {
+                    } else if (previousRepetition != SharedSavingsGoalManager.TimeSpan.None && repetition == SharedSavingsGoalManager.TimeSpan.None) {
                         /* it was a repeating payment */
-                        val alert = AlertDialog.Builder(applicationContext)
+                        val alert = AlertDialog.Builder(this@AddPayment)
                         alert.setMessage("This will remove this Payment from the repetition but continue the repetition.")
                         alert.setTitle("Confirmation")
                         alert.setPositiveButton("Yes") { dialog, _ ->
@@ -276,7 +278,7 @@ class AddPayment : AppCompatActivity() {
                             dialog.dismiss()
                         }
                         alert.show()
-                    } else if (previousReptition != SharedSavingsGoalManager.TimeSpan.None && previousReptition == repetition) {
+                    } else if (previousRepetition != SharedSavingsGoalManager.TimeSpan.None && previousRepetition == repetition) {
                         /* this was a repeating payment is staying the same */
                         val options = arrayOf("Change the selected occurrence only", "Change this and all future occurrences", "Change all occurrences")
 
@@ -291,12 +293,6 @@ class AddPayment : AppCompatActivity() {
 
                                 1 -> {
                                     lifecycleScope.launch {
-                                        // TODO test (if wrong also change in delete!)
-                                        dbPayment.removeSavingsGoalIdBeforePayment(
-                                            curSavingsGoalId!!,
-                                            curItemId
-                                        )
-                                        // TODO test
                                         dbPayment.updatePaymentsBySavingsGoalFromPayment(newPayment.wallet, newTitle, newPayment.description!!, newPayment.price, newPayment.isPayment, newPayment.category!!, curSavingsGoalId!!, curItemId)
                                         dbSavingsGoal.updateSavingsGoal(newRepeatingPayment)
                                     }
@@ -304,7 +300,6 @@ class AddPayment : AppCompatActivity() {
 
                                 2 -> {
                                     lifecycleScope.launch {
-                                        //TODO test
                                         dbPayment.updatePaymentsBySavingsGoal(newPayment.wallet, newTitle, newPayment.description!!, newPayment.price, newPayment.isPayment, newPayment.category!!, curSavingsGoalId!!)
                                         dbSavingsGoal.updateSavingsGoal(newRepeatingPayment)
                                     }
@@ -320,12 +315,9 @@ class AddPayment : AppCompatActivity() {
                         }
 
                         alert.show()
-                    } else if (previousReptition != SharedSavingsGoalManager.TimeSpan.None && previousReptition != repetition) {
+                    } else if (previousRepetition != SharedSavingsGoalManager.TimeSpan.None && previousRepetition != repetition) {
                         /* this was a repeating payment but repetition changed */
-                        // TODO fix title
-                        // TODO if change: tell user: this will delete all after
-                        // if not changed: upsert thing, add SavingsID!!!
-                        val alert = AlertDialog.Builder(applicationContext)
+                        val alert = AlertDialog.Builder(this@AddPayment)
                         alert.setMessage("This will remove this and all following payments from the previous repetition and create a new repetition.")
                         alert.setTitle("Confirmation")
                         alert.setPositiveButton("Yes") { dialog, _ ->
@@ -396,8 +388,8 @@ class AddPayment : AppCompatActivity() {
             isPayment = item.isPayment
             curSavingsGoalId = item.savingsGoalId
             if (curSavingsGoalId != null) {
-                previousReptition = dbSavingsGoal.getTimeSpan(curSavingsGoalId!!)
-                startRepetition = previousReptition.label
+                previousRepetition = dbSavingsGoal.getTimeSpan(curSavingsGoalId!!)
+                startRepetition = previousRepetition.label
             }
             startDescription = item.description ?: ""
         }

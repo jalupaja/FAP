@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.EditorInfo
@@ -20,7 +19,6 @@ import com.example.fap.MainActivity
 import com.example.fap.R
 import com.example.fap.data.FapDatabase
 import com.example.fap.data.entities.Category
-import com.example.fap.data.entities.Payment
 import com.example.fap.data.entities.User
 import com.example.fap.data.entities.Wallet
 import com.example.fap.databinding.ActivityLoginBinding
@@ -32,9 +30,6 @@ import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import java.security.MessageDigest
-import java.time.LocalDate
-import java.time.ZoneId
-import java.util.Date
 import java.util.UUID
 
 class Login : AppCompatActivity() {
