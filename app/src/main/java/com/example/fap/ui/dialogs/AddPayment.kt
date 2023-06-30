@@ -175,7 +175,7 @@ class AddPayment : AppCompatActivity() {
 
         btnSave.setOnClickListener {
             val wallet = itemWallet.selectedItem?.toString() ?: ""
-            val title = itemTitle.text?.toString() ?: ""
+            val title = itemTitle.text?.toString()?.trim() ?: ""
             val price = itemPrice.text?.toString() ?: ""
             val currency = itemCurrency.selectedItem?.toString() ?: ""
             val description = itemDescription.text?.toString() ?: ""
