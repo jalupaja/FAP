@@ -48,14 +48,14 @@ interface FapDaoPayment {
     @Query("SELECT SUM(price) FROM Payment WHERE userId = :userId AND category = :category AND isPayment = 1")
     suspend fun getTotalAmountSpentByCategory(userId: String, category: String): Double?
 
-    @Query("SELECT p.category as title, SUM(CASE WHEN p.isPayment = 1 THEN -p.price ELSE p.price END) AS sum FROM Payment p WHERE p.userId = :userId")
+    @Query("SELECT p.category as title, SUM(CASE WHEN p.isPayment = 1 THEN -p.price ELSE p.price END) AS sum FROM Payment p WHERE p.userId = :userId group by p.category")
     suspend fun getTotalAmountByCategory(userId: String): List<CategoryItem>
+
+    @Query("SELECT p.category as title ,SUM(CASE WHEN p.isPayment = 1 THEN -p.price ELSE p.price END) AS sum FROM Payment p WHERE p.userId = :userId AND p.wallet = :wallet group by p.category")
+    suspend fun getTotalAmountByCategoryByWallet(userId: String, wallet: String): List<CategoryItem>
 
     @Query("SELECT SUM(CASE WHEN p.isPayment = 1 THEN -p.price ELSE p.price END) AS sum FROM Payment p WHERE p.userId = :userId AND p.category = :category")
     suspend fun getTotalAmountByCategory(userId: String, category: String): Double?
-
-    @Query("SELECT p.category as title ,SUM(CASE WHEN p.isPayment = 1 THEN -p.price ELSE p.price END) AS sum FROM Payment p WHERE p.userId = :userId AND p.wallet = :wallet")
-    suspend fun getTotalAmountByCategoryByWallet(userId: String, wallet: String): List<CategoryItem>
 
     @Query("SELECT SUM(price) FROM Payment WHERE userId = :userId AND isPayment = 0")
     suspend fun getTotalIncome(userId: String): Double?

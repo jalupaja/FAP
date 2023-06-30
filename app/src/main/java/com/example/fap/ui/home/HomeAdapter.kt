@@ -12,19 +12,18 @@ import com.example.fap.R
 import com.example.fap.data.FapDatabase
 import com.example.fap.ui.category.CategoryItem
 import com.example.fap.utils.SharedPreferencesManager
-import com.github.mikephil.charting.data.PieData
-import com.github.mikephil.charting.data.PieDataSet
-import com.github.mikephil.charting.data.PieEntry
-import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
-import com.github.mikephil.charting.data.Entry
-import com.github.mikephil.charting.data.LineData
-import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.formatter.ValueFormatter
+
 
 class HomeAdapter(private val wallets: List<WalletInfo>) : RecyclerView.Adapter<HomeAdapter.ViewHolder>() {
 
@@ -83,7 +82,7 @@ class HomeAdapter(private val wallets: List<WalletInfo>) : RecyclerView.Adapter<
 
         init {
             setupChartBalance()
-            setupChartStock()
+            setupChartCategory()
         }
 
         fun bind(wallet: WalletInfo) {
@@ -151,19 +150,36 @@ class HomeAdapter(private val wallets: List<WalletInfo>) : RecyclerView.Adapter<
         }
 
         private fun updateCategoryData(categories: List<CategoryItem>) {
-            var nDataEntries = mutableListOf<BarEntry>()
+            val xAxisLabel = ArrayList<String>()
+            val entries = ArrayList<BarEntry>()
+            val dataSets = ArrayList<BarDataSet>()
+
 
             categories.forEachIndexed{ index, categoryItem ->
-                nDataEntries.add(BarEntry(index.toFloat(), categoryItem.sum.toFloat()))
+                xAxisLabel.add(categoryItem.title)
+                entries.add(BarEntry(index.toFloat(), categoryItem.sum.toFloat()))
             }
 
-            var nDataSet = BarDataSet(nDataEntries, "categories")
+            val set1 = BarDataSet(entries, "test")
+            set1.colors = listOf(
+                resources.getColor(R.color.green, context?.theme),
+                resources.getColor(R.color.red, context?.theme),
+                resources.getColor(R.color.yellow, context?.theme)
+            )
+            dataSets.add(set1)
 
-            nDataSet.formLineWidth = 2f
+            var data = BarData(set1)//BarData(barDataSet)
 
-            nDataSet.color = resources.getColor(R.color.light_blue_900, context?.theme)
+            val xAxis: XAxis = chartCategory.xAxis
+            xAxis.valueFormatter = object : ValueFormatter() {
+                override fun getFormattedValue(value: Float, axis: AxisBase): String {
+                    return xAxisLabel[value.toInt()]
+                }
+            }
 
-            chartCategory.data.addDataSet(nDataSet)
+            data.barWidth = 0.9f
+            chartCategory.data = data
+            chartCategory.setFitBars(true)
             chartCategory.invalidate()
             chartCategory.notifyDataSetChanged()
         }
@@ -204,7 +220,7 @@ class HomeAdapter(private val wallets: List<WalletInfo>) : RecyclerView.Adapter<
             chartBalance.notifyDataSetChanged()
         }
 
-        private fun setupChartStock() {
+        private fun setupChartCategory() {
             chartCategory.setDrawBarShadow(false)
             chartCategory.setDrawValueAboveBar(true)
             chartCategory.description.isEnabled = false
@@ -220,12 +236,10 @@ class HomeAdapter(private val wallets: List<WalletInfo>) : RecyclerView.Adapter<
 
             val rightAxis = chartCategory.axisRight
             rightAxis.setDrawGridLines(false)
+            rightAxis.setDrawLabels(false)
 
-            val dataSet = BarDataSet(listOf(
-                BarEntry(0F, 0F)
-            ), "Categories")
-            val chartData = BarData(dataSet)
-            chartCategory.data = chartData
+            chartCategory.legend.isEnabled = false
+
             chartCategory.invalidate()
             chartCategory.notifyDataSetChanged()
         }
