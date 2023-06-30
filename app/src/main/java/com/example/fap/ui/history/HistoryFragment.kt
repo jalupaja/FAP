@@ -81,8 +81,9 @@ class HistoryFragment : Fragment() {
                         selectedDate.set(Calendar.DAY_OF_MONTH, dayOfMonth)
                         val formattedDate = SimpleDateFormat(dateFormatPattern, Locale.getDefault()).format(selectedDate.time)
 
-                        startDateBtn.setText(formattedDate)
+                        startDateBtn.text = formattedDate
                         startDate = selectedDate.time
+                        historyAdapter?.getDateFilter()?.filter("$startDate-$endDate")
                     }, curDate.year, curDate.monthValue, curDate.dayOfMonth)
                 }
             datePickerDialog?.show()
@@ -100,9 +101,9 @@ class HistoryFragment : Fragment() {
                         selectedDate.set(Calendar.DAY_OF_MONTH, dayOfMonth)
                         val formattedDate = SimpleDateFormat(dateFormatPattern, Locale.getDefault()).format(selectedDate.time)
 
-                        endDateBtn.setText(formattedDate)
+                        endDateBtn.text = formattedDate
                         endDate = selectedDate.time
-                        //historyAdapter.filterDate(endDate, startDate)
+                        historyAdapter?.getDateFilter()?.filter("$startDate-$endDate")
                     }, curDate.year, curDate.monthValue, curDate.dayOfMonth)
                 }
             datePickerDialog?.show()
@@ -117,9 +118,9 @@ class HistoryFragment : Fragment() {
         lifecycleScope.launch {
             val dbPayment = FapDatabase.getInstance(requireContext()).fapDaoPayment()
             val payments = if (categoryHistory == "showAll") {
-                dbPayment.getPayments(sharedPreferences.getCurUser(requireContext()))
+                dbPayment.getPayments(sharedPreferences.getCurUser(requireContext())).reversed()
             } else {
-                dbPayment.getPaymentsByCategory(sharedPreferences.getCurUser(requireContext()), categoryHistory)
+                dbPayment.getPaymentsByCategory(sharedPreferences.getCurUser(requireContext()), categoryHistory).reversed()
             }
             for (payment in payments) {
                 historyData.add(HistoryItem(payment.id, payment.title, payment.category ?: "", payment.price, payment.isPayment, payment.date))
