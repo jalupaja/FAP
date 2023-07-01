@@ -14,7 +14,6 @@ import com.example.fap.ui.category.CategoryItem
 import com.example.fap.utils.SharedPreferencesManager
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.PieChart
-import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
@@ -22,7 +21,11 @@ import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
-import com.github.mikephil.charting.formatter.ValueFormatter
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Date
+import java.util.Locale
 
 
 class HomeAdapter(private val wallets: List<WalletInfo>) : RecyclerView.Adapter<HomeAdapter.ViewHolder>() {
@@ -101,7 +104,13 @@ class HomeAdapter(private val wallets: List<WalletInfo>) : RecyclerView.Adapter<
             lblIncomeMonth.text = incomeMonth
             lblExpenseMonth.text = expenseMonth
             lblBalanceMonth.text = balanceMonth
-            //chartBalance.centerText = "Income: ${wallet.income}${wallet.currency} \nExpense: ${wallet.expense}}${wallet.currency}"
+            val curDate = LocalDate.parse(
+                SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(
+                    Date()
+                ), DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+            chartBalance.centerText = "Total for: ${curDate.month}"
+            chartBalance.setCenterTextSize(13f)
+            chartBalance.setCenterTextColor(R.color.black)
             updateChartData(wallet.incomeMonth, wallet.expenseMonth)
             updateCategoryData(wallet.category)
         }
@@ -156,30 +165,24 @@ class HomeAdapter(private val wallets: List<WalletInfo>) : RecyclerView.Adapter<
 
 
             categories.forEachIndexed{ index, categoryItem ->
-                xAxisLabel.add(categoryItem.title)
                 entries.add(BarEntry(index.toFloat(), categoryItem.sum.toFloat()))
             }
 
             val set1 = BarDataSet(entries, "test")
             set1.colors = listOf(
-                resources.getColor(R.color.green, context?.theme),
-                resources.getColor(R.color.red, context?.theme),
-                resources.getColor(R.color.yellow, context?.theme)
+                resources.getColor(R.color.light_blue_900, context?.theme),
+                resources.getColor(R.color.gray, context?.theme),
+                resources.getColor(R.color.purple_700, context?.theme)
             )
             dataSets.add(set1)
 
             var data = BarData(set1)//BarData(barDataSet)
 
-            val xAxis: XAxis = chartCategory.xAxis
-            xAxis.valueFormatter = object : ValueFormatter() {
-                override fun getFormattedValue(value: Float, axis: AxisBase): String {
-                    return xAxisLabel[value.toInt()]
-                }
-            }
-
             data.barWidth = 0.9f
             chartCategory.data = data
             chartCategory.setFitBars(true)
+            chartCategory.xAxis.valueFormatter = BarXAxisFormatter(categories)
+            chartCategory.xAxis.granularity = 1f
             chartCategory.invalidate()
             chartCategory.notifyDataSetChanged()
         }
