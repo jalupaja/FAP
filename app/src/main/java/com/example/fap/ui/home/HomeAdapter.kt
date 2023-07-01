@@ -108,9 +108,12 @@ class HomeAdapter(private val wallets: List<WalletInfo>) : RecyclerView.Adapter<
                 SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(
                     Date()
                 ), DateTimeFormatter.ofPattern("dd.MM.yyyy"))
-            chartBalance.centerText = "Total for: ${curDate.month}"
+            chartBalance.centerText = "Data for: ${curDate.month}"
             chartBalance.setCenterTextSize(13f)
-            chartBalance.setCenterTextColor(R.color.black)
+            val typedValue = TypedValue()
+            context.theme.resolveAttribute(com.google.android.material.R.attr.colorOnPrimary, typedValue, true)
+            @ColorInt val color = typedValue.data
+            chartBalance.setCenterTextColor(color)
             updateChartData(wallet.incomeMonth, wallet.expenseMonth)
             updateCategoryData(wallet.category)
         }
@@ -159,7 +162,6 @@ class HomeAdapter(private val wallets: List<WalletInfo>) : RecyclerView.Adapter<
         }
 
         private fun updateCategoryData(categories: List<CategoryItem>) {
-            val xAxisLabel = ArrayList<String>()
             val entries = ArrayList<BarEntry>()
             val dataSets = ArrayList<BarDataSet>()
 
@@ -179,10 +181,16 @@ class HomeAdapter(private val wallets: List<WalletInfo>) : RecyclerView.Adapter<
             var data = BarData(set1)//BarData(barDataSet)
 
             data.barWidth = 0.9f
+            val typedValue = TypedValue()
+            context.theme.resolveAttribute(com.google.android.material.R.attr.colorOnPrimary, typedValue, true)
+            @ColorInt val color = typedValue.data
+            data.setValueTextColor(color)
             chartCategory.data = data
             chartCategory.setFitBars(true)
             chartCategory.xAxis.valueFormatter = BarXAxisFormatter(categories)
             chartCategory.xAxis.granularity = 1f
+            chartCategory.xAxis.textColor = color
+            chartCategory.axisLeft.textColor = color
             chartCategory.invalidate()
             chartCategory.notifyDataSetChanged()
         }
