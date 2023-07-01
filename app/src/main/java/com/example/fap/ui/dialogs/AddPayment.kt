@@ -166,9 +166,6 @@ class AddPayment : AppCompatActivity() {
         }
 
         itemSavingsGoal.setOnClickListener {
-            // TODO placement of the button
-            // TODO probably fine: what if this changes on edit?, What if it changes from Repeating to SavingsGoal?
-            // TODO probably fine: del, save
             if (isSavingsGoal) {
                 isSavingsGoal = false
                 itemSavingsGoalLayout.hint = getString(R.string.savingsgoal_false)
@@ -373,19 +370,19 @@ class AddPayment : AppCompatActivity() {
                     val amountOfTime: Int
                     when (repetition) {
                         SharedSavingsGoalManager.TimeSpan.Daily -> {
-                            amountOfTime = (diffInMillis / (1000L * 60 * 60 * 24)).toInt()
+                            amountOfTime = (diffInMillis / (1000L * 60 * 60 * 24)).toInt() + 1
                             calendar.add(Calendar.DAY_OF_YEAR, amountOfTime)
                         }
                         SharedSavingsGoalManager.TimeSpan.Weekly -> {
-                            amountOfTime = (diffInMillis / (1000L * 60 * 60 * 24 * 7)).toInt()
+                            amountOfTime = (diffInMillis / (1000L * 60 * 60 * 24 * 7)).toInt() + 1
                             calendar.add(Calendar.WEEK_OF_YEAR, amountOfTime)
                         }
                         SharedSavingsGoalManager.TimeSpan.Monthly -> {
-                            amountOfTime = (diffInMillis / (1000L * 60 * 60 * 24 * 30)).toInt()
+                            amountOfTime = (diffInMillis / (1000L * 60 * 60 * 24 * 30)).toInt() + 1
                             calendar.add(Calendar.MONTH, amountOfTime)
                         }
                         SharedSavingsGoalManager.TimeSpan.Yearly -> {
-                            amountOfTime = (diffInMillis / (1000L * 60 * 60 * 24 * 365)).toInt()
+                            amountOfTime = (diffInMillis / (1000L * 60 * 60 * 24 * 365)).toInt() + 1
                             calendar.add(Calendar.YEAR, amountOfTime)
                         }
                         else -> {
