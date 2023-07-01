@@ -55,6 +55,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
         theme.setOnPreferenceChangeListener { _, newValue ->
             newValue as? String
             when (newValue) {
+                getString(R.string.theme_auto) -> {
+                    updateTheme(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+                }
                 getString(R.string.theme_light) -> {
                     updateTheme(AppCompatDelegate.MODE_NIGHT_NO)
                 }

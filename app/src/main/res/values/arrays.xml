@@ -1,10 +1,12 @@
 <resources>
     <string-array name="theme">
+        <item>System</item>
         <item>Light Mode</item>
         <item>Dark Mode</item>
     </string-array>
 
     <string-array name="theme_values">
+        <item>@string/theme_auto</item>
         <item>@string/theme_light</item>
         <item>@string/theme_dark</item>
     </string-array>

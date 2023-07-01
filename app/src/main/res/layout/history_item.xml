@@ -29,7 +29,6 @@
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@id/history_title"
         android:layout_alignParentEnd="true"
-        android:textColor="@color/dark_gray"
         android:textSize="17sp"
         android:textStyle="bold" />
 

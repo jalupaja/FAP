@@ -93,14 +93,18 @@ class CategoryAdapter(
         }
 
         fun bind(item: CategoryItem) {
-            titleTextView.text = item.title
+            if (item.title == "") {
+                titleTextView.text = "not categorised"
+            } else {
+                titleTextView.text = item.title
+            }
             sumTextView.text = sharedCurrency.num2Money(item.sum)
             val sum = sumTextView.text.toString()
 
-            if (sum[0] == '-') {
-                sumTextView.setTextColor(colorRed)
-            } else {
+            if (item.sum > 0) {
                 sumTextView.setTextColor(colorGreen)
+            } else if (item.sum < 0) {
+                sumTextView.setTextColor(colorRed)
             }
         }
     }
