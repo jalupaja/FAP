@@ -64,10 +64,10 @@ class AddPayment : AppCompatActivity() {
         var previousRepetition = SharedSavingsGoalManager.TimeSpan.None
         val dateFormatPattern = "dd.MM.yyyy"
         var repetitionPrefix = "Repetition: "
+        var isSavingsGoal = false
 
         val btnBack = binding.btnBack
         val btnDel = binding.btnDel
-        val btnSavingsGoal = binding.btnSavingsGoal
         val itemTitle = binding.titleInput
         val itemDateStartLayout = binding.datePickerStartLayout
         val itemDateStart = binding.datePickerStart
@@ -78,6 +78,8 @@ class AddPayment : AppCompatActivity() {
         val itemCategory = binding.categorySpinner
         val itemWallet = binding.walletSpinner
         val btnIsPayment = binding.btnIsPayment
+        val itemSavingsGoal = binding.savingsGoalPicker
+        val itemSavingsGoalLayout = binding.savingsGoalPickerLayout
         val itemRepetition = binding.repetitionPicker
         val btnIsIncome = binding.btnIsIncome
         val itemDescription = binding.descriptionInput
@@ -163,11 +165,32 @@ class AddPayment : AppCompatActivity() {
             }
         }
 
-        btnSavingsGoal.setOnClickListener {
+        itemSavingsGoal.setOnClickListener {
             // TODO placement of the button
             // TODO probably fine: what if this changes on edit?, What if it changes from Repeating to SavingsGoal?
             // TODO probably fine: del, save
-            if (btnSavingsGoal.isChecked) {
+            if (isSavingsGoal) {
+                isSavingsGoal = false
+                itemSavingsGoalLayout.hint = getString(R.string.savingsgoal_false)
+
+                val newRepetitionPrefix = "Repetition: "
+                itemRepetition.setText(
+                    newRepetitionPrefix + itemRepetition.text?.removePrefix(
+                        repetitionPrefix
+                    )
+                )
+                repetitionPrefix = newRepetitionPrefix
+
+                itemDateEnd.setText(
+                    SimpleDateFormat(dateFormatPattern, Locale.getDefault()).format(
+                        Date(0)
+                    )
+                )
+                itemDateEndLayout.visibility = View.GONE
+                itemDateStartLayout.hint = "Date"
+            } else {
+                isSavingsGoal = true
+                itemSavingsGoalLayout.hint = getString(R.string.savingsgoal_true)
                 // TODO rename Repetitionprefix
                 val newRepetitionPrefix = "per payment: "
                 var curRepetition = itemRepetition.text?.removePrefix(repetitionPrefix).toString()
@@ -179,28 +202,31 @@ class AddPayment : AppCompatActivity() {
                 itemRepetition.setText(newRepetitionPrefix + curRepetition)
                 repetitionPrefix = newRepetitionPrefix
 
-                val date = Date.from(
-                    LocalDate.parse(
-                        itemDateStart.text.toString(),
-                        DateTimeFormatter.ofPattern(dateFormatPattern)
+                if (itemDateEnd.text.toString() == SimpleDateFormat(
+                        dateFormatPattern,
+                        Locale.getDefault()
+                    ).format(Date(0))
+                ) {
+                    val date = Date.from(
+                        LocalDate.parse(
+                            itemDateStart.text.toString(),
+                            DateTimeFormatter.ofPattern(dateFormatPattern)
+                        )
+                            .plusMonths(6)
+                            .atStartOfDay()
+                            .atZone(ZoneId.systemDefault())
+                            .toInstant()
                     )
-                        .plusMonths(6)
-                        .atStartOfDay()
-                        .atZone(ZoneId.systemDefault())
-                        .toInstant()
-                )
 
-                itemDateEnd.setText(SimpleDateFormat(dateFormatPattern, Locale.getDefault()).format(date))
+                    itemDateEnd.setText(
+                        SimpleDateFormat(
+                            dateFormatPattern,
+                            Locale.getDefault()
+                        ).format(date)
+                    )
+                }
                 itemDateEndLayout.visibility = View.VISIBLE
                 itemDateStartLayout.hint = "Start Date"
-            } else {
-                val newRepetitionPrefix = "Repetition: "
-                itemRepetition.setText(newRepetitionPrefix + itemRepetition.text?.removePrefix(repetitionPrefix))
-                repetitionPrefix = newRepetitionPrefix
-
-                itemDateEnd.setText(SimpleDateFormat(dateFormatPattern, Locale.getDefault()).format(Date(0)))
-                itemDateEndLayout.visibility = View.GONE
-                itemDateStartLayout.hint = "Date"
             }
         }
 
@@ -221,12 +247,12 @@ class AddPayment : AppCompatActivity() {
             val datePickerDialog = DatePickerDialog(this@AddPayment, { _, year, month, dayOfMonth ->
                 val selectedDate = Calendar.getInstance()
                 selectedDate.set(Calendar.YEAR, year)
-                selectedDate.set(Calendar.MONTH, month - 1)
+                selectedDate.set(Calendar.MONTH, month)
                 selectedDate.set(Calendar.DAY_OF_MONTH, dayOfMonth)
                 val formattedDate = SimpleDateFormat(dateFormatPattern, Locale.getDefault()).format(selectedDate.time)
 
                 itemDateStart.setText(formattedDate)
-            }, curDate.year, curDate.monthValue, curDate.dayOfMonth)
+            }, curDate.year, curDate.monthValue - 1, curDate.dayOfMonth)
 
             datePickerDialog.show()
         }
@@ -236,12 +262,12 @@ class AddPayment : AppCompatActivity() {
             val datePickerDialog = DatePickerDialog(this@AddPayment, { _, year, month, dayOfMonth ->
                 val selectedDate = Calendar.getInstance()
                 selectedDate.set(Calendar.YEAR, year)
-                selectedDate.set(Calendar.MONTH, month - 1)
+                selectedDate.set(Calendar.MONTH, month)
                 selectedDate.set(Calendar.DAY_OF_MONTH, dayOfMonth)
                 val formattedDate = SimpleDateFormat(dateFormatPattern, Locale.getDefault()).format(selectedDate.time)
 
                 itemDateEnd.setText(formattedDate)
-            }, curDate.year, curDate.monthValue, curDate.dayOfMonth)
+            }, curDate.year, curDate.monthValue - 1, curDate.dayOfMonth)
 
             datePickerDialog.show()
         }
@@ -256,9 +282,6 @@ class AddPayment : AppCompatActivity() {
             val curRepetition = itemRepetition.text?.removePrefix(repetitionPrefix).toString()
 
             for (option in options) {
-                if (option == SharedSavingsGoalManager.TimeSpan.None.label && btnSavingsGoal.isChecked) {
-                    continue
-                }
 
                 val btn = RadioButton(this@AddPayment, )
                 btn.text = option
@@ -268,6 +291,10 @@ class AddPayment : AppCompatActivity() {
                 )
                 layoutParams.setMargins(0, 10, 0, 10)
                 btn.layoutParams = layoutParams
+
+                if (option == SharedSavingsGoalManager.TimeSpan.None.label && isSavingsGoal) {
+                    btn.visibility = View.GONE
+                }
 
                 btnGroup.addView(btn)
 
@@ -310,34 +337,34 @@ class AddPayment : AppCompatActivity() {
 
             lifecycleScope.launch {
 
-            val wallet = itemWallet.selectedItem?.toString() ?: ""
-            val currency = itemCurrency.selectedItem?.toString() ?: ""
+                val wallet = itemWallet.selectedItem?.toString() ?: ""
+                val currency = itemCurrency.selectedItem?.toString() ?: ""
                 var price = sharedCurrency.calculateFromCurrency(
                     itemPrice.text!!.toString().toDouble(),
                     currency,
                     applicationContext
                 )
-            val description = itemDescription.text?.toString() ?: ""
-            val dateStart = Date.from(
-                LocalDate.parse(
-                    itemDateStart.text.toString(),
-                    DateTimeFormatter.ofPattern(dateFormatPattern)
-                ).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()
-            )
-            var dateEnd = Date.from(
-                LocalDate.parse(
-                    itemDateEnd.text.toString(),
-                    DateTimeFormatter.ofPattern(dateFormatPattern)
-                ).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()
-            )
-            val category = itemCategory.text?.toString() ?: ""
-            val repetition = SharedSavingsGoalManager.TimeSpan.valueOf(
-                itemRepetition.text?.toString()?.removePrefix(repetitionPrefix) ?: SharedSavingsGoalManager.TimeSpan.None.label
-            )
-            val startAmount = 0.0
-            var endAmount = 0.0
+                val description = itemDescription.text?.toString() ?: ""
+                val dateStart = Date.from(
+                    LocalDate.parse(
+                        itemDateStart.text.toString(),
+                        DateTimeFormatter.ofPattern(dateFormatPattern)
+                    ).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()
+                )
+                var dateEnd = Date.from(
+                    LocalDate.parse(
+                        itemDateEnd.text.toString(),
+                        DateTimeFormatter.ofPattern(dateFormatPattern)
+                    ).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()
+                )
+                val category = itemCategory.text?.toString() ?: ""
+                val repetition = SharedSavingsGoalManager.TimeSpan.valueOf(
+                    itemRepetition.text?.toString()?.removePrefix(repetitionPrefix) ?: SharedSavingsGoalManager.TimeSpan.None.label
+                )
+                val startAmount = 0.0
+                var endAmount = 0.0
 
-                if (btnSavingsGoal.isChecked) {
+                if (isSavingsGoal) {
                     /* calculate price per payment and dateEnd (else going from 01.06 to 02.07 (Monthly),  will result in 3 payments instead of 2) */
                     endAmount = price
                     val calendar: Calendar = Calendar.getInstance()
@@ -527,92 +554,98 @@ class AddPayment : AppCompatActivity() {
             }
         }
 
-    curItemId = intent.getIntExtra("paymentId", -1)
+        curItemId = intent.getIntExtra("paymentId", -1)
 
-    currencyAdapter = ArrayAdapter(applicationContext, R.layout.spinner_item)
-    walletAdapter = ArrayAdapter(applicationContext, R.layout.spinner_item)
-    val categorySpinner = binding.categorySpinner
+        currencyAdapter = ArrayAdapter(applicationContext, R.layout.spinner_item)
+        walletAdapter = ArrayAdapter(applicationContext, R.layout.spinner_item)
+        val categorySpinner = binding.categorySpinner
 
-    var startTitle = ""
-    var startDateStart = SimpleDateFormat(dateFormatPattern, Locale.getDefault()).format(Date())
-    var startDateEnd = SimpleDateFormat(dateFormatPattern, Locale.getDefault()).format(Date(0))
-    var startPrice = ""
-    val startCurrency = sharedCurrency.getDefaultCurrencyIndex()
-    var startCategory = ""
-    var startWallet = 0
-    var startRepetition = SharedSavingsGoalManager.TimeSpan.None.label
-    var startDescription = ""
+        var startTitle = ""
+        var startDateStart = SimpleDateFormat(dateFormatPattern, Locale.getDefault()).format(Date())
+        var startDateEnd = SimpleDateFormat(dateFormatPattern, Locale.getDefault()).format(Date(0))
+        var startPrice = ""
+        val startCurrency = sharedCurrency.getDefaultCurrencyIndex()
+        var startCategory = ""
+        var startWallet = 0
+        var startRepetition = SharedSavingsGoalManager.TimeSpan.None.label
+        var startDescription = ""
 
-    lifecycleScope.launch {
-        // Setup existing wallets
-        currencyAdapter.addAll(sharedCurrency.getAvailableCurrencies())
-        itemCurrency.adapter = currencyAdapter
-        val wallets = dbWallet.getWallets(curUser)
-        itemWallet.adapter = walletAdapter
-        for (wallet in wallets) {
-            walletAdapter.add(wallet.name)
-        }
-
-        // Setup existing categories
-        val categories = dbCategory.getCategories()
-        categoryAdapter = ArrayAdapter<String>(applicationContext, R.layout.spinner_item)
-        categorySpinner.setAdapter(categoryAdapter)
-        for (category in categories) {
-            categoryAdapter.add(category.name)
-        }
-
-        // Update default values if this is supposed to edit an existing item
-        if (curItemId != -1) {
-            btnDel.visibility = View.VISIBLE
-            val item = dbPayment.getPayment(curItemId)
-            startTitle = item.title
-            startDateStart = SimpleDateFormat(dateFormatPattern, Locale.getDefault()).format(item.date)
-            startDateEnd = SimpleDateFormat(dateFormatPattern, Locale.getDefault()).format(dbSavingsGoal.getDateEnd(curSavingsGoalId!!))
-            startPrice = "%.2f".format(item.price)
-            startCategory = item.category ?: ""
-            startWallet = walletAdapter.getPosition(item.wallet)
-            isPayment = item.isPayment
-            curSavingsGoalId = item.savingsGoalId
-            if (curSavingsGoalId != null) {
-                previousRepetition = dbSavingsGoal.getTimeSpan(curSavingsGoalId!!)
-                startRepetition = previousRepetition.label
+        lifecycleScope.launch {
+            // Setup existing wallets
+            currencyAdapter.addAll(sharedCurrency.getAvailableCurrencies())
+            itemCurrency.adapter = currencyAdapter
+            val wallets = dbWallet.getWallets(curUser)
+            itemWallet.adapter = walletAdapter
+            for (wallet in wallets) {
+                walletAdapter.add(wallet.name)
             }
-            startDescription = item.description ?: ""
+
+            // Setup existing categories
+            val categories = dbCategory.getCategories()
+            categoryAdapter = ArrayAdapter<String>(applicationContext, R.layout.spinner_item)
+            categorySpinner.setAdapter(categoryAdapter)
+            for (category in categories) {
+                categoryAdapter.add(category.name)
+            }
+
+            // Update default values if this is supposed to edit an existing item
+            if (curItemId != -1) {
+                btnDel.visibility = View.VISIBLE
+                val item = dbPayment.getPayment(curItemId)
+                startTitle = item.title
+                startDateStart = SimpleDateFormat(dateFormatPattern, Locale.getDefault()).format(item.date)
+                startDateEnd = SimpleDateFormat(dateFormatPattern, Locale.getDefault()).format(Date(0))
+                startPrice = "%.2f".format(item.price)
+                startCategory = item.category ?: ""
+                startWallet = walletAdapter.getPosition(item.wallet)
+                isPayment = item.isPayment
+                curSavingsGoalId = item.savingsGoalId
+                if (curSavingsGoalId != null) {
+                    previousRepetition = dbSavingsGoal.getTimeSpan(curSavingsGoalId!!)
+                    val newDateEnd = dbSavingsGoal.getDateEnd(curSavingsGoalId!!)
+                    if (Date(0) != newDateEnd) {
+                        startDateEnd = SimpleDateFormat(dateFormatPattern, Locale.getDefault()).format(newDateEnd)
+                        itemSavingsGoal.performClick()
+                    }
+
+                    startRepetition = previousRepetition.label
+                }
+                startDescription = item.description ?: ""
+            }
+
+            // Setup default values
+            itemTitle.setText(startTitle)
+            itemDateStart.setText(startDateStart)
+            itemDateEnd.setText(startDateEnd)
+            itemPrice.setText(startPrice)
+            itemCurrency.setSelection(startCurrency)
+            itemCategory.setText(startCategory)
+            itemWallet.setSelection(startWallet)
+            if (isPayment) {
+                btnIsPayment.callOnClick()
+            } else {
+                btnIsIncome.callOnClick()
+            }
+            itemRepetition.setText(repetitionPrefix + startRepetition)
+            itemDescription.setText(startDescription)
         }
 
-        // Setup default values
-        itemTitle.setText(startTitle)
-        itemDateStart.setText(startDateStart)
-        itemDateEnd.setText(startDateEnd)
-        itemPrice.setText(startPrice)
-        itemCurrency.setSelection(startCurrency)
-        itemCategory.setText(startCategory)
-        itemWallet.setSelection(startWallet)
-        if (isPayment) {
-            btnIsPayment.callOnClick()
-        } else {
-            btnIsIncome.callOnClick()
+        onBackPressedDispatcher.addCallback(this, backButtonCallback)
+    }
+
+    private val backButtonCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            finish()
         }
-        itemRepetition.setText(repetitionPrefix + startRepetition)
-        itemDescription.setText(startDescription)
     }
 
-    onBackPressedDispatcher.addCallback(this, backButtonCallback)
-}
-
-private val backButtonCallback = object : OnBackPressedCallback(true) {
-    override fun handleOnBackPressed() {
-        finish()
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Fix Back Button in Toolbar
+        if (item.itemId == android.R.id.home) {
+            backButtonCallback.handleOnBackPressed()
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
-}
-
-override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    // Fix Back Button in Toolbar
-    if (item.itemId == android.R.id.home) {
-        backButtonCallback.handleOnBackPressed()
-        return true
-    }
-    return super.onOptionsItemSelected(item)
-}
 
 }

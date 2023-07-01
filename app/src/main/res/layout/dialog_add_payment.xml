@@ -23,21 +23,6 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ToggleButton
-            android:id="@+id/btn_savings_goal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal|center"
-            android:layout_margin="5dp"
-            android:backgroundTint="@android:color/transparent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/btn_back"
-            app:layout_constraintRight_toLeftOf="@id/btn_del"
-            android:textOn="is SavingsGoal"
-            android:textOff="no SavingsGoal"/>
-
-
         <ImageButton
             android:id="@+id/btn_del"
             android:layout_width="wrap_content"
@@ -243,6 +228,22 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/savings_goal_picker_layout"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="60sp"
+                android:layout_margin="2dp"
+                android:hint="@string/savingsgoal_false">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/savings_goal_picker"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:focusable="false"
+                    android:inputType="none"
+                    android:paddingVertical="1dp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="60sp"
@@ -255,7 +256,6 @@
                     android:inputType="none"
                     android:paddingVertical="1dp" />
             </com.google.android.material.textfield.TextInputLayout>
-
 
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"

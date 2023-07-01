@@ -47,5 +47,7 @@
     <string name="theme_oled">oled</string>
 
     <string name="history_empty">Nothing here yet.\nAdd something using the Button on the bottom right.</string>
+    <string name="savingsgoal_false">SavingsGoal: No</string>
+    <string name="savingsgoal_true">SavingsGoal: Yes</string>
 
 </resources>
