@@ -30,7 +30,8 @@
             android:layout_marginStart="5dp"
             android:background="@android:color/transparent"
             android:paddingStart="40dp"
-            android:src="@drawable/left" />
+            android:src="@drawable/left"
+            android:theme="@style/Theme.FAP.Matching_Buttons" />
 
         <TextView
             android:id="@+id/indicator_text"
@@ -53,7 +54,8 @@
             android:layout_marginEnd="5dp"
             android:background="@android:color/transparent"
             android:paddingEnd="20dp"
-            android:src="@drawable/right" />
+            android:src="@drawable/right"
+            android:theme="@style/Theme.FAP.Matching_Buttons" />
 
     </RelativeLayout>
 

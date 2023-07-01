@@ -59,7 +59,7 @@
         <item name="android:textColorPrimary">@color/gray</item>
     </style>
 
-    <style name="Theme.FAP.Login">
+    <style name="Theme.FAP.Matching_Buttons">
         <item name="tint">@color/md_theme_dark_onPrimary</item>
     </style>
 

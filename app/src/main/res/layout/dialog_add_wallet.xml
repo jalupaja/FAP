@@ -14,6 +14,7 @@
         android:layout_marginVertical="5dp"
         android:backgroundTint="@android:color/transparent"
         android:src="@drawable/back"
+        android:theme="@style/Theme.FAP.Matching_Buttons"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

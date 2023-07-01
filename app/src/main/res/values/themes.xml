@@ -64,7 +64,7 @@
         <item name="android:textColorPrimary">#777</item>
     </style>
 
-    <style name="Theme.FAP.Login">
+    <style name="Theme.FAP.Matching_Buttons">
         <item name="tint">@color/md_theme_light_onPrimary</item>
     </style>
 
