@@ -68,7 +68,6 @@ class AddPayment : AppCompatActivity() {
 
         val btnBack = binding.btnBack
         val btnDel = binding.btnDel
-        // TODO placement of the button
         val btnSavingsGoal = binding.btnSavingsGoal
         val itemTitle = binding.titleInput
         val itemDateStartLayout = binding.datePickerStartLayout
@@ -166,10 +165,12 @@ class AddPayment : AppCompatActivity() {
         }
 
         btnSavingsGoal.setOnClickListener {
-            // TODO what if this changes on edit?, What if it changes from Repeating to SavingsGoal?
-            // TODO del, save
+            // TODO placement of the button
+            // TODO probably fine: what if this changes on edit?, What if it changes from Repeating to SavingsGoal?
+            // TODO remove NONE option on SavingsGoal
+            // TODO probably fine: del, save
             if (btnSavingsGoal.isChecked) {
-                // TODO rename
+                // TODO rename Repetitionprefix
                 val newRepetitionPrefix = "per payment: "
                 var curRepetition = itemRepetition.text?.removePrefix(repetitionPrefix).toString()
 
@@ -257,6 +258,10 @@ class AddPayment : AppCompatActivity() {
             val curRepetition = itemRepetition.text?.removePrefix(repetitionPrefix).toString()
 
             for (option in options) {
+                if (option == SharedSavingsGoalManager.TimeSpan.None.label && btnSavingsGoal.isChecked) {
+                    continue
+                }
+
                 val btn = RadioButton(this@AddPayment, )
                 btn.text = option
                 val layoutParams = LinearLayout.LayoutParams(
