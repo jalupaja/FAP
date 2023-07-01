@@ -7,6 +7,8 @@
     android:theme="@style/Theme.FAP.Add_Payment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_marginTop="25dp"
+        android:layout_marginHorizontal="15dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 
@@ -15,7 +17,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
-            android:layout_margin="5dp"
             android:backgroundTint="@android:color/transparent"
             android:src="@drawable/back"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -27,9 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
-            android:layout_margin="5dp"
-            android:background="@drawable/round_background"
-            android:backgroundTint="@color/dark_red"
+            android:backgroundTint="@android:color/transparent"
             android:src="@drawable/delete"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -228,6 +227,7 @@
                 android:layout_height="60sp"
                 android:layout_marginTop="15sp"
                 android:textStyle="bold"
+                android:textColor="?attr/colorOnSecondary"
                 android:text="Save"/>
 
         </LinearLayout>

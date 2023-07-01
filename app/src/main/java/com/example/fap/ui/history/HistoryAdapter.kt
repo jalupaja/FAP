@@ -28,7 +28,7 @@ class HistoryAdapter(private var historyList: List<HistoryItem>) : RecyclerView.
 
         sharedCurrency = SharedCurrencyManager.getInstance(context)
         colorRed = ContextCompat.getColor(context, R.color.neon_red)
-        colorGreen = ContextCompat.getColor(context, R.color.dark_green)
+        colorGreen = ContextCompat.getColor(context, R.color.green)
         return ViewHolder(view)
     }
 
@@ -69,42 +69,6 @@ class HistoryAdapter(private var historyList: List<HistoryItem>) : RecyclerView.
                     val results = FilterResults()
                     results.values = filteredList
                     return results
-        }
-
-        override  fun publishResults(constraint: CharSequence?, results: FilterResults?) {
-            if (results?.values is ArrayList<*>) {
-                val filteredList = results.values as ArrayList<HistoryItem>
-                historyList = ArrayList(filteredList)
-
-                notifyDataSetChanged()
-            }
-        }
-    }
-
-    fun getDateFilter(): Filter {
-        return dateFilter
-    }
-
-    private val dateFilter = object : Filter() {
-        override fun performFiltering(constraint: CharSequence?): FilterResults {
-            val filteredList: ArrayList<HistoryItem> = ArrayList()
-
-            if (constraint.isNullOrEmpty()) {
-                initialHistoryList.let { filteredList.addAll(it) }
-            } else {
-                val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-                val startDate = constraint.split("-")[0]
-                val endDate = constraint.split("-")[1]
-                initialHistoryList.forEach { historyItem ->
-                    if (historyItem.date >= dateFormat.parse(startDate) && historyItem.date <= dateFormat.parse(endDate)) {
-                        filteredList.add(historyItem)
-                    }
-                }
-            }
-
-            val results = FilterResults()
-            results.values = filteredList
-            return results
         }
 
         override  fun publishResults(constraint: CharSequence?, results: FilterResults?) {

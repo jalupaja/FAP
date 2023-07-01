@@ -54,8 +54,6 @@ class HistoryFragment : Fragment() {
         historyAdapter = HistoryAdapter(historyData)
         recyclerView.adapter = historyAdapter
         searchView = binding.historySearchView
-        startDateBtn = binding.historyStartDateBtn
-        endDateBtn = binding.historyEndDateBtn
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
@@ -68,46 +66,6 @@ class HistoryFragment : Fragment() {
                 return true
             }
         })
-
-        startDateBtn.setOnClickListener{
-            val dateFormatPattern = "dd.MM.yyyy"
-            val curDate = LocalDate.parse(SimpleDateFormat(dateFormatPattern, Locale.getDefault()).format(Date()), DateTimeFormatter.ofPattern(dateFormatPattern))
-            val datePickerDialog =
-                context?.let { it1 ->
-                    DatePickerDialog(it1, { _, year, month, dayOfMonth ->
-                        val selectedDate = Calendar.getInstance()
-                        selectedDate.set(Calendar.YEAR, year)
-                        selectedDate.set(Calendar.MONTH, month)
-                        selectedDate.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-                        val formattedDate = SimpleDateFormat(dateFormatPattern, Locale.getDefault()).format(selectedDate.time)
-
-                        startDateBtn.text = formattedDate
-                        startDate = selectedDate.time
-                        historyAdapter?.getDateFilter()?.filter("$startDate-$endDate")
-                    }, curDate.year, curDate.monthValue, curDate.dayOfMonth)
-                }
-            datePickerDialog?.show()
-        }
-
-        endDateBtn.setOnClickListener{
-            val dateFormatPattern = "dd.MM.yyyy"
-            val curDate = LocalDate.parse(SimpleDateFormat(dateFormatPattern, Locale.getDefault()).format(Date()), DateTimeFormatter.ofPattern(dateFormatPattern))
-            val datePickerDialog =
-                context?.let { it1 ->
-                    DatePickerDialog(it1, { _, year, month, dayOfMonth ->
-                        val selectedDate = Calendar.getInstance()
-                        selectedDate.set(Calendar.YEAR, year)
-                        selectedDate.set(Calendar.MONTH, month)
-                        selectedDate.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-                        val formattedDate = SimpleDateFormat(dateFormatPattern, Locale.getDefault()).format(selectedDate.time)
-
-                        endDateBtn.text = formattedDate
-                        endDate = selectedDate.time
-                        historyAdapter?.getDateFilter()?.filter("$startDate-$endDate")
-                    }, curDate.year, curDate.monthValue, curDate.dayOfMonth)
-                }
-            datePickerDialog?.show()
-        }
 
         return view
     }

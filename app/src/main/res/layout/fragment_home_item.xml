@@ -90,7 +90,7 @@
                         android:layout_height="wrap_content"
                         android:text="0.00"
                         android:textAlignment="center"
-                        android:textColor="@color/green"
+                        android:textColor="?attr/colorCustomColor2"
                         android:textSize="16dp" />
                 </LinearLayout>
 
@@ -157,7 +157,7 @@
                         android:layout_height="wrap_content"
                         android:text="0.00"
                         android:textAlignment="center"
-                        android:textColor="@color/red"
+                        android:textColor="@color/neon_red"
                         android:textSize="15dp" />
                 </LinearLayout>
 

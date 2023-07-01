@@ -27,8 +27,8 @@ class CategoryAdapter(
         val context = parent.context
         val view = LayoutInflater.from(context).inflate(R.layout.category_item, parent, false)
         sharedCurrency = SharedCurrencyManager.getInstance(context)
-        colorRed = ContextCompat.getColor(context, R.color.dark_red)
-        colorGreen = ContextCompat.getColor(context, R.color.dark_green)
+        colorRed = ContextCompat.getColor(context, R.color.neon_red)
+        colorGreen = ContextCompat.getColor(context, R.color.green)
         return ViewHolder(view)
     }
 
@@ -98,9 +98,9 @@ class CategoryAdapter(
             val sum = sumTextView.text.toString()
 
             if (sum[0] == '-') {
-                sumTextView.setTextColor(colorGreen)
-            } else {
                 sumTextView.setTextColor(colorRed)
+            } else {
+                sumTextView.setTextColor(colorGreen)
             }
         }
     }

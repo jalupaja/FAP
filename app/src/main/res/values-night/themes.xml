@@ -13,7 +13,7 @@
         <item name="colorOnTertiary">@color/md_theme_dark_onTertiary</item>
         <item name="colorTertiaryContainer">@color/md_theme_dark_tertiaryContainer</item>
         <item name="colorOnTertiaryContainer">@color/md_theme_dark_onTertiaryContainer</item>
-        <item name="colorError">@color/md_theme_dark_error</item>
+        <item name="colorError">@color/md_theme_light_error</item>
         <item name="colorErrorContainer">@color/md_theme_dark_errorContainer</item>
         <item name="colorOnError">@color/md_theme_dark_onError</item>
         <item name="colorOnErrorContainer">@color/md_theme_dark_onErrorContainer</item>
@@ -32,7 +32,7 @@
         <item name="colorCustomColor1Container">#4e378b</item>
         <item name="colorOnCustomColor1Container">#e8ddff</item>
         <item name="harmonizeCustomColor1">false</item>
-        <item name="colorCustomColor2">#73df31</item>
+        <item name="colorCustomColor2">#00FF00</item>
         <item name="colorOnCustomColor2">#143800</item>
         <item name="colorCustomColor2Container">#205100</item>
         <item name="colorOnCustomColor2Container">#8efd4d</item>
