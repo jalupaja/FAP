@@ -30,7 +30,6 @@ import com.example.fap.utils.SharedCurrencyManager
 import com.example.fap.utils.SharedSavingsGoalManager
 import com.google.android.material.snackbar.Snackbar
 import java.time.ZoneId
-import java.time.temporal.ChronoUnit
 import java.util.*
 
 class AddPayment : AppCompatActivity() {
@@ -167,7 +166,6 @@ class AddPayment : AppCompatActivity() {
         btnSavingsGoal.setOnClickListener {
             // TODO placement of the button
             // TODO probably fine: what if this changes on edit?, What if it changes from Repeating to SavingsGoal?
-            // TODO remove NONE option on SavingsGoal
             // TODO probably fine: del, save
             if (btnSavingsGoal.isChecked) {
                 // TODO rename Repetitionprefix
@@ -344,26 +342,29 @@ class AddPayment : AppCompatActivity() {
                     endAmount = price
                     val calendar: Calendar = Calendar.getInstance()
                     calendar.time = dateStart
-                    var amountOfTime = 1L
+                    val diffInMillis = dateEnd.time - dateStart.time
 
+                    val amountOfTime: Int
                     when (repetition) {
                         SharedSavingsGoalManager.TimeSpan.Daily -> {
-                            amountOfTime = ChronoUnit.DAYS.between(dateStart.toInstant(), dateEnd.toInstant())
-                            calendar.add(Calendar.DAY_OF_YEAR, amountOfTime.toInt())
+                            amountOfTime = (diffInMillis / (1000L * 60 * 60 * 24)).toInt()
+                            calendar.add(Calendar.DAY_OF_YEAR, amountOfTime)
                         }
                         SharedSavingsGoalManager.TimeSpan.Weekly -> {
-                            amountOfTime = ChronoUnit.WEEKS.between(dateStart.toInstant(), dateEnd.toInstant())
-                            calendar.add(Calendar.WEEK_OF_YEAR, amountOfTime.toInt())
+                            amountOfTime = (diffInMillis / (1000L * 60 * 60 * 24 * 7)).toInt()
+                            calendar.add(Calendar.WEEK_OF_YEAR, amountOfTime)
                         }
                         SharedSavingsGoalManager.TimeSpan.Monthly -> {
-                            amountOfTime = ChronoUnit.MONTHS.between(dateStart.toInstant(), dateEnd.toInstant())
-                            calendar.add(Calendar.MONTH, amountOfTime.toInt())
+                            amountOfTime = (diffInMillis / (1000L * 60 * 60 * 24 * 30)).toInt()
+                            calendar.add(Calendar.MONTH, amountOfTime)
                         }
                         SharedSavingsGoalManager.TimeSpan.Yearly -> {
-                            amountOfTime = ChronoUnit.YEARS.between(dateStart.toInstant(), dateEnd.toInstant())
-                            calendar.add(Calendar.YEAR, amountOfTime.toInt())
+                            amountOfTime = (diffInMillis / (1000L * 60 * 60 * 24 * 365)).toInt()
+                            calendar.add(Calendar.YEAR, amountOfTime)
                         }
-                        else -> { }
+                        else -> {
+                            amountOfTime = 0
+                        }
                     }
                     price /= amountOfTime
                     dateEnd = calendar.time
