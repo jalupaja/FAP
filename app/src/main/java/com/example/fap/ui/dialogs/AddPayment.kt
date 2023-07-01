@@ -191,8 +191,7 @@ class AddPayment : AppCompatActivity() {
             } else {
                 isSavingsGoal = true
                 itemSavingsGoalLayout.hint = getString(R.string.savingsgoal_true)
-                // TODO rename Repetitionprefix
-                val newRepetitionPrefix = "per payment: "
+                val newRepetitionPrefix = "Interval: "
                 var curRepetition = itemRepetition.text?.removePrefix(repetitionPrefix).toString()
 
                 if (curRepetition == SharedSavingsGoalManager.TimeSpan.None.label) {
