@@ -33,6 +33,11 @@
     <string name="use_biometrics">use biometrics</string>
     <string name="database_name">FAP_DATABASE.db</string>
 
+    <string name="history_empty">Nothing here yet.\nAdd something using the Button on the bottom right.</string>
+    <string name="savingsgoal_false">SavingsGoal: No</string>
+    <string name="savingsgoal_true">SavingsGoal: Yes</string>
+    <string name="category_hint">Select or add a category</string>
+
     <string name="shared_prefs_biometrics_key">FAP_BIO_KEY</string>
     <string name="shared_prefs_cur_user">FAP_CUR_USER</string>
     <string name="shared_prefs_theme">FAP_THEME</string>
@@ -45,9 +50,5 @@
     <string name="theme_light">light</string>
     <string name="theme_dark">dark</string>
     <string name="theme_oled">oled</string>
-
-    <string name="history_empty">Nothing here yet.\nAdd something using the Button on the bottom right.</string>
-    <string name="savingsgoal_false">SavingsGoal: No</string>
-    <string name="savingsgoal_true">SavingsGoal: Yes</string>
 
 </resources>

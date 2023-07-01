@@ -136,13 +136,12 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <!-- If the hint is extracted, the spacing will be wrong! -->
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="60sp"
                 android:layout_margin="2dp"
-                android:hint="   Select or add a category">
+                android:hint="@string/category_hint">
                 <com.google.android.material.textfield.MaterialAutoCompleteTextView
                     android:id="@+id/category_spinner"
                     android:layout_width="match_parent"
@@ -150,7 +149,7 @@
                     android:imeOptions="actionDone"
                     android:inputType="text"
                     android:paddingVertical="1dp"
-                    android:paddingHorizontal="3dp" />
+                    android:paddingHorizontal="20dp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
