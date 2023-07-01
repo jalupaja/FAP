@@ -7,6 +7,7 @@ import androidx.room.Query
 import androidx.room.Update
 import com.example.fap.data.entities.SavingsGoal
 import com.example.fap.utils.SharedSavingsGoalManager
+import java.util.Date
 
 @Dao
 interface FapDaoSavingGoal {
@@ -16,6 +17,9 @@ interface FapDaoSavingGoal {
 
     @Query("SELECT timeSpanPerTime FROM SavingsGoal WHERE id = :id")
     suspend fun getTimeSpan(id: Int): SharedSavingsGoalManager.TimeSpan
+
+    @Query("SELECT endDate FROM SavingsGoal WHERE id = :id")
+    suspend fun getDateEnd(id: Int): Date
 
     @Insert
     suspend fun insertSavingsGoal(savingsGoal: SavingsGoal): Long
