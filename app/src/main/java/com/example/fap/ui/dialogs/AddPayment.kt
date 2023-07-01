@@ -271,11 +271,11 @@ class AddPayment : AppCompatActivity() {
                 layoutParams.setMargins(0, 10, 0, 10)
                 btn.layoutParams = layoutParams
 
-                if (option == curRepetition) {
-                    btn.isChecked = true
-                }
-
                 btnGroup.addView(btn)
+
+                if (option == curRepetition) {
+                    btnGroup.check(btn.id)
+                }
             }
 
             alert.setPositiveButton(("Yes")) { dialog, _ ->
