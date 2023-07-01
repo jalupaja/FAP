@@ -17,11 +17,15 @@ import android.app.DatePickerDialog
 import android.view.MenuItem
 import android.view.View
 import android.widget.ArrayAdapter
+import android.widget.LinearLayout
+import android.widget.RadioButton
 import androidx.activity.OnBackPressedCallback
+import androidx.core.view.forEachIndexed
 import com.example.fap.R
 import com.example.fap.data.entities.Category
 import com.example.fap.data.entities.Payment
 import com.example.fap.data.entities.SavingsGoal
+import com.example.fap.databinding.DialogRadioButtonsBinding
 import com.example.fap.utils.SharedCurrencyManager
 import com.example.fap.utils.SharedSavingsGoalManager
 import com.google.android.material.snackbar.Snackbar
@@ -96,33 +100,57 @@ class AddPayment : AppCompatActivity() {
                 }
                 alert.show()
             } else {
+                val dialogBinding = DialogRadioButtonsBinding.inflate(layoutInflater)
+                val alert = AlertDialog.Builder(this@AddPayment)
+                alert.setView(dialogBinding.root)
+                val btnGroup = dialogBinding.btnGroup
                 val options = arrayOf("Delete the selected occurrence only", "Delete this and all future occurrences", "Delete all occurrences")
 
-                val alert = AlertDialog.Builder(this@AddPayment)
-                alert.setItems(options) { dialog, selected ->
+                for (option in options) {
+                    val btn = RadioButton(this@AddPayment, )
+                    btn.text = option
+                    val layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    )
+                    layoutParams.setMargins(0, 10, 0, 10)
+                    btn.layoutParams = layoutParams
+                    btnGroup.addView(btn)
+                }
+
+                alert.setPositiveButton(("Yes")) { dialog, _ ->
+                    var selected = -1
+                    btnGroup.forEachIndexed { index, view ->
+                        if (view is RadioButton && view.isChecked) {
+                            selected = index
+                            return@forEachIndexed
+                        }
+                    }
                     when (selected) {
                         0 -> {
                             lifecycleScope.launch {
                                 dbPayment.deletePayment(curItemId)
+                                backButtonCallback.handleOnBackPressed()
                             }
                         }
                         1 -> {
                             lifecycleScope.launch {
                                 dbPayment.removeSavingsGoalIdBeforePayment(curSavingsGoalId!!, curItemId)
                                 dbSavingsGoal.deleteSavingsGoalById(curSavingsGoalId!!)
+                                backButtonCallback.handleOnBackPressed()
                             }
                         }
                         2 -> {
                             lifecycleScope.launch {
                                 dbSavingsGoal.deleteSavingsGoalById(curSavingsGoalId!!)
+                                backButtonCallback.handleOnBackPressed()
                             }
                         }
                         else -> { }
                     }
                     dialog.dismiss()
-                    backButtonCallback.handleOnBackPressed()
                 }
-                alert.setNegativeButton("Cancel") { dialog, _ ->
+                alert.setNegativeButton("No") { dialog, _ ->
                     dialog.dismiss()
                 }
 
@@ -158,15 +186,44 @@ class AddPayment : AppCompatActivity() {
         }
 
         itemRepetition.setOnClickListener {
-            val options = SharedSavingsGoalManager.TimeSpan.values().map { it.label }.toTypedArray()
 
+            val dialogBinding = DialogRadioButtonsBinding.inflate(layoutInflater)
             val alert = AlertDialog.Builder(this@AddPayment)
-            alert.setItems(options) { dialog, selected ->
+            alert.setView(dialogBinding.root)
+            val btnGroup = dialogBinding.btnGroup
+            val options = SharedSavingsGoalManager.TimeSpan.values().map { it.label }.toTypedArray()
+            val curRepetition = itemRepetition.text?.removePrefix(repetitionPrefix).toString()
+
+            for (option in options) {
+                val btn = RadioButton(this@AddPayment, )
+                btn.text = option
+                val layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+                layoutParams.setMargins(0, 10, 0, 10)
+                btn.layoutParams = layoutParams
+
+                if (option == curRepetition) {
+                    btn.isChecked = true
+                }
+
+                btnGroup.addView(btn)
+            }
+
+            alert.setPositiveButton(("Yes")) { dialog, _ ->
+                var selected = -1
+                btnGroup.forEachIndexed { index, view ->
+                    if (view is RadioButton && view.isChecked) {
+                        selected = index
+                        return@forEachIndexed
+                    }
+                }
                 val selectedOption = SharedSavingsGoalManager.TimeSpan.values()[selected]
                 itemRepetition.setText(repetitionPrefix + selectedOption.label)
                 dialog.dismiss()
             }
-            alert.setNegativeButton("Cancel") { dialog, _ ->
+            alert.setNegativeButton("No") { dialog, _ ->
                 dialog.dismiss()
             }
 
@@ -280,14 +337,37 @@ class AddPayment : AppCompatActivity() {
                         alert.show()
                     } else if (previousRepetition != SharedSavingsGoalManager.TimeSpan.None && previousRepetition == repetition) {
                         /* this was a repeating payment is staying the same */
+                        val dialogBinding = DialogRadioButtonsBinding.inflate(layoutInflater)
+                        val alert = AlertDialog.Builder(this@AddPayment)
+                        alert.setView(dialogBinding.root)
+                        val btnGroup = dialogBinding.btnGroup
                         val options = arrayOf("Change the selected occurrence only", "Change this and all future occurrences", "Change all occurrences")
 
-                        val alert = AlertDialog.Builder(this@AddPayment)
-                        alert.setItems(options) { dialog, selected ->
+                        for (option in options) {
+                            val btn = RadioButton(this@AddPayment, )
+                            btn.text = option
+                            val layoutParams = LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT
+                            )
+                            layoutParams.setMargins(0, 10, 0, 10)
+                            btn.layoutParams = layoutParams
+                            btnGroup.addView(btn)
+                        }
+
+                        alert.setPositiveButton(("Yes")) { dialog, _ ->
+                            var selected = -1
+                            btnGroup.forEachIndexed { index, view ->
+                                if (view is RadioButton && view.isChecked) {
+                                    selected = index
+                                    return@forEachIndexed
+                                }
+                            }
                             when (selected) {
                                 0 -> {
                                     lifecycleScope.launch {
                                         dbPayment.upsertPayment(newPayment.copy(title = newTitle))
+                                        backButtonCallback.handleOnBackPressed()
                                     }
                                 }
 
@@ -295,6 +375,7 @@ class AddPayment : AppCompatActivity() {
                                     lifecycleScope.launch {
                                         dbPayment.updatePaymentsBySavingsGoalFromPayment(newPayment.wallet, newTitle, newPayment.description!!, newPayment.price, newPayment.isPayment, newPayment.category!!, curSavingsGoalId!!, curItemId)
                                         dbSavingsGoal.updateSavingsGoal(newRepeatingPayment)
+                                        backButtonCallback.handleOnBackPressed()
                                     }
                                 }
 
@@ -302,15 +383,16 @@ class AddPayment : AppCompatActivity() {
                                     lifecycleScope.launch {
                                         dbPayment.updatePaymentsBySavingsGoal(newPayment.wallet, newTitle, newPayment.description!!, newPayment.price, newPayment.isPayment, newPayment.category!!, curSavingsGoalId!!)
                                         dbSavingsGoal.updateSavingsGoal(newRepeatingPayment)
+                                        backButtonCallback.handleOnBackPressed()
                                     }
                                 }
 
                                 else -> {}
                             }
                             dialog.dismiss()
-                            backButtonCallback.handleOnBackPressed()
                         }
-                        alert.setNegativeButton("Cancel") { dialog, _ ->
+
+                        alert.setNegativeButton("No") { dialog, _ ->
                             dialog.dismiss()
                         }
 
