@@ -42,7 +42,7 @@ abstract class FapDatabase: RoomDatabase() {
     abstract fun fapDaoSavingGoal(): FapDaoSavingGoal
     abstract fun fapDaoUser(): FapDaoUser
     abstract fun fapDaoWallet(): FapDaoWallet
-    abstract fun currencyDao(): FapDaoCurrency
+    abstract fun fapDaoCurrency(): FapDaoCurrency
 
     companion object {
         private var instance: FapDatabase? = null

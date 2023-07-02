@@ -1,9 +1,7 @@
 package com.example.fap.data.dao
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.example.fap.data.entities.Payment
@@ -64,4 +62,13 @@ interface FapDaoPayment {
 
     @Query("SELECT * FROM Wallet WHERE userId = :userId")
     suspend fun getPaymentsByWallets(userId: String): List<PaymentsByWallets>
+
+    @Query("UPDATE Payment set savingsGoalId = null WHERE savingsGoalId = :savingsGoalId AND date < (SELECT date FROM Payment WHERE id = :paymentId)")
+    suspend fun removeSavingsGoalIdBeforePayment(savingsGoalId: Int, paymentId: Int)
+
+    @Query("UPDATE Payment set wallet = :wallet, title = :title, description = :description, price = :price, isPayment = :isPayment, category = :category WHERE savingsGoalId = :savingsGoalId")
+    suspend fun updatePaymentsBySavingsGoal(wallet: String, title: String, description: String, price: Double, isPayment: Boolean, category: String, savingsGoalId: Int)
+
+    @Query("UPDATE Payment set wallet = :wallet, title = :title, description = :description, price = :price, isPayment = :isPayment, category = :category WHERE savingsGoalId = :savingsGoalId AND date >= (SELECT date FROM Payment WHERE id = :curPaymentId)")
+    suspend fun updatePaymentsBySavingsGoalFromPayment(wallet: String, title: String, description: String, price: Double, isPayment: Boolean, category: String, savingsGoalId: Int, curPaymentId: Int)
 }

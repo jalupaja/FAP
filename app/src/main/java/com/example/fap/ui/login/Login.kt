@@ -24,21 +24,13 @@ import com.example.fap.data.entities.Wallet
 import com.example.fap.databinding.ActivityLoginBinding
 import com.example.fap.utils.SharedCurrencyManager
 import com.example.fap.utils.SharedPreferencesManager
+import com.example.fap.utils.SharedSavingsGoalManager
 import com.example.fap.utils.SharedSecurityManager
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.security.MessageDigest
 import java.util.UUID
-
-
-/**
- * An example full-screen activity that shows and hides the system UI (i.e.
- * status bar and navigation/system bar) with user interaction.
- */
 
 class Login : AppCompatActivity() {
 
@@ -248,9 +240,10 @@ class Login : AppCompatActivity() {
             REGISTERSTATE.REGISTERED -> {
                 if (checkPassword(textLogin.text.toString())) {
                     lifecycleScope.launch {
+                        SharedSavingsGoalManager.getInstance(applicationContext).updateSavingsGoals(applicationContext)
+                        login()
                         SharedCurrencyManager.getInstance(applicationContext).tryUpdateCurrency(applicationContext)
                     }
-                    login()
                 } else {
                     lblLoginStatus.text = getString(R.string.wrong_password)
                 }

@@ -25,6 +25,12 @@ import java.util.Date
             parentColumns = ["name"],
             childColumns = ["category"],
             onDelete = ForeignKey.CASCADE
+        ),
+        ForeignKey(
+            entity = SavingsGoal::class,
+            parentColumns = ["id"],
+            childColumns = ["savingsGoalId"],
+            onDelete = ForeignKey.CASCADE
         )
     ]
 )
@@ -39,4 +45,5 @@ data class Payment(
     val date: Date,
     val isPayment: Boolean,
     val category: String?,
+    val savingsGoalId: Int? = null,
 )

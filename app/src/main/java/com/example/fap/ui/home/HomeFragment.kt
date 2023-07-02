@@ -28,7 +28,6 @@ class HomeFragment : Fragment() {
     private lateinit var sharedPreferences: SharedPreferencesManager
     private lateinit var sharedCurrency: SharedCurrencyManager
 
-    // TODO in HomeFragment:
     private var wallets = ArrayList<WalletInfo>()
     private lateinit var walletAdapter: HomeAdapter
     private lateinit var viewpager: ViewPager2

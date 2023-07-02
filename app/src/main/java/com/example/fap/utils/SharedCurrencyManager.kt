@@ -85,7 +85,7 @@ class SharedCurrencyManager(context: Context) {
                             val db = FapDatabase.getInstance(context)
                             for (currency in rates.keys()) {
                                 val newCurrency = availableCurrencies.filter { it.value == currency }.keys.first()
-                                db.currencyDao().updateCurrency(
+                                db.fapDaoCurrency().updateCurrency(
                                     Currency(
                                         newCurrency,
                                         rates.getDouble(currency)
@@ -161,7 +161,7 @@ class SharedCurrencyManager(context: Context) {
         val db = FapDatabase.getInstance(context)
         var i = 0
         for (currency in availableCurrencyConversion.keys) {
-            db.currencyDao().insertCurrency(Currency(currency, availableCurrencyConversion[currency]!!))
+            db.fapDaoCurrency().insertCurrency(Currency(currency, availableCurrencyConversion[currency]!!))
             i += 1
         }
         sharedPreferences.saveLastCurrencyUpdate(context, "0000-00-00")
@@ -170,7 +170,7 @@ class SharedCurrencyManager(context: Context) {
 
     suspend fun calculateFromCurrency(amount: Double, currencyFrom: String, context: Context): Double {
         val db = FapDatabase.getInstance(context)
-        val conversion = db.currencyDao().getConversion(defaultCurrency) / db.currencyDao().getConversion(currencyFrom)
+        val conversion = db.fapDaoCurrency().getConversion(defaultCurrency) / db.fapDaoCurrency().getConversion(currencyFrom)
         return amount * conversion
     }
 
@@ -178,7 +178,7 @@ class SharedCurrencyManager(context: Context) {
         if (currencyFrom != currencyTo) {
             val db = FapDatabase.getInstance(context)
             val curUser = sharedPreferences.getCurUser(context)
-            val conversion = db.currencyDao().getConversion(currencyTo) / db.currencyDao().getConversion(currencyFrom)
+            val conversion = db.fapDaoCurrency().getConversion(currencyTo) / db.fapDaoCurrency().getConversion(currencyFrom)
             var newPrice: Double
 
             val payments = db.fapDaoPayment().getPayments(curUser)
