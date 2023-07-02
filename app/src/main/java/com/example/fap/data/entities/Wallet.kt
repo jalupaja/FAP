@@ -3,7 +3,6 @@ package com.example.fap.data.entities
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import com.example.fap.data.entities.User
 
 @Entity(tableName = "Wallet",
     foreignKeys = [ForeignKey(

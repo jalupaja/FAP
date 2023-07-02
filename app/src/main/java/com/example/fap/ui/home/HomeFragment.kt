@@ -82,13 +82,13 @@ class HomeFragment : Fragment() {
         lifecycleScope.launch {
 
             val db = FapDatabase.getInstance(requireContext())
-            val list_paymentsByWallets = db.fapDaoPayment().getPaymentsByWallets(sharedPreferences.getCurUser(requireContext()))
+            val listOfPaymentsByWallets = db.fapDaoPayment().getPaymentsByWallets(sharedPreferences.getCurUser(requireContext()))
 
             val categories = db.fapDaoPayment().getTotalAmountByCategory(sharedPreferences.getCurUser(requireContext()))
 
 
             wallets.clear()
-            for (paymentsByWallet in list_paymentsByWallets) {
+            for (paymentsByWallet in listOfPaymentsByWallets) {
                 var totalSpentWallet = 0.0
                 var totalIncomeWallet = 0.0
                 var totalSpentMonthWallet = 0.0

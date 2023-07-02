@@ -1,6 +1,5 @@
 package com.example.fap.ui.home
 
-import android.content.Context
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -59,12 +58,12 @@ class HomeAdapter(private val wallets: List<WalletInfo>) : RecyclerView.Adapter<
         private var chartBalance: PieChart = itemView.findViewById(R.id.chart_balance)
         private var chartCategory : BarChart = itemView.findViewById(R.id.chart_category)
 
-        val resources = itemView.resources
-        val context = itemView.context
+        val resources = itemView.resources!!
+        val context = itemView.context!!
 
         //get theme OnSurface Color
-        val typedValue = TypedValue()
-        val theme = context.theme
+        private val typedValue = TypedValue()
+        val theme = context.theme!!
 
         @ColorInt
         val colorOnSurface = typedValue.data
@@ -179,14 +178,6 @@ class HomeAdapter(private val wallets: List<WalletInfo>) : RecyclerView.Adapter<
             chartCategory.axisLeft.textColor = color
             chartCategory.invalidate()
             chartCategory.notifyDataSetChanged()
-        }
-
-        private fun setupOther() {
-            theme.resolveAttribute(
-                com.google.android.material.R.attr.colorOnSurface,
-                typedValue,
-                true
-            )
         }
 
         private fun setupChartBalance() {

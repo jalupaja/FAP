@@ -1,6 +1,5 @@
 package com.example.fap.ui.settings
 
-import android.content.ContextWrapper
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatDelegate

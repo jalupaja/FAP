@@ -11,10 +11,10 @@ class BarXAxisFormatter(categories: List<CategoryItem>): ValueFormatter() {
     override fun getAxisLabel(value: Float, axis: AxisBase?): String {
         lateinit var categorySub: String
         for (category in passedCategories) {
-            if (category.title.length >= 9) {
-                categorySub = category.title.substring(0, 8)
+            categorySub = if (category.title.length >= 9) {
+                category.title.substring(0, 8)
             } else {
-                categorySub = category.title
+                category.title
             }
 
             newCategories.add(categorySub)
