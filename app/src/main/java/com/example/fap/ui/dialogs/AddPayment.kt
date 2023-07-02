@@ -379,19 +379,19 @@ class AddPayment : AppCompatActivity() {
                     val amountOfTime: Int
                     when (repetition) {
                         SharedSavingsGoalManager.TimeSpan.Daily -> {
-                            amountOfTime = (diffInMillis / (1000L * 60 * 60 * 24)).toInt() + 1
+                            amountOfTime = diffInMillis.floorDiv(1000L * 60 * 60 * 24).toInt() + 1
                             calendar.add(Calendar.DAY_OF_YEAR, amountOfTime)
                         }
                         SharedSavingsGoalManager.TimeSpan.Weekly -> {
-                            amountOfTime = (diffInMillis / (1000L * 60 * 60 * 24 * 7)).toInt() + 1
+                            amountOfTime = diffInMillis.floorDiv(1000L * 60 * 60 * 24 * 7).toInt() + 1
                             calendar.add(Calendar.WEEK_OF_YEAR, amountOfTime)
                         }
                         SharedSavingsGoalManager.TimeSpan.Monthly -> {
-                            amountOfTime = (diffInMillis / (1000L * 60 * 60 * 24 * 30)).toInt() + 1
+                            amountOfTime = diffInMillis.floorDiv(1000L * 60 * 60 * 24 * 30).toInt() + 1
                             calendar.add(Calendar.MONTH, amountOfTime)
                         }
                         SharedSavingsGoalManager.TimeSpan.Yearly -> {
-                            amountOfTime = (diffInMillis / (1000L * 60 * 60 * 24 * 365)).toInt() + 1
+                            amountOfTime = diffInMillis.floorDiv(1000L * 60 * 60 * 24 * 365).toInt() + 1
                             calendar.add(Calendar.YEAR, amountOfTime)
                         }
                         else -> {
