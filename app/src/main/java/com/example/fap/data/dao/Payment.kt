@@ -6,7 +6,6 @@ import androidx.room.Query
 import androidx.room.Update
 import com.example.fap.data.entities.Payment
 import java.util.Date
-import androidx.room.Upsert
 import com.example.fap.data.entities.PaymentsByWallets
 import com.example.fap.ui.category.CategoryItem
 
@@ -16,8 +15,8 @@ interface FapDaoPayment {
     @Insert
     suspend fun insertPayment(payment: Payment)
 
-    @Upsert
-    suspend fun upsertPayment(payment: Payment)
+    @Update
+    suspend fun updateSinglePayment(payments: Payment)
 
     @Update
     suspend fun updatePayments(payments: List<Payment>)

@@ -442,7 +442,11 @@ class AddPayment : AppCompatActivity() {
 
                 if (previousRepetition == SharedSavingsGoalManager.TimeSpan.None && repetition == SharedSavingsGoalManager.TimeSpan.None) {
                     /* is and never was a repeating payment */
-                    dbPayment.upsertPayment(newPayment)
+                    if (curItemId != -1) {
+                        dbPayment.updateSinglePayment(newPayment)
+                    } else {
+                        dbPayment.insertPayment(newPayment)
+                    }
                     backButtonCallback.handleOnBackPressed()
                 } else if (previousRepetition == SharedSavingsGoalManager.TimeSpan.None && repetition != SharedSavingsGoalManager.TimeSpan.None) {
                     /* it is now a repeating payment */
@@ -459,7 +463,7 @@ class AddPayment : AppCompatActivity() {
                     alert.setTitle("Confirmation")
                     alert.setPositiveButton("Yes") { dialog, _ ->
                         lifecycleScope.launch {
-                            dbPayment.upsertPayment(
+                            dbPayment.updateSinglePayment(
                                 newPayment.copy(savingsGoalId = null)
                             )
                             backButtonCallback.handleOnBackPressed()
@@ -501,7 +505,7 @@ class AddPayment : AppCompatActivity() {
                         when (selected) {
                             0 -> {
                                 lifecycleScope.launch {
-                                    dbPayment.upsertPayment(newPayment.copy(title = newTitle))
+                                    dbPayment.updateSinglePayment(newPayment.copy(title = newTitle))
                                     backButtonCallback.handleOnBackPressed()
                                 }
                             }
