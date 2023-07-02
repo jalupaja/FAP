@@ -92,6 +92,8 @@ class HistoryAdapter(private var historyList: List<HistoryItem>) : RecyclerView.
             if (historyItem.price != 0.0) {
                 if (historyItem.isPayment) {
                     textPrice.setTextColor(colorRed)
+                    val newText = "-${textPrice.text}"
+                    textPrice.text = newText
                 } else {
                     textPrice.setTextColor(colorGreen)
                 }
