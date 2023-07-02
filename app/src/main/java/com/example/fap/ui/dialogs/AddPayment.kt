@@ -263,7 +263,7 @@ class AddPayment : AppCompatActivity() {
                 val formattedDate = SimpleDateFormat(dateFormatPattern, Locale.getDefault()).format(selectedDate.time)
 
                 val startDate = LocalDate.parse(itemDateStart.text.toString(), DateTimeFormatter.ofPattern(dateFormatPattern))
-                if (startDate.year < year || startDate.monthValue < month || startDate.dayOfMonth < dayOfMonth) {
+                if (startDate.year > year || (startDate.year >= year && startDate.monthValue > month + 1) || (startDate.year >= year && startDate.monthValue >= month + 1 && startDate.dayOfMonth > dayOfMonth)) {
                     Snackbar.make(
                         binding.root,
                         "The End Date should be after the Start Date!",
@@ -379,19 +379,19 @@ class AddPayment : AppCompatActivity() {
                     val amountOfTime: Int
                     when (repetition) {
                         SharedSavingsGoalManager.TimeSpan.Daily -> {
-                            amountOfTime = (diffInMillis / (1000L * 60 * 60 * 24)).toInt() + 1
+                            amountOfTime = diffInMillis.floorDiv(1000L * 60 * 60 * 24).toInt() + 1
                             calendar.add(Calendar.DAY_OF_YEAR, amountOfTime)
                         }
                         SharedSavingsGoalManager.TimeSpan.Weekly -> {
-                            amountOfTime = (diffInMillis / (1000L * 60 * 60 * 24 * 7)).toInt() + 1
+                            amountOfTime = diffInMillis.floorDiv(1000L * 60 * 60 * 24 * 7).toInt() + 1
                             calendar.add(Calendar.WEEK_OF_YEAR, amountOfTime)
                         }
                         SharedSavingsGoalManager.TimeSpan.Monthly -> {
-                            amountOfTime = (diffInMillis / (1000L * 60 * 60 * 24 * 30)).toInt() + 1
+                            amountOfTime = diffInMillis.floorDiv(1000L * 60 * 60 * 24 * 30).toInt() + 1
                             calendar.add(Calendar.MONTH, amountOfTime)
                         }
                         SharedSavingsGoalManager.TimeSpan.Yearly -> {
-                            amountOfTime = (diffInMillis / (1000L * 60 * 60 * 24 * 365)).toInt() + 1
+                            amountOfTime = diffInMillis.floorDiv(1000L * 60 * 60 * 24 * 365).toInt() + 1
                             calendar.add(Calendar.YEAR, amountOfTime)
                         }
                         else -> {
@@ -612,7 +612,7 @@ class AddPayment : AppCompatActivity() {
                 if (curSavingsGoalId != null) {
                     previousRepetition = dbSavingsGoal.getTimeSpan(curSavingsGoalId!!)
                     val newDateEnd = dbSavingsGoal.getDateEnd(curSavingsGoalId!!)
-                    if (Date(0) != newDateEnd) {
+                    if (newDateEnd.time > 0) {
                         startDateEnd = SimpleDateFormat(dateFormatPattern, Locale.getDefault()).format(newDateEnd)
                         itemSavingsGoal.performClick()
                     }
