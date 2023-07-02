@@ -2,12 +2,54 @@
     <string name="app_name">FAP</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Android Studio</string>
-    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_title">FAP</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
 
     <string name="menu_home">Home</string>
-    <string name="menu_gallery">Gallery</string>
-    <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_history">History</string>
+    <string name="menu_category">Category</string>
+    <string name="title_activity_login">Login</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="menu_logout">Logout</string>
+
+    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="settings">Settings</string>
+    <string name="add_wallet">Add Wallet</string>
+    <string name="add_a_wallet">Add a Wallet</string>
+    <string name="hint_wallet">New Wallet</string>
+    <string name="all_wallets">All Wallets</string>
+
+    <string name="login_input">Login</string>
+    <string name="password_hint">Password</string>
+    <string name="register_password">Input a Password to secure your data</string>
+    <string name="retry_register_password">Wrong Password\nInput a Password to secure your data</string>
+    <string name="wrong_password">Wrong Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="biometric_subtitle">Biometric verification</string>
+    <string name="biometric_dont_use">Cancel</string>
+    <string name="activate_biometrics">Input your password to proceed</string>
+    <string name="use_biometrics">use biometrics</string>
+    <string name="database_name">FAP_DATABASE.db</string>
+
+    <string name="history_empty">Nothing here yet.\nAdd something using the Button on the bottom right.</string>
+    <string name="savingsgoal_false">SavingsGoal: No</string>
+    <string name="savingsgoal_true">SavingsGoal: Yes</string>
+    <string name="category_hint">Select or add a category</string>
+
+    <string name="shared_prefs_biometrics_key">FAP_BIO_KEY</string>
+    <string name="shared_prefs_cur_user">FAP_CUR_USER</string>
+    <string name="shared_prefs_theme">FAP_THEME</string>
+    <string name="shared_prefs_hash">FAP_HASH</string>
+    <string name="shared_prefs_current_currency">FAP_CURRENCY</string>
+    <string name="shared_prefs_last_currency_update">FAP_CURRENCY_DATE</string>
+
+    <string name="theme_dialog">Change Theme</string>
+    <string name="theme_default">Dark Theme</string>
+    <string name="theme_auto">auto</string>
+    <string name="theme_light">light</string>
+    <string name="theme_dark">dark</string>
+    <string name="theme_oled">oled</string>
+
 </resources>

@@ -1,0 +1,28 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory app:title="@string/app_name">
+
+        <SwitchPreferenceCompat
+            app:key="biometrics"
+            app:title="Use Biometrics" />
+
+        <ListPreference
+            android:defaultValue="@string/theme_default"
+            android:dialogTitle="@string/theme_dialog"
+            android:entries="@array/theme"
+            android:entryValues="@array/theme_values"
+            app:defaultValue="@string/theme_auto"
+            app:key="theme"
+            app:title="Theme" />
+
+        <ListPreference
+            android:defaultValue="€"
+            android:dialogTitle="Change default Currency"
+            android:entries="@array/currency"
+            android:entryValues="@array/currency"
+            app:key="currency"
+            app:title="Default Currency" />
+
+    </PreferenceCategory>
+</PreferenceScreen>
