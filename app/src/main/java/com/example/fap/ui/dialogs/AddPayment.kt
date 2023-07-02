@@ -14,6 +14,7 @@ import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 import android.app.DatePickerDialog
+import android.content.res.ColorStateList
 import android.view.MenuItem
 import android.view.View
 import android.widget.ArrayAdapter
@@ -229,12 +230,20 @@ class AddPayment : AppCompatActivity() {
         btnIsPayment.setOnClickListener {
             btnIsPayment.alpha = 1F
             btnIsIncome.alpha = 0.6F
+            var colorStateList = ColorStateList.valueOf(getColor(R.color.light_gray))
+            btnIsIncome.backgroundTintList = colorStateList
+            colorStateList = ColorStateList.valueOf(getColor(R.color.dark_red))
+            btnIsPayment.backgroundTintList = colorStateList
             isPayment = true
         }
 
         btnIsIncome.setOnClickListener {
             btnIsPayment.alpha = 0.6F
             btnIsIncome.alpha = 1F
+            var colorStateList = ColorStateList.valueOf(getColor(R.color.light_gray))
+            btnIsPayment.backgroundTintList = colorStateList
+            colorStateList = ColorStateList.valueOf(getColor(R.color.dark_green))
+            btnIsIncome.backgroundTintList = colorStateList
             isPayment = false
         }
 

@@ -47,6 +47,7 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginBottom="20dp"
+        android:textColor="?attr/colorOnSecondary"
         android:text="Save"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
