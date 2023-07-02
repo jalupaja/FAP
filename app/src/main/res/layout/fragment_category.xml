@@ -17,7 +17,7 @@
         android:visibility="gone"/>
 
     <SearchView
-        android:id="@+id/category_searchView"
+        android:id="@+id/category_search_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:queryHint="Category"
@@ -27,6 +27,6 @@
         android:id="@+id/category_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/category_searchView"
-        app:layout_constraintTop_toBottomOf="@id/category_searchView" />
+        android:layout_below="@+id/category_search_view"
+        app:layout_constraintTop_toBottomOf="@id/category_search_view" />
 </RelativeLayout>

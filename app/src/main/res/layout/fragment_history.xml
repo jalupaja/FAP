@@ -18,7 +18,7 @@
             android:visibility="gone" />
 
         <SearchView
-                android:id="@+id/history_searchView"
+                android:id="@+id/history_search_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:queryHint="Item Name"
@@ -28,7 +28,7 @@
             android:id="@+id/history_recyclerview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/history_searchView"
-            app:layout_constraintTop_toBottomOf="@+id/history_searchView" />
+            android:layout_below="@+id/history_search_view"
+            app:layout_constraintTop_toBottomOf="@+id/history_search_view" />
 
 </RelativeLayout>

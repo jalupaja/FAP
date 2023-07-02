@@ -11,8 +11,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.fap.R
 import com.example.fap.ui.dialogs.AddPayment
 import com.example.fap.utils.SharedCurrencyManager
-import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 
 class HistoryAdapter(private var historyList: List<HistoryItem>) : RecyclerView.Adapter<HistoryAdapter.ViewHolder>() {

@@ -1,26 +1,17 @@
 package com.example.fap.ui.history
 
-import android.app.DatePickerDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.fap.R
 import com.example.fap.data.FapDatabase
 import com.example.fap.databinding.FragmentHistoryBinding
 import com.example.fap.utils.SharedPreferencesManager
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.Calendar
-import java.util.Date
-import java.util.Locale
 
 class HistoryFragment : Fragment() {
 
@@ -34,10 +25,6 @@ class HistoryFragment : Fragment() {
     private lateinit var historyAdapter: HistoryAdapter
     private lateinit var categoryHistory: String
     private lateinit var searchView: SearchView
-    private lateinit var startDateBtn: Button
-    private lateinit var endDateBtn: Button
-    private var startDate: Date = Date(1999, 1, 1)
-    private var endDate: Date = Date()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -57,17 +44,21 @@ class HistoryFragment : Fragment() {
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                historyAdapter?.getFilter()?.filter(query)
+                updateSearch(query)
                 return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                historyAdapter?.getFilter()?.filter(newText)
+                updateSearch(newText)
                 return true
             }
         })
 
         return view
+    }
+
+    private inline fun updateSearch(search: CharSequence?) {
+        historyAdapter.getFilter().filter(search)
     }
 
     override fun onResume() {
@@ -89,6 +80,7 @@ class HistoryFragment : Fragment() {
                 binding.lblHistoryEmpty.visibility = View.GONE
             }
             historyAdapter.notifyDataSetChanged()
+            updateSearch(searchView?.query)
         }
     }
 

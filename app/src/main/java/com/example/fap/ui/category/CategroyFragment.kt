@@ -8,9 +8,7 @@ import android.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.fap.R
 import com.example.fap.data.FapDatabase
-import com.example.fap.data.entities.Category
 import com.example.fap.utils.SharedPreferencesManager
 import com.example.fap.databinding.FragmentCategoryBinding
 import kotlinx.coroutines.launch
@@ -43,18 +41,20 @@ class CategoryFragment : Fragment() {
         searchView = binding.categorySearchView
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                categoryAdapter?.getFilter()?.filter(query)
+                updateSearch(query)
                 return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                categoryAdapter?.getFilter()?.filter(newText)
+                updateSearch(newText)
                 return true
             }
         })
-
-
     return view
+    }
+
+    private inline fun updateSearch(search: CharSequence?) {
+        categoryAdapter.getFilter().filter(search)
     }
 
     override fun onResume() {
@@ -73,6 +73,7 @@ class CategoryFragment : Fragment() {
                 binding.textCategory.visibility = View.GONE
             }
             categoryAdapter.notifyDataSetChanged()
+            updateSearch(searchView?.query)
         }
     }
 
