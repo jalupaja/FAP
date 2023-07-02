@@ -8,6 +8,7 @@ import com.example.fap.data.entities.Payment
 import java.util.Date
 import androidx.room.Upsert
 import com.example.fap.data.entities.PaymentsByWallets
+import com.example.fap.ui.category.CategoryItem
 
 @Dao
 interface FapDaoPayment {
@@ -45,7 +46,13 @@ interface FapDaoPayment {
     @Query("SELECT SUM(price) FROM Payment WHERE userId = :userId AND category = :category AND isPayment = 1")
     suspend fun getTotalAmountSpentByCategory(userId: String, category: String): Double?
 
-    @Query("SELECT SUM(CASE WHEN p.isPayment = 1 THEN -p.price ELSE p.price END) AS sumCat FROM Payment p WHERE p.userId = :userId AND p.category = :category")
+    @Query("SELECT p.category as title, SUM(CASE WHEN p.isPayment = 1 THEN -p.price ELSE p.price END) AS sum FROM Payment p WHERE p.userId = :userId group by p.category")
+    suspend fun getTotalAmountByCategory(userId: String): List<CategoryItem>
+
+    @Query("SELECT p.category as title ,SUM(CASE WHEN p.isPayment = 1 THEN -p.price ELSE p.price END) AS sum FROM Payment p WHERE p.userId = :userId AND p.wallet = :wallet group by p.category")
+    suspend fun getTotalAmountByCategoryByWallet(userId: String, wallet: String): List<CategoryItem>
+
+    @Query("SELECT SUM(CASE WHEN p.isPayment = 1 THEN -p.price ELSE p.price END) AS sum FROM Payment p WHERE p.userId = :userId AND p.category = :category")
     suspend fun getTotalAmountByCategory(userId: String, category: String): Double?
 
     @Query("SELECT SUM(price) FROM Payment WHERE userId = :userId AND isPayment = 0")

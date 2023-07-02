@@ -228,12 +228,12 @@ class AddPayment : AppCompatActivity() {
 
         btnIsPayment.setOnClickListener {
             btnIsPayment.alpha = 1F
-            btnIsIncome.alpha = 0.7F
+            btnIsIncome.alpha = 0.2F
             isPayment = true
         }
 
         btnIsIncome.setOnClickListener {
-            btnIsPayment.alpha = 0.7F
+            btnIsPayment.alpha = 0.2F
             btnIsIncome.alpha = 1F
             isPayment = false
         }

@@ -14,6 +14,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.example.fap.R
 import com.example.fap.data.FapDatabase
 import com.example.fap.databinding.FragmentHomeBinding
+import com.example.fap.ui.category.CategoryItem
 import com.example.fap.utils.SharedCurrencyManager
 import com.example.fap.utils.SharedPreferencesManager
 import kotlinx.coroutines.launch
@@ -87,6 +88,11 @@ class HomeFragment : Fragment() {
 
             val db = FapDatabase.getInstance(requireContext())
             val list_paymentsByWallets = db.fapDaoPayment().getPaymentsByWallets(sharedPreferences.getCurUser(requireContext()))
+
+            val categoriesNames = db.fapDaoCategory().getCategories()
+            var categories = db.fapDaoPayment().getTotalAmountByCategory(sharedPreferences.getCurUser(requireContext()))
+
+
             wallets.clear()
             for (paymentsByWallet in list_paymentsByWallets) {
                 var totalSpentWallet = 0.0
@@ -94,6 +100,9 @@ class HomeFragment : Fragment() {
                 var totalSpentMonthWallet = 0.0
                 var totalIncomeMonthWallet = 0.0
                 val walletName = paymentsByWallet.wallet.name
+
+                val categoriesWallet = db.fapDaoPayment().getTotalAmountByCategoryByWallet(sharedPreferences.getCurUser(requireContext()), walletName)
+
                 for (payment in paymentsByWallet.payments) {
                     val paymentYear = Calendar.getInstance().apply { time = payment.date }.get(Calendar.YEAR)
                     val paymentMonth = Calendar.getInstance().apply { time = payment.date }.get(Calendar.MONTH)
@@ -116,9 +125,9 @@ class HomeFragment : Fragment() {
                 totalIncome += totalIncomeWallet
                 totalSpent += totalSpentWallet
 
-                wallets.add(WalletInfo(walletName, totalIncomeWallet, totalSpentWallet, totalIncomeMonthWallet, totalSpentMonthWallet, currency))
+                wallets.add(WalletInfo(walletName, totalIncomeWallet, totalSpentWallet, totalIncomeMonthWallet, totalSpentMonthWallet, currency, categoriesWallet))
             }
-            wallets.add(0, WalletInfo("", totalIncome, totalSpent, totalIncomeMonth, totalSpentMonth, currency))
+            wallets.add(0, WalletInfo("", totalIncome, totalSpent, totalIncomeMonth, totalSpentMonth, currency, categories))
 
             walletAdapter.notifyDataSetChanged()
         }

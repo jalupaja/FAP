@@ -10,18 +10,23 @@ import androidx.annotation.ColorInt
 import androidx.recyclerview.widget.RecyclerView
 import com.example.fap.R
 import com.example.fap.data.FapDatabase
-import com.example.fap.data.entities.Payment
+import com.example.fap.ui.category.CategoryItem
 import com.example.fap.utils.SharedPreferencesManager
+import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
-import com.github.mikephil.charting.animation.Easing
-import com.github.mikephil.charting.charts.LineChart
-import com.github.mikephil.charting.charts.PieChart
-import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.data.Entry
-import com.github.mikephil.charting.data.LineData
-import com.github.mikephil.charting.data.LineDataSet
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Date
+import java.util.Locale
+
 
 class HomeAdapter(private val wallets: List<WalletInfo>) : RecyclerView.Adapter<HomeAdapter.ViewHolder>() {
 
@@ -66,7 +71,7 @@ class HomeAdapter(private val wallets: List<WalletInfo>) : RecyclerView.Adapter<
         private var lblBalanceMonth: TextView = itemView.findViewById(R.id.lbl_balance_month)
         private var lblExpenseMonth: TextView = itemView.findViewById(R.id.lbl_expense_month)
         private var chartBalance: PieChart = itemView.findViewById(R.id.chart_balance)
-        private var chartStock: LineChart = itemView.findViewById(R.id.chart_stock)
+        private var chartCategory : BarChart = itemView.findViewById(R.id.chart_category)
 
         val resources = itemView.resources
         val context = itemView.context
@@ -78,27 +83,9 @@ class HomeAdapter(private val wallets: List<WalletInfo>) : RecyclerView.Adapter<
         @ColorInt
         val colorOnSurface = typedValue.data
 
-
-        //Chart com.example.fap.data.Stock
-        val entriesStock = listOf(
-            Entry(1f, 10f),
-            Entry(2f, 2f),
-            Entry(3f, 7f),
-            Entry(4f, 20f),
-        )
-        val stockDataSet = LineDataSet(entriesStock, "Test1")
-
-        val entriesStock2 = listOf(
-            Entry(1f, 30f),
-            Entry(2f, 4f),
-            Entry(3f, 100f),
-            Entry(4f, 2f),
-        )
-        val stockDataSet2 = LineDataSet(entriesStock2, "Test2")
-
         init {
             setupChartBalance()
-            setupChartStock()
+            setupChartCategory()
         }
 
         fun bind(wallet: WalletInfo) {
@@ -109,6 +96,7 @@ class HomeAdapter(private val wallets: List<WalletInfo>) : RecyclerView.Adapter<
             val incomeMonth = "%.2f".format(wallet.incomeMonth)
             val expenseMonth = "%.2f".format(wallet.expenseMonth)
             val balanceMonth = "%.2f".format(wallet.incomeMonth - wallet.expenseMonth)
+            val categories = wallet.category
             lblExpenseMonth.text = "%.2f".format(wallet.expenseMonth)
 
             // update values
@@ -116,9 +104,20 @@ class HomeAdapter(private val wallets: List<WalletInfo>) : RecyclerView.Adapter<
             lblIncomeMonth.text = incomeMonth
             lblExpenseMonth.text = expenseMonth
             lblBalanceMonth.text = balanceMonth
-            //chartBalance.centerText = "Income: ${wallet.income}${wallet.currency} \nExpense: ${wallet.expense}}${wallet.currency}"
+            val curDate = LocalDate.parse(
+                SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(
+                    Date()
+                ), DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+            chartBalance.centerText = "Data for: ${curDate.month}"
+            chartBalance.setCenterTextSize(13f)
+            val typedValue = TypedValue()
+            context.theme.resolveAttribute(com.google.android.material.R.attr.colorOnPrimary, typedValue, true)
+            @ColorInt val color = typedValue.data
+            chartBalance.setCenterTextColor(color)
             updateChartData(wallet.incomeMonth, wallet.expenseMonth)
+            updateCategoryData(wallet.category)
         }
+
         private fun updateChartData(income: Double, expense: Double) {
             var nDataSet = PieDataSet(
                 listOf(
@@ -162,6 +161,40 @@ class HomeAdapter(private val wallets: List<WalletInfo>) : RecyclerView.Adapter<
             chartBalance.notifyDataSetChanged()
         }
 
+        private fun updateCategoryData(categories: List<CategoryItem>) {
+            val entries = ArrayList<BarEntry>()
+            val dataSets = ArrayList<BarDataSet>()
+
+
+            categories.forEachIndexed{ index, categoryItem ->
+                entries.add(BarEntry(index.toFloat(), categoryItem.sum.toFloat()))
+            }
+
+            val set1 = BarDataSet(entries, "test")
+            set1.colors = listOf(
+                resources.getColor(R.color.light_blue_900, context?.theme),
+                resources.getColor(R.color.gray, context?.theme),
+                resources.getColor(R.color.purple_700, context?.theme)
+            )
+            dataSets.add(set1)
+
+            var data = BarData(set1)//BarData(barDataSet)
+
+            data.barWidth = 0.9f
+            val typedValue = TypedValue()
+            context.theme.resolveAttribute(com.google.android.material.R.attr.colorOnPrimary, typedValue, true)
+            @ColorInt val color = typedValue.data
+            data.setValueTextColor(color)
+            chartCategory.data = data
+            chartCategory.setFitBars(true)
+            chartCategory.xAxis.valueFormatter = BarXAxisFormatter(categories)
+            chartCategory.xAxis.granularity = 1f
+            chartCategory.xAxis.textColor = color
+            chartCategory.axisLeft.textColor = color
+            chartCategory.invalidate()
+            chartCategory.notifyDataSetChanged()
+        }
+
         private fun setupOther() {
             theme.resolveAttribute(
                 com.google.android.material.R.attr.colorOnSurface,
@@ -198,26 +231,28 @@ class HomeAdapter(private val wallets: List<WalletInfo>) : RecyclerView.Adapter<
             chartBalance.notifyDataSetChanged()
         }
 
-        private fun setupChartStock() {
-            stockDataSet.lineWidth = 2f
-            stockDataSet.color = resources.getColor(R.color.yellow, context?.theme)
+        private fun setupChartCategory() {
+            chartCategory.setDrawBarShadow(false)
+            chartCategory.setDrawValueAboveBar(true)
+            chartCategory.description.isEnabled = false
+            chartCategory.setPinchZoom(false)
+            chartCategory.setDrawGridBackground(false)
 
-            stockDataSet2.color = resources.getColor(R.color.purple_700, context?.theme)
-            stockDataSet2.lineWidth = 2f
+            val xAxis = chartCategory.xAxis
+            xAxis.position = XAxis.XAxisPosition.BOTTOM
+            xAxis.setDrawGridLines(false)
 
-            chartStock.data = LineData(stockDataSet, stockDataSet2)
-            chartStock.axisRight.isEnabled = false
-            chartStock.setTouchEnabled(false)
-            chartStock.setPinchZoom(true)
-            chartStock.description.text = ""
-            chartStock.animateX(1000, Easing.EaseInExpo)
-            chartStock.legend.textColor = colorOnSurface
+            val leftAxis = chartCategory.axisLeft
+            leftAxis.setDrawGridLines(false)
 
-            chartStock.xAxis.position = XAxis.XAxisPosition.BOTTOM
-            chartStock.xAxis.setDrawGridLines(false)
+            val rightAxis = chartCategory.axisRight
+            rightAxis.setDrawGridLines(false)
+            rightAxis.setDrawLabels(false)
 
-            chartStock.invalidate()
-            chartStock.notifyDataSetChanged()
+            chartCategory.legend.isEnabled = false
+
+            chartCategory.invalidate()
+            chartCategory.notifyDataSetChanged()
         }
     }
 }
