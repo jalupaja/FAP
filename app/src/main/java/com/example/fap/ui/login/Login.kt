@@ -240,7 +240,7 @@ class Login : AppCompatActivity() {
             REGISTERSTATE.REGISTERED -> {
                 if (checkPassword(textLogin.text.toString())) {
                     lifecycleScope.launch {
-                        SharedSavingsGoalManager.getInstance(applicationContext).updateSavingsGoals(applicationContext)
+                        SharedSavingsGoalManager.getInstance().updateSavingsGoals(applicationContext)
                         login()
                         SharedCurrencyManager.getInstance(applicationContext).tryUpdateCurrency(applicationContext)
                     }

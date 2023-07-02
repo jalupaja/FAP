@@ -4,9 +4,9 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import com.example.fap.data.PaymentsByWallets
 import com.example.fap.data.entities.Payment
 import java.util.Date
-import com.example.fap.data.entities.PaymentsByWallets
 import com.example.fap.ui.category.CategoryItem
 
 @Dao

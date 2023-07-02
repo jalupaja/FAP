@@ -91,9 +91,4 @@ class SettingsFragment : PreferenceFragmentCompat() {
         AppCompatDelegate.setDefaultNightMode(mode)
         requireActivity().recreate()
     }
-
-    private fun exportDbToCsv(){
-        //val currentDBPath = getDatabasePath("photex_db.db").absolutePath
-
-    }
 }

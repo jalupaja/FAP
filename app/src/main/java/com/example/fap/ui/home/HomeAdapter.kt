@@ -27,7 +27,6 @@ import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 
-
 class HomeAdapter(private val wallets: List<WalletInfo>) : RecyclerView.Adapter<HomeAdapter.ViewHolder>() {
 
     private lateinit var sharedPreferences: SharedPreferencesManager
@@ -50,19 +49,6 @@ class HomeAdapter(private val wallets: List<WalletInfo>) : RecyclerView.Adapter<
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val wallet = wallets[position]
         holder.bind(wallet)
-    }
-
-    private suspend fun updateTotal(context: Context): Double {
-        var income: Double? = dbPayment.fapDaoPayment().getTotalIncome(sharedPreferences.getCurUser(context))
-        var expense: Double? =
-            dbPayment.fapDaoPayment().getTotalAmountSpent(sharedPreferences.getCurUser(context))
-
-        if (income == null)
-            income = 0.0
-        if (expense == null)
-            expense = 0.0
-
-        return (income - expense)
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -89,14 +75,14 @@ class HomeAdapter(private val wallets: List<WalletInfo>) : RecyclerView.Adapter<
         }
 
         fun bind(wallet: WalletInfo) {
-            val income = "%.2f".format(wallet.income)
-            val expense = "%.2f".format(wallet.expense)
-            val balance = "%.2f".format(wallet.income - wallet.expense)
+            //val income = "%.2f".format(wallet.income)
+            //val expense = "%.2f".format(wallet.expense)
+            //val balance = "%.2f".format(wallet.income - wallet.expense)
             val balanceCurrency = "%.2f".format(wallet.income - wallet.expense) + wallet.currency
             val incomeMonth = "%.2f".format(wallet.incomeMonth)
             val expenseMonth = "%.2f".format(wallet.expenseMonth)
             val balanceMonth = "%.2f".format(wallet.incomeMonth - wallet.expenseMonth)
-            val categories = wallet.category
+            //val categories = wallet.category
             lblExpenseMonth.text = "%.2f".format(wallet.expenseMonth)
 
             // update values
@@ -178,7 +164,7 @@ class HomeAdapter(private val wallets: List<WalletInfo>) : RecyclerView.Adapter<
             )
             dataSets.add(set1)
 
-            var data = BarData(set1)//BarData(barDataSet)
+            val data = BarData(set1)
 
             data.barWidth = 0.9f
             val typedValue = TypedValue()

@@ -99,7 +99,6 @@ class CategoryAdapter(
                 titleTextView.text = item.title
             }
             sumTextView.text = sharedCurrency.num2Money(item.sum)
-            val sum = sumTextView.text.toString()
 
             if (item.sum > 0) {
                 sumTextView.setTextColor(colorGreen)

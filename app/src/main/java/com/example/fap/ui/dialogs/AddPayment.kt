@@ -54,7 +54,7 @@ class AddPayment : AppCompatActivity() {
 
         sharedPreferences = SharedPreferencesManager.getInstance(applicationContext)
         sharedCurrency = SharedCurrencyManager.getInstance(applicationContext)
-        sharedSavingsGoal = SharedSavingsGoalManager.getInstance(applicationContext)
+        sharedSavingsGoal = SharedSavingsGoalManager.getInstance()
 
         val dbPayment = FapDatabase.getInstance(applicationContext).fapDaoPayment()
         val dbWallet = FapDatabase.getInstance(applicationContext).fapDaoWallet()
@@ -114,7 +114,7 @@ class AddPayment : AppCompatActivity() {
                 val options = arrayOf("Delete the selected occurrence only", "Delete this and all future occurrences", "Delete all occurrences")
 
                 for (option in options) {
-                    val btn = RadioButton(this@AddPayment, )
+                    val btn = RadioButton(this@AddPayment)
                     btn.text = option
                     val layoutParams = LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
@@ -288,7 +288,7 @@ class AddPayment : AppCompatActivity() {
 
             for (option in options) {
 
-                val btn = RadioButton(this@AddPayment, )
+                val btn = RadioButton(this@AddPayment)
                 btn.text = option
                 val layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
@@ -483,7 +483,7 @@ class AddPayment : AppCompatActivity() {
                     val options = arrayOf("Change the selected occurrence only", "Change this and all future occurrences", "Change all occurrences")
 
                     for (option in options) {
-                        val btn = RadioButton(this@AddPayment, )
+                        val btn = RadioButton(this@AddPayment)
                         btn.text = option
                         val layoutParams = LinearLayout.LayoutParams(
                             LinearLayout.LayoutParams.MATCH_PARENT,

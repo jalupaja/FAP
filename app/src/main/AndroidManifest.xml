@@ -20,7 +20,8 @@
             android:name=".ui.login.Login"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="true"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -31,12 +32,14 @@
             android:name=".MainActivity"
             android:exported="true"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.FAP.NoActionBar">
+            android:theme="@style/Theme.FAP.NoActionBar"
+            tools:ignore="LockedOrientationActivity">
         </activity>
         <activity
             android:name=".ui.dialogs.AddPayment"
             android:exported="true"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity">
         </activity>
         <activity
             android:name=".ui.dialogs.AddWallet"

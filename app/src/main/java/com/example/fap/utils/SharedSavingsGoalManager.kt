@@ -8,7 +8,7 @@ import java.time.ZoneId
 import java.util.Calendar
 import java.util.Date
 
-class SharedSavingsGoalManager() {
+class SharedSavingsGoalManager {
     enum class TimeSpan(val label: String) {
         None("None"),
         Daily("Daily"),
@@ -17,7 +17,7 @@ class SharedSavingsGoalManager() {
         Yearly("Yearly"),
     }
 
-    fun calculateNextDate(date: Date, timeSpan: TimeSpan): Date {
+    private fun calculateNextDate(date: Date, timeSpan: TimeSpan): Date {
         val calendar: Calendar = Calendar.getInstance()
         calendar.time = date
 
@@ -101,7 +101,7 @@ class SharedSavingsGoalManager() {
     companion object {
         private var instance: SharedSavingsGoalManager? = null
 
-        fun getInstance(context: Context): SharedSavingsGoalManager {
+        fun getInstance(): SharedSavingsGoalManager {
             if (instance == null) {
                 instance = SharedSavingsGoalManager()
             }

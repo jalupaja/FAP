@@ -20,8 +20,6 @@ import java.util.Calendar
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
     private lateinit var sharedPreferences: SharedPreferencesManager
     private lateinit var sharedCurrency: SharedCurrencyManager
@@ -86,8 +84,7 @@ class HomeFragment : Fragment() {
             val db = FapDatabase.getInstance(requireContext())
             val list_paymentsByWallets = db.fapDaoPayment().getPaymentsByWallets(sharedPreferences.getCurUser(requireContext()))
 
-            val categoriesNames = db.fapDaoCategory().getCategories()
-            var categories = db.fapDaoPayment().getTotalAmountByCategory(sharedPreferences.getCurUser(requireContext()))
+            val categories = db.fapDaoPayment().getTotalAmountByCategory(sharedPreferences.getCurUser(requireContext()))
 
 
             wallets.clear()
@@ -154,25 +151,5 @@ class HomeFragment : Fragment() {
         } else {
             indicatorRight.visibility = View.VISIBLE
         }
-    }
-
-    private suspend fun getTotalIncome(): Double {
-       val db = FapDatabase.getInstance(requireContext())
-       var income: Double? = db.fapDaoPayment().getTotalIncome(sharedPreferences.getCurUser(requireContext()))
-
-        if (income == null)
-            income = 0.0
-
-        return income
-    }
-
-    private suspend fun getTotalSpent(): Double {
-        val db = FapDatabase.getInstance(requireContext())
-        var spent: Double? = db.fapDaoPayment().getTotalAmountSpent(sharedPreferences.getCurUser(requireContext()))
-
-        if (spent == null)
-            spent = 0.0
-
-        return spent
     }
 }

@@ -1,7 +1,9 @@
-package com.example.fap.data.entities
+package com.example.fap.data
 
 import androidx.room.Embedded
 import androidx.room.Relation
+import com.example.fap.data.entities.Payment
+import com.example.fap.data.entities.Wallet
 
 data class PaymentsByWallets(
     @Embedded
