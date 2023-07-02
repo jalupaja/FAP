@@ -612,7 +612,7 @@ class AddPayment : AppCompatActivity() {
                 if (curSavingsGoalId != null) {
                     previousRepetition = dbSavingsGoal.getTimeSpan(curSavingsGoalId!!)
                     val newDateEnd = dbSavingsGoal.getDateEnd(curSavingsGoalId!!)
-                    if (Date(0) != newDateEnd) {
+                    if (newDateEnd.time > 0) {
                         startDateEnd = SimpleDateFormat(dateFormatPattern, Locale.getDefault()).format(newDateEnd)
                         itemSavingsGoal.performClick()
                     }
