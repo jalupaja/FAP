@@ -263,7 +263,7 @@ class AddPayment : AppCompatActivity() {
                 val formattedDate = SimpleDateFormat(dateFormatPattern, Locale.getDefault()).format(selectedDate.time)
 
                 val startDate = LocalDate.parse(itemDateStart.text.toString(), DateTimeFormatter.ofPattern(dateFormatPattern))
-                if (startDate.year < year || startDate.monthValue < month || startDate.dayOfMonth < dayOfMonth) {
+                if (startDate.year > year || (startDate.year >= year && startDate.monthValue > month + 1) || (startDate.year >= year && startDate.monthValue >= month + 1 && startDate.dayOfMonth > dayOfMonth)) {
                     Snackbar.make(
                         binding.root,
                         "The End Date should be after the Start Date!",
